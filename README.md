@@ -3,11 +3,26 @@ Project for "Zarządzanie Projektami" class - table reservation system in a rest
 
 ## Running instructions:
 ### Bakend
+To create virtual enviroment:
+-  cd .\backend\
+- python -m venv venv
+
+To run App:
 -  cd .\backend\
 -  venv\Scripts\activate
 -  pip install -r .\requirements.txt
 -  flask run
+
 ### Front
+To run first time:
+1. download node.js:
+https://nodejs.org/en/download/prebuilt-installer
+2. Run this commands in cmd:
+- cd .\frontend\
+- npm install -g @angular/cli
+- npm install 
+
+Do the following to run frontend:
 -  run second terminal
 -  cd .\frontend\
 -  ng serve 
