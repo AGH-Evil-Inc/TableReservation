@@ -4,9 +4,9 @@ from flask_restx import Api, Resource, fields
 from flask_cors import CORS
 import jwt
 import datetime
-from flask_login import LoginManager, UserMixin, login_user, logout_user
-# from flask_sqlalchemy import SQLAlchemy  # TODO: Odkomentuj po podłączeniu bazy danych
-# from sqlalchemy import Integer, String, Boolean  # TODO: Odkomentuj po podłączeniu bazy danych
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
+from flask_sqlalchemy import SQLAlchemy  # TODO: Odkomentuj po podłączeniu bazy danych
+from sqlalchemy import Integer, String, Boolean  # TODO: Odkomentuj po podłączeniu bazy danych
 import os
 import binascii
 import hashlib
@@ -123,6 +123,83 @@ class Init(Resource):
             users_db[1] = admin
 
         return {'message': 'Initial configuration done!'}, 200
+    
+# TODO:
+# Jak będzie baza danych to usunąć inita z wyżej i walnąc tego:
+# Ścieżka inicjalizująca bazę danych
+# @ns.route('/init')
+# class Init(Resource):
+#     def get(self):
+#         # Utworzenie wszystkich tabel w bazie danych
+#         db.create_all()
+
+#         # Sprawdzenie, czy użytkownik admin już istnieje
+#         admin = User.query.filter_by(email='admin@example.com').first()
+#         if admin is None:
+#             # Jeśli admin nie istnieje, utwórz go
+#             admin_password = User.get_hashed_password('1234')
+#             admin = User(
+#                 email='admin@example.com',
+#                 password=admin_password,
+#                 first_name='King',
+#                 last_name='Kong',
+#                 is_admin=True
+#             )
+#             db.session.add(admin)
+#             db.session.commit()
+
+#         return {'message': 'Initial configuration done!'}, 200
+
+
+#  TODO :
+# Strona startowa
+# Endpoint dla strony startowej
+# @ns.route('/home')
+# class HomePage(Resource):
+#     @login_required
+#     def get(self):
+#         # Upewnij się, że użytkownik jest zalogowany
+#         if not current_user.is_authenticated:
+#             return {'message': 'Nie jesteś zalogowany!'}, 401
+
+#         # Sprawdzenie, czy użytkownik jest zalogowany i zwrócenie jego danych
+#         current_user_data = {
+#             'user_id': current_user.id,
+#             'email': current_user.email,
+#             'first_name': current_user.first_name,
+#             'last_name': current_user.last_name,
+#         }
+
+#         data = {
+#             'message': f'Witamy, {current_user.first_name}!',
+#             'user': current_user_data,
+#             'api_version': '1.0',
+#             'features': [
+#                 'Autoryzacja użytkowników',
+#                 'Rejestracja nowych kont',
+#                 'Przeglądanie danych użytkowników',
+#                 'Zarządzanie rezerwacjami'
+#             ]
+#         }
+#         return jsonify(data), 200
+
+
+# # Strona startowa naszej aplikacji czyli gdzie nas przeniesie po wejściu w link
+# @ns.route('/')
+# class Starting_Page(Resource):
+#     def get(self):
+#         # Przykładowe dane, które mogą być użyte przez frontend
+#         data = {
+#             'message': 'Witamy w Authentication API!',
+#             'api_version': '1.0',
+#             'info': 'To jest strona startowa backendu naszej aplikacji.',
+#             'available_endpoints': [
+#                 {'endpoint': '/api/register', 'description': 'Rejestracja nowego użytkownika'},
+#                 {'endpoint': '/api/login', 'description': 'Logowanie użytkownika'},
+#                 {'endpoint': '/api/home', 'description': 'Strona domowa użytkownika'},
+#             ]
+#         }
+#         return jsonify(data), 200
 
 # Rejestracja nowego użytkownika
 @ns.route('/register')
@@ -250,6 +327,15 @@ class Login(Resource):
 
         return {'token': token}, 200
     '''
+
+# Wylogowywanie:
+@app.route('/logout')
+@ns.route('/logout')
+class Logout(Resource):
+    @login_required  # Użytkownik musi być zalogowany, aby móc się wylogować
+    def post(self):
+        logout_user()
+        return {'message': 'You are logged out'}, 200
 
 api.add_namespace(ns)
 
