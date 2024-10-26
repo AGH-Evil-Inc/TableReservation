@@ -1,0 +1,12 @@
+title: User
+type: object
+properties:
+  username:
+    type: string
+    example: user123
+  password:
+    type: string
+    example: pass123
+required:
+  - username
+  - password
