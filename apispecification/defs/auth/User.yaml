@@ -1,12 +1,26 @@
 title: User
 type: object
 properties:
-  username:
+  id:
+    type: integer
+    example: 1
+  email:
     type: string
-    example: user123
+    example: user@example.com
+  first_name:
+    type: string
+    example: firstname
+  last_name:
+    type: string
+    example: lastname
   password:
     type: string
     example: pass123
+  is_admin:
+    type: boolean
+    example: false
 required:
-  - username
+  - email
+  - first_name
+  - last_name
   - password
