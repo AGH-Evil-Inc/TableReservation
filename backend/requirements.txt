@@ -7,3 +7,5 @@ PyJWT==2.8.0
 Flask-Cors==5.0.0
 flask-login==0.6.3
 wtforms==3.2.1
+sqlalchemy-utils==0.41.2
+mysqlclient==2.2.0
