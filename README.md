@@ -11,7 +11,7 @@ To run App:
 -  cd .\backend\
 -  venv\Scripts\activate
 -  pip install -r .\requirements.txt
-- set FLASK_DEBUG=1 - to active auto reload the backend after savind the project
+-  set FLASK_DEBUG=1 - to active auto reload the backend after savind the project
 -  flask run
 
 ### Front

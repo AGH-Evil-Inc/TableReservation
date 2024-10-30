@@ -9,7 +9,7 @@ import { AuthService } from 'src/app/services/auth.service';
 })
 export class RegisterComponent {
   
-  user: User = { username: '', password: '' };
+  user: User = { email: '',first_name: '',last_name: '', password: '' };
   message: string = '';
 
   constructor(private authService: AuthService) {}

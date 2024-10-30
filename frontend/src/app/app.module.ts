@@ -9,6 +9,9 @@ import { RegisterComponent } from './auth/register/register.component';
 import { LoginComponent } from './auth/login/login.component';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { HomePageComponent } from './reservation/home-page/home-page.component';
+import { ShellFooterComponent } from './shell/shell-footer/shell-footer.component';
+import { ShellHeaderComponent } from './shell/shell-header/shell-header.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
 @NgModule({
@@ -16,13 +19,16 @@ import { HomePageComponent } from './reservation/home-page/home-page.component';
     AppComponent,
     RegisterComponent,
     LoginComponent,
-    HomePageComponent
+    HomePageComponent,
+    ShellFooterComponent,
+    ShellHeaderComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    BrowserAnimationsModule
   ],
   providers: [
     AuthService,
