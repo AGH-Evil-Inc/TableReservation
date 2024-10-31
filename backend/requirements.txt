@@ -9,3 +9,5 @@ flask-login==0.6.3
 wtforms==3.2.1
 sqlalchemy-utils==0.41.2
 mysqlclient==2.2.0
+pandas==2.2.3
+openpyxl==3.1.3
