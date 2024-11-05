@@ -20,7 +20,7 @@
     a {
       color: #fff;
       text-decoration: none;
-      transition: color 0.3s;
+      transition: all 0.5s;
 
       img {
         max-width: 75px; /* Maksymalna szerokość logo */
@@ -50,7 +50,7 @@
           font-size: 1.1rem;
           padding: 5px 0;
           position: relative;
-          transition: color 0.5s;
+          transition: all 0.5s;
 
           &:hover {
             color: #ffeb3b;
@@ -63,7 +63,7 @@
             height: 2px;
             background: #ffeb3b;
             width: 0;
-            transition: width 0.4s;
+            transition: width 0.5s;
             position: absolute;
             left: 50%;
             bottom: -4px;
@@ -83,11 +83,12 @@
       color: #fff;
       font-size: 2rem;
       display: inline-block;
-      transition: color 0.5s;
+      transition: all 1s;
+  
 
       &:hover {
         color: #ffeb3b;
-        transform: rotate(25deg);
+        transform: rotate(25deg) scale(1.5);
       }
     }
   }

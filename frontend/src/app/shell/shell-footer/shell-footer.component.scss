@@ -48,7 +48,7 @@ $footer-heading-color: #ffeb3b;
       a {
         color: $footer-text-color;
         text-decoration: none;
-        transition: color 0.3s, transform 0.3s;
+        transition: all 0.5s;
 
         &:hover {
           transform: translateX(5px); /* Efekt przesunięcia */
@@ -71,10 +71,10 @@ $footer-heading-color: #ffeb3b;
   .icon {
     font-size: 2rem;
     display: inline-block;
-    transition: transform 0.3s, color 0.3s;
+    transition: all 0.3s;
 
     &:hover {
-      transform: scale(1.4); /* Powiększenie przy najechaniu */
+      transform: scale(1.4) rotate(15deg); 
     }
   }
 
