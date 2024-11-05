@@ -1,64 +1,105 @@
+// Definicje kolorów
+$footer-background: linear-gradient(0deg, #061531, #528cef);
+$footer-text-color: #fff;
+$footer-heading-color: #ffeb3b;
+
+
+// Style dla stopki
 .footer {
-    background-color: #333;
-    color: #fff;
-    padding: 20px 0;
-    font-size: 0.9em;
-  
-    .container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      text-align: left;
+  background: $footer-background;
+  color: $footer-text-color;
+  padding: 2rem 0;
+  font-size: 0.9rem;
+  box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2); /* Subtelny cień */
+
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    text-align: left;
+  }
+
+  .footer-column {
+    flex: 1;
+    min-width: 220px;
+    padding: 1rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+
+    &:first-of-type {
+      border-left: none; /* Usunięcie lewej granicy z pierwszej kolumny */
     }
-  
-    .footer-section {
-      flex: 1;
-      min-width: 200px;
-      margin: 20px;
-      h3 {
-        font-size: 1.2em;
-        margin-bottom: 10px;
-        color: #fff;
+
+    h3 {
+      font-size: 1.4rem;
+      margin-bottom: 0.8rem;
+      color: $footer-heading-color; /* Kolor nagłówka */
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+
+      li {
+        margin: 0.4rem 0;
       }
-  
-      ul {
-        list-style: none;
-        padding: 0;
-        li {
-          margin: 5px 0;
+
+      a {
+        color: $footer-text-color;
+        text-decoration: none;
+        transition: color 0.3s, transform 0.3s;
+
+        &:hover {
+          transform: translateX(5px); /* Efekt przesunięcia */
+          color: $footer-heading-color;
         }
-  
-        a {
-          color: #ccc;
-          text-decoration: none;
-          &:hover {
-            text-decoration: underline;
-          }
-        }
       }
     }
-  
-    .social-icons {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-  
-    .icon {
-      font-size: 1.8em;
-      display: inline-block;
-      transition: color 0.3s;
-      &:hover {
-        color: #fff;
-      }
-    }
-  
-    .footer-bottom {
-      text-align: center;
-      padding-top: 10px;
-      font-size: 0.9em;
-      border-top: 1px solid #444;
-      margin-top: 20px;
+
+    p {
+      margin: 0.6rem 0;
     }
   }
+
+  .social-icons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.2rem;
+  }
+
+  .icon {
+    font-size: 2rem;
+    display: inline-block;
+    transition: transform 0.3s, color 0.3s;
+
+    &:hover {
+      transform: scale(1.4); /* Powiększenie przy najechaniu */
+    }
+  }
+
+  .footer-bottom {
+    text-align: center;
+    padding-top: 1rem;
+    font-size: 0.9rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    margin-top: 2rem;
+    color:$footer-text-color;
+  }
+
+  @media (max-width: 768px) {
+    .footer {
+      font-size: 0.8rem; 
   
+      .container {
+        flex-direction: column; 
+        align-items: center; 
+      }
+  
+      .footer-column {
+        text-align: center; 
+        min-width: 100%; 
+      }
+    }
+  } 
+}

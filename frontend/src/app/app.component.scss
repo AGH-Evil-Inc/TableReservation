@@ -1,0 +1,15 @@
+.modal-content {
+    background-color: #333;
+    color: #fff;
+  }
+  
+.btn-primary {
+background-color: #55acee;
+border-color: #55acee;
+
+&:hover {
+    background-color: #3b5998;
+    border-color: #3b5998;
+}
+}
+  
