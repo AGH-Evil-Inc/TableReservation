@@ -14,7 +14,7 @@ export interface User {
     email: string;
     first_name: string;
     last_name: string;
-    phone: string;
+    phone_number: string;
     password: string;
     is_admin?: boolean;
 }

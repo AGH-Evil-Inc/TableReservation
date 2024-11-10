@@ -10,7 +10,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 })
 export class RegisterComponent {
   
-  user: User = { email: '', first_name: '', last_name: '', phone: '', password: '' };
+  user: User = { email: '', first_name: '', last_name: '', phone_number: '', password: '' };
   message: string = '';
 
   constructor(private authService: AuthService, private dialogRef: MatDialogRef<RegisterComponent>) {}

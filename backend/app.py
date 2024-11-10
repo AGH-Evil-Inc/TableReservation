@@ -6,7 +6,7 @@ import jwt
 import datetime
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Integer, String, Boolean 
+from sqlalchemy import Integer, String, Boolean
 import os
 import binascii
 import hashlib
@@ -22,7 +22,7 @@ db.init_app(app)
 
 # Stworzenie LoginManagera do obsługi logowania
 login_manager = LoginManager(app)
-login_manager.login_view = 'api.login'
+login_manager.login_view = 'api_login'
 
 # Konfiguracja API
 api = Api(app, version='1.0', title='Authentication API', description='API for user authentication (registration and login)')
@@ -34,10 +34,13 @@ with open('../apispecification/defs/auth/User.yaml', 'r') as file:
     user_schema = yaml.safe_load(file)
 with open('../apispecification/defs/auth/LoginData.yaml', 'r') as file:
     login_data_schema = yaml.safe_load(file)
+with open('../apispecification/defs/auth/LoginResponse.yaml', 'r') as file:
+    login_response_schema = yaml.safe_load(file)
 
 # Dynamiczne tworzenie modelu
 user_model = api.schema_model('User', user_schema)
 login_data_model = api.schema_model('LoginData', login_data_schema)
+login_response_model = api.schema_model('LoginResponse', login_response_schema)
 
 
 # User loader callback for flask_login
@@ -63,12 +66,12 @@ class Init(Resource):
                     password=admin_password,
                     first_name='King',
                     last_name='Kong',
-                    phone='123456789',
+                    phone_number='123456789',
                     is_admin=True
                 )
                 db.session.add(admin)
                 db.session.commit()
-            
+
             try:
                 tables_df = pd.read_excel("SampleData.xlsx", sheet_name="tables")
                 users_df = pd.read_excel("SampleData.xlsx", sheet_name="users")
@@ -85,7 +88,7 @@ class Init(Resource):
                             location_y=t["location_y"]
                         )
                         db.session.add(new_table_entry)
-                    # Populuj użytkowników (z pominięciem admina)
+                # Populuj użytkowników (z pominięciem admina)
                 for _, u in users_df.iterrows():
                     if u["email"] != 'admin@example.com':
                         existing_user = User.query.filter_by(email=u["email"]).first()
@@ -108,7 +111,6 @@ class Init(Resource):
                 message = f"Error during initial configuration: {e}"
                 return {'message': message}, 500
 
-
             return {'message': 'Initial configuration done!'}, 200
 
 
@@ -124,8 +126,7 @@ class Register(Resource):
         first_name = data.get('first_name')
         last_name = data.get('last_name')
         password = data.get('password')
-        phone = data.get('phone')
-
+        phone_number = data.get('phone_number')
 
         if not email or not first_name or not last_name or not password:
             return {'message': 'Invalid input'}, 400
@@ -140,13 +141,14 @@ class Register(Resource):
             password=hashed_password,
             first_name=first_name,
             last_name=last_name,
-            phone=phone,
+            phone_number=phone_number,
             is_admin=False
         )
         db.session.add(new_user)
         db.session.commit()
 
         return {'message': 'User created successfully'}, 201
+
 
 # Logowanie użytkownika
 @ns.route('/login')
@@ -174,7 +176,9 @@ class Login(Resource):
             'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
         }, app.config['SECRET_KEY'], algorithm='HS256')
 
-        return {'token': token}, 200
+        login_response_model = {"name": user.first_name, 'token': token}
+        return login_response_model, 200
+
 
 # Wylogowywanie:
 @app.route('/logout')
