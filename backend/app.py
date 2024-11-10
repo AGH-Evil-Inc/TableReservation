@@ -63,8 +63,7 @@ class Init(Resource):
                     password=admin_password,
                     first_name='King',
                     last_name='Kong',
-                    phone='123456789'
-
+                    phone='123456789',
                     is_admin=True
                 )
                 db.session.add(admin)
