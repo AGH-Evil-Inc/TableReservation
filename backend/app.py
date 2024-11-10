@@ -62,6 +62,7 @@ class Init(Resource):
                     password=admin_password,
                     first_name='King',
                     last_name='Kong',
+                    phone='123456789'
                     is_admin=True
                 )
                 db.session.add(admin)
@@ -122,6 +123,7 @@ class Register(Resource):
         first_name = data.get('first_name')
         last_name = data.get('last_name')
         password = data.get('password')
+        phone = data.get('phone')
 
         if not email or not first_name or not last_name or not password:
             return {'message': 'Invalid input'}, 400
@@ -136,6 +138,7 @@ class Register(Resource):
             password=hashed_password,
             first_name=first_name,
             last_name=last_name,
+            phone=phone,
             is_admin=False
         )
         db.session.add(new_user)
@@ -175,6 +178,8 @@ class Login(Resource):
 @app.route('/logout')
 @ns.route('/logout')
 class Logout(Resource):
+    @ns.response(200, 'Logout successful')
+    @ns.response(400, 'Logout invalid')
     @login_required  # Użytkownik musi być zalogowany, aby móc się wylogować
     def post(self):
         logout_user()

@@ -9,7 +9,7 @@ encoder.ts
 git_push.sh
 index.ts
 model/loginData.ts
-model/loginPost200Response.ts
+model/loginResponse.ts
 model/models.ts
 model/user.ts
 param.ts

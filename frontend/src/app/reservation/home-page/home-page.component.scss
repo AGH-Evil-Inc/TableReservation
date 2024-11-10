@@ -1,62 +1,100 @@
 .content {
-    padding: 2rem;
-  
-    .hero-section {
-      color: #fff;
-      text-align: center;
-      padding: 4rem 2rem;
-      
-      .cta-button {
-        display: inline-block;
-        margin-top: 1rem;
-        padding: 0.8rem 1.5rem;
-        background-color: #ffeb3b;
-        color: #061531;
-        border-radius: 8px;
-        text-decoration: none;
-        transition: background-color 0.3s;
-  
-        &:hover {
-          background-color: #ffcc00;
-        }
-      }
+  padding: 2rem;
+
+  .hero-section {
+    background-color: #1047ad;
+    color: #fff;
+    text-align: center;
+    padding: 3rem 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
     }
-  
-    .about-section {
-      text-align: center;
-      margin-top: 2rem;
-      
-      img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 12px;
-        margin-top: 1rem;
-      }
-    }
-  
-    .promotions-section {
-      display: flex;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-      margin-top: 2rem;
-  
-      .promotion-card {
-        background: #528cef;
-        padding: 1rem;
-        border-radius: 8px;
-        color: #fff;
-        flex: 1;
-        min-width: 250px;
-      }
-    }
-  
-    .testimonials-section {
-      margin-top: 2rem;
-      blockquote {
-        font-style: italic;
-        margin: 1rem 0;
-        padding-left: 1rem;
-        border-left: 4px solid #ffeb3b;
+
+    .cta-button {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.8rem 1.5rem;
+      background-color: #ffeb3b;
+      color: #061531;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: #ffcc00;
       }
     }
   }
+
+  .about-section {
+    text-align: center;
+    margin-top: 2rem;
+
+    h2 {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1rem;
+      color: #333;
+    }
+  }
+
+  .promotions-section {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+
+    .promotion-card {
+      background: #528cef;
+      padding: 1rem;
+      border-radius: 8px;
+      color: #fff;
+      flex: 1;
+      min-width: 250px;
+
+      h3 {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+      }
+
+      p {
+        font-size: 0.95rem;
+      }
+    }
+  }
+
+  .testimonials-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: #f4f4f4;
+    border-radius: 8px;
+
+    h2 {
+      text-align: center;
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 1rem 0;
+      padding-left: 1rem;
+      border-left: 4px solid #ffeb3b;
+      font-size: 0.9rem;
+      color: #333;
+
+      footer {
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        color: #555;
+      }
+    }
+  }
+}
