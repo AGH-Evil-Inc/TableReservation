@@ -8,6 +8,7 @@ configuration.ts
 encoder.ts
 git_push.sh
 index.ts
+model/loginData.ts
 model/loginPost200Response.ts
 model/models.ts
 model/user.ts

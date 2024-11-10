@@ -14,7 +14,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './defs/auth/User.yaml'
+              $ref: './defs/auth/LoginData.yaml'
       responses:
         '201':
           description: User created successfully

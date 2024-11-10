@@ -6,5 +6,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./home-page.component.scss']
 })
 export class HomePageComponent {
-    message: string = 'Welcome to the Home Page!'
+
 }

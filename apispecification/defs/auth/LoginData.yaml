@@ -1,0 +1,12 @@
+title: LoginData
+type: object
+properties:
+  email:
+    type: string
+    example: user@example.com
+  password:
+    type: string
+    example: pass123
+required:
+  - email
+  - password

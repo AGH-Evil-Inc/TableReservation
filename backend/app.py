@@ -32,9 +32,12 @@ ns = api.namespace('api', description='Authentication operations')
 # Wczytanie schematu z pliku YAML
 with open('../apispecification/defs/auth/User.yaml', 'r') as file:
     user_schema = yaml.safe_load(file)
+with open('../apispecification/defs/auth/LoginData.yaml', 'r') as file:
+    login_data_schema = yaml.safe_load(file)
 
 # Dynamiczne tworzenie modelu
 user_model = api.schema_model('User', user_schema)
+login_data_model = api.schema_model('LoginData', login_data_schema)
 
 # User loader callback for flask_login
 @login_manager.user_loader
@@ -143,7 +146,7 @@ class Register(Resource):
 # Logowanie użytkownika
 @ns.route('/login')
 class Login(Resource):
-    @ns.expect(user_model)
+    @ns.expect(login_data_model)
     @ns.response(200, 'Login successful')
     @ns.response(400, 'Invalid input')
     @ns.response(401, 'Invalid credentials')

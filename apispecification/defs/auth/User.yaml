@@ -13,6 +13,9 @@ properties:
   last_name:
     type: string
     example: lastname
+  phone:
+   type: string 
+   example: +48-123-456-789
   password:
     type: string
     example: pass123
@@ -21,6 +24,7 @@ properties:
     example: false
 required:
   - email
+  - phone
   - first_name
   - last_name
   - password

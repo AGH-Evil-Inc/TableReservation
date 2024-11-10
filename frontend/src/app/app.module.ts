@@ -29,6 +29,12 @@ import { MdbTooltipModule } from 'mdb-angular-ui-kit/tooltip';
 import { MdbValidationModule } from 'mdb-angular-ui-kit/validation';
 import { CookieModule } from 'ngx-cookie';
 import { CookieBannerComponent } from './shell/cookie-banner/cookie-banner.component';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { MatDialogModule } from '@angular/material/dialog'
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field'
+import { MatInputModule } from '@angular/material/input'
 
 
 @NgModule({ declarations: [
@@ -40,10 +46,16 @@ import { CookieBannerComponent } from './shell/cookie-banner/cookie-banner.compo
         ShellHeaderComponent,
         CookieBannerComponent
     ],
-    bootstrap: [AppComponent], imports: [BrowserModule,
+    bootstrap: [AppComponent],
+    imports: [BrowserModule,
         AppRoutingModule,
         FormsModule,
         BrowserAnimationsModule,
+        MatDialogModule,
+        MatButtonModule,
+        MatIconModule,
+        MatInputModule,
+        MatFormFieldModule,
         MdbAccordionModule,
         MdbCarouselModule,
         MdbCheckboxModule,
@@ -63,6 +75,7 @@ import { CookieBannerComponent } from './shell/cookie-banner/cookie-banner.compo
         AuthService,
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
         provideHttpClient(withInterceptorsFromDi()),
-        provideAnimations()
+        provideAnimations(),
+        provideAnimationsAsync()
     ] })
 export class AppModule { }
