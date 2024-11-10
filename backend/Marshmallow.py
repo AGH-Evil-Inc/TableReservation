@@ -7,7 +7,7 @@ class UserSchema(Schema):
     first_name = ma_fields.Str(required=True, validate=validate.Regexp('^[A-Za-z]+$'))
     last_name = ma_fields.Str(required=True, validate=validate.Regexp('^[A-Za-z]+$'))
     password = ma_fields.Str(required=True, validate=validate.Length(min=6))
-    phone = ma_fields.Str(validate=validate.Regexp('^\d{7,15}$'))
+    phone = ma_fields.Str(validate=validate.Regexp(r'^\d{9}$'))
 
 class LoginSchema(Schema):
     email = ma_fields.Email(required=True)

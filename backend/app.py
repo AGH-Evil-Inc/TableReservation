@@ -13,6 +13,8 @@ import hashlib
 from database_model import db, User, Reservation, Table
 import pandas as pd
 from flask_mail import Mail, Message
+from Marshmallow import UserSchema, LoginSchema, ResetPasswordSchema, NewPasswordSchema
+from marshmallow import Schema, fields as ma_fields, validate, ValidationError
 
 app = Flask(__name__)
 CORS(app)
@@ -128,15 +130,17 @@ class Register(Resource):
     @ns.response(400, 'Invalid input')
     def post(self):
         data = request.get_json()
-        email = data.get('email')
-        first_name = data.get('first_name')
-        last_name = data.get('last_name')
-        password = data.get('password')
-        phone_number = data.get('phone')
-
-
-        if not email or not first_name or not last_name or not password:
-            return {'message': 'Invalid input'}, 400
+        schema = UserSchema()
+        try:
+            validated_data = schema.load(data)
+        except ValidationError as err:
+            return {'message': 'Invalid input', 'errors': err.messages}, 400
+        
+        email = validated_data['email']
+        first_name = validated_data['first_name']
+        last_name = validated_data['last_name']
+        password = validated_data['password']
+        phone_number = validated_data.get('phone')
 
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
@@ -165,11 +169,14 @@ class Login(Resource):
     @ns.response(401, 'Invalid credentials')
     def post(self):
         data = request.get_json()
-        email = data.get('email')
-        password = data.get('password')
+        schema = LoginSchema()
+        try:
+            validated_data = schema.load(data)
+        except ValidationError as err:
+            return {'message': 'Invalid input', 'errors': err.messages}, 400
 
-        if not email or not password:
-            return {'message': 'Invalid input'}, 400
+        email = validated_data['email']
+        password = validated_data['password']
 
         user = User.query.filter_by(email=email).first()
         if user is None or not User.verify_password(user.password, password):
@@ -186,7 +193,6 @@ class Login(Resource):
         return login_response_model, 200
 
 # Wylogowywanie:
-@app.route('/logout')
 @ns.route('/logout')
 class Logout(Resource):
     @ns.response(200, 'Logout successful')
@@ -204,10 +210,13 @@ class RequestPasswordReset(Resource):
     @ns.response(400, 'Cannot send email to reset password')
     def post(self):
         data = request.get_json()
-        email = data.get('email')
+        schema = ResetPasswordSchema()
+        try:
+            validated_data = schema.load(data)
+        except ValidationError as err:
+            return {'message': 'Invalid input', 'errors': err.messages}, 400
 
-        if not email:
-            return {'message': 'Email is required'}, 400
+        email = validated_data['email']
 
         user = User.query.filter_by(email=email).first()
 
@@ -250,11 +259,14 @@ Table&Taste"""
 class ResetPassword(Resource):
     def post(self):
         data = request.get_json()
-        reset_token = data.get('token')
-        new_password = data.get('new_password')
+        schema = NewPasswordSchema()
+        try:
+            validated_data = schema.load(data)
+        except ValidationError as err:
+            return {'message': 'Invalid input', 'errors': err.messages}, 400
 
-        if not reset_token or not new_password:
-            return {'message': 'Reset token and new password are required'}, 400
+        reset_token = validated_data['token']
+        new_password = validated_data['new_password']
 
         try:
             # Decode the token
