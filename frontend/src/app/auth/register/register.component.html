@@ -1,11 +1,57 @@
-<h2>Register</h2>
-<form (submit)="register()">
-  <label for="username">Username:</label>
-  <input type="text" id="username" [(ngModel)]="user.username" name="username" required>
-  <br>
-  <label for="password">Password:</label>
-  <input type="password" id="password" [(ngModel)]="user.password" name="password" required>
-  <br>
-  <button type="submit">Register</button>
-</form>
-<p>{{ message }}</p>
+<h2 mat-dialog-title class="dialog-title">
+  Rejestracja
+  <button mat-icon-button (click)="closeDialog()" class="close-button" aria-label="Close">
+    <mat-icon>close</mat-icon>
+  </button>
+</h2>
+
+<div mat-dialog-content class="dialog-content">
+  <form (ngSubmit)="register()" #registerForm="ngForm">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" [(ngModel)]="user.email" name="email" required email>
+      <mat-error *ngIf="registerForm.controls['email']?.invalid && registerForm.controls['email']?.touched">
+        Proszę podać poprawny email
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Imię</mat-label>
+      <input matInput type="text" [(ngModel)]="user.first_name" name="first_name" required>
+      <mat-error *ngIf="registerForm.controls['first_name']?.invalid && registerForm.controls['first_name']?.touched">
+        Imię jest wymagane
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nazwisko</mat-label>
+      <input matInput type="text" [(ngModel)]="user.last_name" name="last_name" required>
+      <mat-error *ngIf="registerForm.controls['last_name']?.invalid && registerForm.controls['last_name']?.touched">
+        Nazwisko jest wymagane
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Numer telefonu</mat-label>
+      <input matInput type="tel" [(ngModel)]="user.phone" name="phone" maxlength="9" required pattern="[0-9]{9}">
+      <mat-error *ngIf="registerForm.controls['phone']?.invalid && registerForm.controls['phone']?.touched">
+        Proszę podać poprawny numer telefonu (9 cyfr)
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Hasło</mat-label>
+      <input matInput type="password" [(ngModel)]="user.password" name="password" required minlength="6">
+      <mat-error *ngIf="registerForm.controls['password']?.invalid && registerForm.controls['password']?.touched">
+        Hasło jest wymagane (min. 6 znaków)
+      </mat-error>
+    </mat-form-field>
+
+    <mat-error *ngIf="message">{{ message }}</mat-error>
+
+    <button mat-raised-button color="primary" class="full-width register-button" type="submit">Zarejestruj się</button>
+  </form>
+</div>
+<div mat-dialog-actions class="dialog-actions">
+  <button mat-button (click)="closeDialog()">Anuluj</button>
+</div>

@@ -1,0 +1,48 @@
+::ng-deep .mat-dialog-container {
+    padding: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    width: 400px; 
+  }
+  
+  .dialog-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #0e3174;
+    color: #fff;
+  }
+  
+  .dialog-content {
+    padding: 1rem;
+    max-height: 600px; 
+    overflow-y: auto;
+  }
+  
+  .full-width {
+    width: 100%;
+    margin-bottom: 1.5rem; 
+  }
+  
+  .mat-error {
+    font-size: 0.875rem; 
+    position: absolute;
+    bottom: -1.5rem; 
+  }
+
+.register-button {
+    margin-bottom: 0;
+}
+  
+.dialog-actions {
+    display: flex;
+    justify-content: center;
+    padding-top: 0;
+    background-color: transparent;
+
+    button {
+        width: 100%;
+    }
+}
+  

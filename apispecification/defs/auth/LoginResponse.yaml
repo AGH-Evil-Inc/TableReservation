@@ -1,0 +1,11 @@
+title: LoginResponse
+type: object
+properties:
+  token:
+    type: string
+    description: JWT token for authenticated sessions
+  name:
+    type: string
+required:
+  - token
+  - name

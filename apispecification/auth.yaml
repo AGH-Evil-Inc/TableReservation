@@ -14,14 +14,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './defs/auth/User.yaml'
+              $ref: './defs/auth/LoginData.yaml'
       responses:
         '201':
           description: User created successfully
-          content:
-            application/json:
-              schema:
-                 $ref: './defs/auth/User.yaml'
         '400':
           description: Invalid input
   /login:
@@ -39,10 +35,15 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  token:
-                    type: string
-                    description: JWT token for authenticated sessions
+                $ref: './defs/auth/LoginResponse.yaml'
         '401':
           description: Invalid credentials
+  /logout:
+    post:
+      summary: Log out an existing user
+      responses:
+        '200':
+          description: Logout successful
+        '400':
+          description: Logout invalid
+      

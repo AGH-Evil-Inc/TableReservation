@@ -1,0 +1,26 @@
+<header class="header">
+  <div class="container">
+    <div class="logo">
+      <a href="/home">
+        <img src="/assets/ZP_logo.png" alt="Logo">
+        <!-- <img src="/assets/test.gif" alt="Animation"> -->
+      </a>
+    </div>
+    <nav class="nav">
+      <ul>
+        <li><a href="/home">Strona główna</a></li>
+        <li><a href="/menu">Menu</a></li>
+        <li><a href="/reservation">Rezerwacja</a></li>
+        <li><a href="/kontakt">Kontakt</a></li>
+      </ul>
+    </nav>
+    <div class="login">
+      <button mat-icon-button color="accent" (click)="openLoginDialog()" *ngIf="!isLoggedIn">
+        <mat-icon>person</mat-icon>
+      </button>
+      <button mat-icon-button color="warn" (click)="logout()" *ngIf="isLoggedIn">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+  </div>
+</header>
