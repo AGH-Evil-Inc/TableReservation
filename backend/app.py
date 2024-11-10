@@ -39,6 +39,7 @@ with open('../apispecification/defs/auth/LoginData.yaml', 'r') as file:
 user_model = api.schema_model('User', user_schema)
 login_data_model = api.schema_model('LoginData', login_data_schema)
 
+
 # User loader callback for flask_login
 @login_manager.user_loader
 def load_user(user_id):
@@ -63,6 +64,7 @@ class Init(Resource):
                     first_name='King',
                     last_name='Kong',
                     phone='123456789'
+
                     is_admin=True
                 )
                 db.session.add(admin)
@@ -124,6 +126,7 @@ class Register(Resource):
         last_name = data.get('last_name')
         password = data.get('password')
         phone = data.get('phone')
+
 
         if not email or not first_name or not last_name or not password:
             return {'message': 'Invalid input'}, 400
