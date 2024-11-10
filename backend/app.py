@@ -12,13 +12,15 @@ import binascii
 import hashlib
 from database_model import db, User, Reservation, Table
 import pandas as pd
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 CORS(app)
 
-# Konfiguracja sekretnego klucza i bazy danych
+# Konfiguracja sekretnego klucza i bazy danych oraz maila
 app.config.from_pyfile('config.cfg')
 db.init_app(app)
+mail = Mail(app)
 
 # Stworzenie LoginManagera do obsługi logowania
 login_manager = LoginManager(app)
@@ -34,10 +36,16 @@ with open('../apispecification/defs/auth/User.yaml', 'r') as file:
     user_schema = yaml.safe_load(file)
 with open('../apispecification/defs/auth/LoginData.yaml', 'r') as file:
     login_data_schema = yaml.safe_load(file)
+with open('../apispecification/defs/auth/RequestResetPassword.yaml', 'r') as file:
+    reset_pass_schema = yaml.safe_load(file)
+with open('../apispecification/defs/auth/LoginResponse.yaml', 'r') as file:
+    login_response_schema = yaml.safe_load(file)
 
 # Dynamiczne tworzenie modelu
 user_model = api.schema_model('User', user_schema)
 login_data_model = api.schema_model('LoginData', login_data_schema)
+reset_pass_model = api.schema_model('RequestResetPassword', reset_pass_schema)
+login_response_model = api.schema_model('LoginResponse', login_response_schema)
 
 
 # User loader callback for flask_login
@@ -63,7 +71,7 @@ class Init(Resource):
                     password=admin_password,
                     first_name='King',
                     last_name='Kong',
-                    phone='123456789',
+                    phone_number='123456789',
                     is_admin=True
                 )
                 db.session.add(admin)
@@ -124,7 +132,7 @@ class Register(Resource):
         first_name = data.get('first_name')
         last_name = data.get('last_name')
         password = data.get('password')
-        phone = data.get('phone')
+        phone_number = data.get('phone')
 
 
         if not email or not first_name or not last_name or not password:
@@ -140,7 +148,7 @@ class Register(Resource):
             password=hashed_password,
             first_name=first_name,
             last_name=last_name,
-            phone=phone,
+            phone_number=phone_number,
             is_admin=False
         )
         db.session.add(new_user)
@@ -174,7 +182,8 @@ class Login(Resource):
             'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
         }, app.config['SECRET_KEY'], algorithm='HS256')
 
-        return {'token': token}, 200
+        login_response_model = {"name" : user.first_name, 'token' : token}
+        return login_response_model, 200
 
 # Wylogowywanie:
 @app.route('/logout')
@@ -186,6 +195,87 @@ class Logout(Resource):
     def post(self):
         logout_user()
         return {'message': 'You are logged out'}, 200
+
+
+@ns.route('/request-password-reset')
+class RequestPasswordReset(Resource):
+    @ns.expect(reset_pass_model)
+    @ns.response(200, 'Email to reset password has been sent')
+    @ns.response(400, 'Cannot send email to reset password')
+    def post(self):
+        data = request.get_json()
+        email = data.get('email')
+
+        if not email:
+            return {'message': 'Email is required'}, 400
+
+        user = User.query.filter_by(email=email).first()
+
+        # Always return the same response to prevent email enumeration
+        message = 'If an account with that email exists, a password reset email has been sent.'
+
+        if user:
+            # Generate a reset token
+            reset_token = jwt.encode({
+                'user_id': user.id,
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+            }, app.config['SECRET_KEY'], algorithm='HS256')
+
+            # Construct the password reset URL
+            reset_url = f"http://your-frontend-domain/reset-password?token={reset_token}"
+
+            # Send the email
+            try:
+                msg = Message("Password Reset Request",
+                              recipients=[user.email])
+                msg.body = f"""Hello {user.first_name},
+
+To reset your password, please click the following link:
+
+{reset_url}
+
+If you did not request a password reset, please ignore this email.
+
+Best regards,
+Table&Taste"""
+                mail.send(msg)
+            except Exception as e:
+                app.logger.error(f'Failed to send password reset email: {str(e)}')
+                return {'message': 'Failed to send password reset email'}, 500
+
+        return {'message': message}, 200
+
+
+@ns.route('/reset-password')
+class ResetPassword(Resource):
+    def post(self):
+        data = request.get_json()
+        reset_token = data.get('token')
+        new_password = data.get('new_password')
+
+        if not reset_token or not new_password:
+            return {'message': 'Reset token and new password are required'}, 400
+
+        try:
+            # Decode the token
+            payload = jwt.decode(reset_token, app.config['SECRET_KEY'], algorithms=['HS256'])
+            user_id = payload['user_id']
+        except jwt.ExpiredSignatureError:
+            return {'message': 'Reset token has expired'}, 401
+        except jwt.InvalidTokenError:
+            return {'message': 'Invalid reset token'}, 401
+
+        user = User.query.get(user_id)
+        if not user:
+            return {'message': 'User not found'}, 400
+
+        # Update the user's password
+        hashed_password = User.get_hashed_password(new_password)
+        user.password = hashed_password
+        db.session.commit()
+
+        return {'message': 'Password reset successful'}, 200
+
 
 api.add_namespace(ns)
 

@@ -15,7 +15,7 @@ properties:
     example: lastname
   phone:
    type: string 
-   example: +48-123-456-789
+   example: 123456789
   password:
     type: string
     example: pass123

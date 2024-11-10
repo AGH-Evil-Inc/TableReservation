@@ -46,4 +46,18 @@ paths:
           description: Logout successful
         '400':
           description: Logout invalid
+  /request-password-reset:
+    post:
+      summary: Reset the password using email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './defs/auth/RequestResetPassword.yaml'
+      responses:
+        '200':
+          description: Email to reset password has been sent
+        '400':
+          description: Cannot send email to reset password
       
