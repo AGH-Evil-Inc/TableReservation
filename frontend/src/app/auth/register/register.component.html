@@ -33,7 +33,7 @@
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Numer telefonu</mat-label>
-      <input matInput type="tel" [(ngModel)]="user.phone" name="phone" maxlength="9" required pattern="[0-9]{9}">
+      <input matInput type="tel" [(ngModel)]="user.phone_number" name="phone" maxlength="9" required pattern="[0-9]{9}">
       <mat-error *ngIf="registerForm.controls['phone']?.invalid && registerForm.controls['phone']?.touched">
         Proszę podać poprawny numer telefonu (9 cyfr)
       </mat-error>

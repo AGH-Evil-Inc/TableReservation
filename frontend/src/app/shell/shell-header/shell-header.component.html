@@ -15,6 +15,7 @@
       </ul>
     </nav>
     <div class="login">
+      <span *ngIf="isLoggedIn" class="user-name">{{ userName }}</span>
       <button mat-icon-button color="accent" (click)="openLoginDialog()" *ngIf="!isLoggedIn">
         <mat-icon>person</mat-icon>
       </button>

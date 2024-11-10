@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { backApiUrl } from './modules-api-url';
 import { LoginData, LoginResponse, User } from '../core/modules/auth';
@@ -19,7 +19,7 @@ export class AuthService {
     return this.http.post<{ token: string, name: string }>(backApiUrl(`/login`),  user );
   }
 
-  logout() {
-    return this.http.post(backApiUrl(`/logout`),'');
+  logout(): Observable<any> {
+    return this.http.post(backApiUrl(`/logout`), {});
   }
 }

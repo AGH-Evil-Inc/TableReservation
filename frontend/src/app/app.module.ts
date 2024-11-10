@@ -35,6 +35,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatInputModule } from '@angular/material/input'
+import { AuthComponentService } from './services/auth-component.service';
 
 
 @NgModule({ declarations: [
@@ -73,6 +74,7 @@ import { MatInputModule } from '@angular/material/input'
         MdbTooltipModule,
         MdbValidationModule], providers: [
         AuthService,
+        AuthComponentService,
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
         provideHttpClient(withInterceptorsFromDi()),
         provideAnimations(),
