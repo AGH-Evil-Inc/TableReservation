@@ -1,0 +1,29 @@
+<div *ngIf="!cookiesAccepted" class="cookie-banner">
+    <p>Ta strona używa plików cookies, aby zapewnić lepsze doświadczenia użytkownika. 
+    Kontynuując, zgadzasz się na ich używanie.</p>
+    <button (click)="acceptCookies()">Akceptuj</button>
+    <button (click)="showCookieSettings()">Zarządzaj ustawieniami</button>
+  </div>
+  
+  <div *ngIf="showSettings" class="cookie-settings">
+    <h3>Ustawienia cookies</h3>
+    <div>
+      <label>
+        <input type="checkbox" [(ngModel)]="cookiePreferences.necessary" disabled>
+        Niezbędne (zawsze włączone)
+      </label>
+    </div>
+    <div>
+      <label>
+        <input type="checkbox" [(ngModel)]="cookiePreferences.analytics">
+        Analityczne
+      </label>
+    </div>
+    <div>
+      <label>
+        <input type="checkbox" [(ngModel)]="cookiePreferences.marketing">
+        Marketingowe
+      </label>
+    </div>
+    <button (click)="saveSettings()">Zapisz ustawienia</button>
+  </div>

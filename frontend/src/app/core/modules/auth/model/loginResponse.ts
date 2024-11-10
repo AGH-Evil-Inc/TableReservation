@@ -9,10 +9,11 @@
  */
 
 
-export interface LoginPost200Response { 
+export interface LoginResponse { 
     /**
      * JWT token for authenticated sessions
      */
-    token?: string;
+    token: string;
+    name: string;
 }
 

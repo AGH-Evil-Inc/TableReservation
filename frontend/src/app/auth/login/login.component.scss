@@ -1,0 +1,63 @@
+::ng-deep .mat-dialog-container {
+    padding: 0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .dialog-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #0e3174;
+    color: #fff;
+  
+    h2 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+  
+    .close-button {
+      background-color: transparent;
+      color: #fff;
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+  
+  .dialog-content {
+    padding: 1rem;
+    max-height: 400px; // Maksymalna wysokość dla uniknięcia przewijania
+    overflow-y: auto; // Dodanie automatycznego przewijania w przypadku dużej zawartości
+  }
+  
+  .mat-form-field {
+    width: 100%;
+    margin-bottom: 1rem;
+  
+    .mat-form-field-outline {
+      border-color: rgba(0, 0, 0, 0.2);
+    }
+  
+    mat-error {
+      color: #f44336;
+    }
+  }
+  
+.dialog-actions {
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+    background-color: transparent;
+
+    .w-100 {
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    button {
+        margin-top: 0.5rem;
+    }
+}
+  

@@ -17,7 +17,9 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
-import { LoginPost200Response } from '../model/loginPost200Response';
+import { LoginData } from '../model/loginData';
+// @ts-ignore
+import { LoginResponse } from '../model/loginResponse';
 // @ts-ignore
 import { User } from '../model/user';
 
@@ -98,9 +100,9 @@ export class DefaultService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public loginPost(user: User, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<LoginPost200Response>;
-    public loginPost(user: User, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<LoginPost200Response>>;
-    public loginPost(user: User, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<LoginPost200Response>>;
+    public loginPost(user: User, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<LoginResponse>;
+    public loginPost(user: User, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<LoginResponse>>;
+    public loginPost(user: User, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<LoginResponse>>;
     public loginPost(user: User, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (user === null || user === undefined) {
             throw new Error('Required parameter user was null or undefined when calling loginPost.');
@@ -152,7 +154,7 @@ export class DefaultService {
         }
 
         let localVarPath = `/login`;
-        return this.httpClient.request<LoginPost200Response>('post', `${this.configuration.basePath}${localVarPath}`,
+        return this.httpClient.request<LoginResponse>('post', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 body: user,
@@ -160,6 +162,66 @@ export class DefaultService {
                 withCredentials: this.configuration.withCredentials,
                 headers: localVarHeaders,
                 observe: observe,
+                transferCache: localVarTransferCache,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Log out an existing user
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public logoutPost(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
+    public logoutPost(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
+    public logoutPost(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
+    public logoutPost(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
+
+        let localVarHeaders = this.defaultHeaders;
+
+        let localVarHttpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
+        if (localVarHttpHeaderAcceptSelected === undefined) {
+            // to determine the Accept header
+            const httpHeaderAccepts: string[] = [
+            ];
+            localVarHttpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        }
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        let localVarHttpContext: HttpContext | undefined = options && options.context;
+        if (localVarHttpContext === undefined) {
+            localVarHttpContext = new HttpContext();
+        }
+
+        let localVarTransferCache: boolean | undefined = options && options.transferCache;
+        if (localVarTransferCache === undefined) {
+            localVarTransferCache = true;
+        }
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/logout`;
+        return this.httpClient.request<any>('post', `${this.configuration.basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                responseType: <any>responseType_,
+                withCredentials: this.configuration.withCredentials,
+                headers: localVarHeaders,
+                observe: observe,
+                transferCache: localVarTransferCache,
                 reportProgress: reportProgress
             }
         );
@@ -167,16 +229,16 @@ export class DefaultService {
 
     /**
      * Register a new user
-     * @param user 
+     * @param loginData 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public registerPost(user: User, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<User>;
-    public registerPost(user: User, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<User>>;
-    public registerPost(user: User, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<User>>;
-    public registerPost(user: User, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (user === null || user === undefined) {
-            throw new Error('Required parameter user was null or undefined when calling registerPost.');
+    public registerPost(loginData: LoginData, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<User>;
+    public registerPost(loginData: LoginData, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<User>>;
+    public registerPost(loginData: LoginData, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<User>>;
+    public registerPost(loginData: LoginData, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (loginData === null || loginData === undefined) {
+            throw new Error('Required parameter loginData was null or undefined when calling registerPost.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -228,11 +290,12 @@ export class DefaultService {
         return this.httpClient.request<User>('post', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: user,
+                body: loginData,
                 responseType: <any>responseType_,
                 withCredentials: this.configuration.withCredentials,
                 headers: localVarHeaders,
                 observe: observe,
+                transferCache: localVarTransferCache,
                 reportProgress: reportProgress
             }
         );

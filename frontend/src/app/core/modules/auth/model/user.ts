@@ -10,7 +10,12 @@
 
 
 export interface User { 
-    username: string;
+    id?: number;
+    email: string;
+    first_name: string;
+    last_name: string;
+    phone: string;
     password: string;
+    is_admin?: boolean;
 }
 

@@ -1,12 +1,30 @@
-<h2>Login</h2>
-<form (ngSubmit)="login()">
-  <label for="username">Username:</label>
-  <input type="text" id="username" [(ngModel)]="user.username" name="username" required>
-  <br>
-  <label for="password">Password:</label>
-  <input type="password" id="password" [(ngModel)]="user.password" name="password" required>
-  <br>
-  <button type="submit">Login</button>
-</form>
-<p>{{ message }}</p>
-<button (click)="navigateToRegister()">Go to Register</button>
+<h2 mat-dialog-title class="dialog-title">
+   Logowanie 
+  <button mat-icon-button (click)="closeDialog()" class="close-button" aria-label="Close"> 
+    <mat-icon>close</mat-icon> 
+  </button>
+</h2>
+<div mat-dialog-content class="dialog-content">
+  <form (ngSubmit)="login()" #loginForm="ngForm">
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" [(ngModel)]="user.email" name="email" required email>
+      <mat-error *ngIf="loginForm.controls['email']?.invalid && loginForm.controls['email']?.touched">
+        Proszę podać poprawny email
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Hasło</mat-label>
+      <input matInput type="password" [(ngModel)]="user.password" name="password" required>
+      <mat-error *ngIf="loginForm.controls['password']?.invalid && loginForm.controls['password']?.touched">
+        Hasło jest wymagane
+      </mat-error>
+    </mat-form-field>
+    <mat-error *ngIf="message">{{ message }}</mat-error> 
+    <button mat-raised-button color="primary" class="w-100" type="submit">Zaloguj się</button>
+  </form>
+</div>
+<div mat-dialog-actions class="dialog-actions">
+  <button mat-button (click)="goToRegister()">Nie masz konta? Zarejestruj się</button>
+  <button mat-button (click)="forgotPassword()">Zapomniałeś hasła?</button>
+</div>
