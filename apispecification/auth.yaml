@@ -1,0 +1,49 @@
+openapi: 3.0.0
+info:
+  title: Authentication API
+  description: API for user authentication (registration and login)
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:5000/api 
+paths:
+  /register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './defs/auth/LoginData.yaml'
+      responses:
+        '201':
+          description: User created successfully
+        '400':
+          description: Invalid input
+  /login:
+    post:
+      summary: Log in an existing user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './defs/auth/User.yaml'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: './defs/auth/LoginResponse.yaml'
+        '401':
+          description: Invalid credentials
+  /logout:
+    post:
+      summary: Log out an existing user
+      responses:
+        '200':
+          description: Logout successful
+        '400':
+          description: Logout invalid
+      

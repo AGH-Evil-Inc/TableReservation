@@ -1,0 +1,30 @@
+title: User
+type: object
+properties:
+  id:
+    type: integer
+    example: 1
+  email:
+    type: string
+    example: user@example.com
+  first_name:
+    type: string
+    example: firstname
+  last_name:
+    type: string
+    example: lastname
+  phone_number:
+   type: string 
+   example: 123456789
+  password:
+    type: string
+    example: pass123
+  is_admin:
+    type: boolean
+    example: false
+required:
+  - email
+  - phone_number
+  - first_name
+  - last_name
+  - password
