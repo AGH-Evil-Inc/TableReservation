@@ -1,4 +1,5 @@
-from marshmallow import Schema, fields as ma_fields, validate, ValidationError
+from marshmallow import Schema, fields as ma_fields, validate, ValidationError, validates_schema
+import datetime
 
 
 # Marshmallow Schemas for Validation
@@ -19,3 +20,16 @@ class ResetPasswordSchema(Schema):
 class NewPasswordSchema(Schema):
     token = ma_fields.Str(required=True)
     new_password = ma_fields.Str(required=True, validate=validate.Length(min=6))
+
+class ReservationSchema(Schema):
+    table_id = ma_fields.Int(required=True)
+    reservation_start = ma_fields.DateTime(required=True)
+    reservation_end = ma_fields.DateTime(required=True)
+    pending = ma_fields.Bool()  # Optional, default handled in code
+
+    @validates_schema
+    def validate_dates(self, data, **kwargs):
+        if data['reservation_start'] >= data['reservation_end']:
+            raise ValidationError('reservation_start must be before reservation_end', field_name='reservation_start')
+        if data['reservation_start'] < datetime.datetime.utcnow():
+            raise ValidationError('reservation_start must be in the future', field_name='reservation_start')

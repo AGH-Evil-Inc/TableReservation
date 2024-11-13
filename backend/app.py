@@ -4,29 +4,31 @@ from flask_restx import Api, Resource, fields
 from flask_cors import CORS
 import jwt
 import datetime
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Integer, String, Boolean 
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import os
-import binascii
-import hashlib
-from database_model import db, User, Reservation, Table
 import pandas as pd
 from flask_mail import Mail, Message
-from Marshmallow import UserSchema, LoginSchema, ResetPasswordSchema, NewPasswordSchema
-from marshmallow import Schema, fields as ma_fields, validate, ValidationError
+from Marshmallow import UserSchema, LoginSchema, ResetPasswordSchema, NewPasswordSchema, ReservationSchema
+from marshmallow import ValidationError
+
+from extensions import db  # Import db from extensions.py
 
 app = Flask(__name__)
 CORS(app)
 
-# Konfiguracja sekretnego klucza i bazy danych oraz maila
+# Configuration
 app.config.from_pyfile('config.cfg')
+
+# Initialize extensions
 db.init_app(app)
 mail = Mail(app)
 
-# Stworzenie LoginManagera do obsługi logowania
+# Now import models after db is initialized
+from database_model import User, Reservation, Table
+
+# Initialize LoginManager
 login_manager = LoginManager(app)
-login_manager.login_view = 'api.login'
+login_manager.login_view = 'api_login'
 
 # Konfiguracja API
 api = Api(app, version='1.0', title='Authentication API', description='API for user authentication (registration and login)')
@@ -42,13 +44,15 @@ with open('../apispecification/defs/auth/RequestResetPassword.yaml', 'r') as fil
     reset_pass_schema = yaml.safe_load(file)
 with open('../apispecification/defs/auth/LoginResponse.yaml', 'r') as file:
     login_response_schema = yaml.safe_load(file)
+with open('../apispecification/defs/auth/Reservation.yaml', 'r') as file:
+    reservation_schema = yaml.safe_load(file)
 
 # Dynamiczne tworzenie modelu
 user_model = api.schema_model('User', user_schema)
 login_data_model = api.schema_model('LoginData', login_data_schema)
 reset_pass_model = api.schema_model('RequestResetPassword', reset_pass_schema)
 login_response_model = api.schema_model('LoginResponse', login_response_schema)
-
+reservation_model = api.schema_model('Reservation', reservation_schema)
 
 # User loader callback for flask_login
 @login_manager.user_loader
@@ -287,6 +291,104 @@ class ResetPassword(Resource):
         db.session.commit()
 
         return {'message': 'Password reset successful'}, 200
+
+@ns.route('/reservation')
+class Reservation(Resource):
+    @ns.expect(reservation_model)
+    @ns.response(201, 'Reservation created successfully')
+    @ns.response(400, 'Invalid input')
+    @ns.response(409, 'Conflict - Table already reserved')
+    @login_required
+    def post(self):
+        """
+        Create a new reservation
+        """
+
+        data = request.get_json()
+        schema = ReservationSchema()
+        try:
+            validated_data = schema.load(data)
+        except ValidationError as err:
+            return {'message': 'Invalid input', 'errors': err.messages}, 400
+        
+        user_id = current_user.id   # From flask_login
+        table_id = validated_data['table_id']
+        reservation_start = validated_data['reservation_start']
+        reservation_end = validated_data['reservation_end']
+        pending = validated_data.get('pending', True)  # Default to True
+
+        # Check if the table exists
+        table = Table.query.get(table_id)
+        if not table:
+            return {'message': f'Table {table_id} does not exist'}, 400
+        
+        # Check if the table is available
+        if not table.available:
+            return {'message': f'Table {table_id} is currently unavailable'}, 400
+
+        # Check for overlapping reservations
+        overlapping_reservations = Reservation.query.filter(
+            Reservation.table_id == table_id,
+            Reservation.reservation_end > reservation_start,
+            Reservation.reservation_start < reservation_end,
+            Reservation.pending == True  # Only consider pending reservations
+        ).first()
+
+        if overlapping_reservations:
+            return {'message': f'Table {table_id} is already reserved during that time'}, 409
+        
+
+        # Create the reservation
+        new_reservation = Reservation(
+            user_id=user_id,
+            table_id=table_id,
+            pending=pending,
+            created_at=datetime.datetime.utcnow(),
+            reservation_start=reservation_start,
+            reservation_end=reservation_end
+        )
+        db.session.add(new_reservation)
+        db.session.commit()
+
+        return {'message': 'Reservation created successfully'}, 201
+
+    @ns.doc(params={
+        'reservation_start': 'Start time of the time range to check (ISO format)',
+        'reservation_end': 'End time of the time range to check (ISO format)'
+    })
+    @ns.response(200, 'Success')
+    @ns.response(400, 'Invalid input')
+    def get(self):
+        """
+        Get occupied tables for a specific date and time range
+        """
+
+        reservation_start_str = request.args.get('reservation_start')
+        reservation_end_str = request.args.get('reservation_end')
+
+        if not reservation_start_str or not reservation_end_str:
+            return {'message': 'reservation_start and reservation_end query parameters are required'}, 400
+        try:
+            reservation_start = datetime.datetime.fromisoformat(reservation_start_str)
+            reservation_end = datetime.datetime.fromisoformat(reservation_end_str)
+        except ValueError as e:
+            return {'message': 'Invalid date format', 'errors': str(e)}, 400
+        
+        if reservation_start >= reservation_end:
+            return {'message': 'reservation_start must be before reservation_end'}, 400
+        
+
+        # Get all overlapping reservations
+        overlapping_reservations = Reservation.query.filter(
+            Reservation.reservation_end > reservation_start,
+            Reservation.reservation_start < reservation_end,
+            Reservation.pending == True  # Only consider pending reservations
+        ).all()
+
+        # Extract occupied table IDs
+        occupied_table_ids = [reservation.table_id for reservation in overlapping_reservations]
+
+        return {'occupied_table_ids': occupied_table_ids}, 200
 
 
 api.add_namespace(ns)
