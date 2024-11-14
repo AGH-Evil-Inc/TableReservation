@@ -293,7 +293,7 @@ class ResetPassword(Resource):
         return {'message': 'Password reset successful'}, 200
 
 @ns.route('/reservation')
-class Reservation(Resource):
+class CreateReservation(Resource):
     @ns.expect(reservation_model)
     @ns.response(201, 'Reservation created successfully')
     @ns.response(400, 'Invalid input')
@@ -310,12 +310,12 @@ class Reservation(Resource):
             validated_data = schema.load(data)
         except ValidationError as err:
             return {'message': 'Invalid input', 'errors': err.messages}, 400
-        
-        user_id = current_user.id   # From flask_login
+
+        user_id = current_user.id
         table_id = validated_data['table_id']
-        reservation_start = validated_data['reservation_start']
-        reservation_end = validated_data['reservation_end']
-        pending = validated_data.get('pending', True)  # Default to True
+        reservation_start = validated_data['reservation_start'].replace(tzinfo=timezone.utc)
+        reservation_end = validated_data['reservation_end'].replace(tzinfo=timezone.utc)
+        pending = validated_data.get('pending', True)
 
         # Check if the table exists
         table = Table.query.get(table_id)
@@ -352,30 +352,29 @@ class Reservation(Resource):
 
         return {'message': 'Reservation created successfully'}, 201
 
+
     @ns.doc(params={
-        'reservation_start': 'Start time of the time range to check (ISO format)',
-        'reservation_end': 'End time of the time range to check (ISO format)'
+        'reservation_start': 'Start time of the time range to check (format: YYYY-MM-DDTHH:MM)',
+        'reservation_end': 'End time of the time range to check (format: YYYY-MM-DDTHH:MM)'
     })
     @ns.response(200, 'Success')
     @ns.response(400, 'Invalid input')
     def get(self):
-        """
-        Get occupied tables for a specific date and time range
-        """
-
         reservation_start_str = request.args.get('reservation_start')
         reservation_end_str = request.args.get('reservation_end')
 
         if not reservation_start_str or not reservation_end_str:
             return {'message': 'reservation_start and reservation_end query parameters are required'}, 400
+
         try:
-            reservation_start = datetime.datetime.fromisoformat(reservation_start_str)
-            reservation_end = datetime.datetime.fromisoformat(reservation_end_str)
+            reservation_start = datetime.strptime(reservation_start_str, '%Y-%m-%dT%H:%M').replace(tzinfo=timezone.utc)
+            reservation_end = datetime.strptime(reservation_end_str, '%Y-%m-%dT%H:%M').replace(tzinfo=timezone.utc)
         except ValueError as e:
             return {'message': 'Invalid date format', 'errors': str(e)}, 400
-        
+
         if reservation_start >= reservation_end:
             return {'message': 'reservation_start must be before reservation_end'}, 400
+
         
 
         # Get all overlapping reservations

@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields as ma_fields, validate, ValidationError, validates_schema
-import datetime
+import datetime, timezone
 
 
 # Marshmallow Schemas for Validation
@@ -29,7 +29,11 @@ class ReservationSchema(Schema):
 
     @validates_schema
     def validate_dates(self, data, **kwargs):
-        if data['reservation_start'] >= data['reservation_end']:
+        reservation_start = data['reservation_start'].replace(tzinfo=timezone.utc)
+        reservation_end = data['reservation_end'].replace(tzinfo=timezone.utc)
+        current_time = datetime.now(timezone.utc)
+
+        if reservation_start >= reservation_end:
             raise ValidationError('reservation_start must be before reservation_end', field_name='reservation_start')
-        if data['reservation_start'] < datetime.datetime.utcnow():
+        if reservation_start < current_time:
             raise ValidationError('reservation_start must be in the future', field_name='reservation_start')
