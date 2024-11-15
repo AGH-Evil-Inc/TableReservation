@@ -4,23 +4,29 @@ from flask_restx import Api, Resource, fields
 from flask_cors import CORS
 import jwt
 import datetime
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Integer, String, Boolean
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import os
-import binascii
-import hashlib
-from database_model import db, User, Reservation, Table
 import pandas as pd
+from flask_mail import Mail, Message
+from Marshmallow import UserSchema, LoginSchema, ResetPasswordSchema, NewPasswordSchema, ReservationSchema
+from marshmallow import ValidationError
+
+from extensions import db  # Import db from extensions.py
 
 app = Flask(__name__)
 CORS(app)
 
-# Konfiguracja sekretnego klucza i bazy danych
+# Configuration
 app.config.from_pyfile('config.cfg')
-db.init_app(app)
 
-# Stworzenie LoginManagera do obsługi logowania
+# Initialize extensions
+db.init_app(app)
+mail = Mail(app)
+
+# Now import models after db is initialized
+from database_model import User, Reservation, Table
+
+# Initialize LoginManager
 login_manager = LoginManager(app)
 login_manager.login_view = 'api_login'
 
@@ -34,14 +40,19 @@ with open('../apispecification/defs/auth/User.yaml', 'r') as file:
     user_schema = yaml.safe_load(file)
 with open('../apispecification/defs/auth/LoginData.yaml', 'r') as file:
     login_data_schema = yaml.safe_load(file)
+with open('../apispecification/defs/auth/RequestResetPassword.yaml', 'r') as file:
+    reset_pass_schema = yaml.safe_load(file)
 with open('../apispecification/defs/auth/LoginResponse.yaml', 'r') as file:
     login_response_schema = yaml.safe_load(file)
+with open('../apispecification/defs/auth/Reservation.yaml', 'r') as file:
+    reservation_schema = yaml.safe_load(file)
 
 # Dynamiczne tworzenie modelu
 user_model = api.schema_model('User', user_schema)
 login_data_model = api.schema_model('LoginData', login_data_schema)
+reset_pass_model = api.schema_model('RequestResetPassword', reset_pass_schema)
 login_response_model = api.schema_model('LoginResponse', login_response_schema)
-
+reservation_model = api.schema_model('Reservation', reservation_schema)
 
 # User loader callback for flask_login
 @login_manager.user_loader
@@ -122,14 +133,17 @@ class Register(Resource):
     @ns.response(400, 'Invalid input')
     def post(self):
         data = request.get_json()
-        email = data.get('email')
-        first_name = data.get('first_name')
-        last_name = data.get('last_name')
-        password = data.get('password')
-        phone_number = data.get('phone_number')
-
-        if not email or not first_name or not last_name or not password:
-            return {'message': 'Invalid input'}, 400
+        schema = UserSchema()
+        try:
+            validated_data = schema.load(data)
+        except ValidationError as err:
+            return {'message': 'Invalid input', 'errors': err.messages}, 400
+        
+        email = validated_data['email']
+        first_name = validated_data['first_name']
+        last_name = validated_data['last_name']
+        password = validated_data['password']
+        phone_number = validated_data.get('phone')
 
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
@@ -159,11 +173,14 @@ class Login(Resource):
     @ns.response(401, 'Invalid credentials')
     def post(self):
         data = request.get_json()
-        email = data.get('email')
-        password = data.get('password')
+        schema = LoginSchema()
+        try:
+            validated_data = schema.load(data)
+        except ValidationError as err:
+            return {'message': 'Invalid input', 'errors': err.messages}, 400
 
-        if not email or not password:
-            return {'message': 'Invalid input'}, 400
+        email = validated_data['email']
+        password = validated_data['password']
 
         user = User.query.filter_by(email=email).first()
         if user is None or not User.verify_password(user.password, password):
@@ -176,12 +193,10 @@ class Login(Resource):
             'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
         }, app.config['SECRET_KEY'], algorithm='HS256')
 
-        login_response_model = {"name": user.first_name, 'token': token}
+        login_response_model = {"name" : user.first_name, 'token' : token}
         return login_response_model, 200
 
-
 # Wylogowywanie:
-@app.route('/logout')
 @ns.route('/logout')
 class Logout(Resource):
     @ns.response(200, 'Logout successful')
@@ -190,6 +205,190 @@ class Logout(Resource):
     def post(self):
         logout_user()
         return {'message': 'You are logged out'}, 200
+
+
+@ns.route('/request-password-reset')
+class RequestPasswordReset(Resource):
+    @ns.expect(reset_pass_model)
+    @ns.response(200, 'Email to reset password has been sent')
+    @ns.response(400, 'Cannot send email to reset password')
+    def post(self):
+        data = request.get_json()
+        schema = ResetPasswordSchema()
+        try:
+            validated_data = schema.load(data)
+        except ValidationError as err:
+            return {'message': 'Invalid input', 'errors': err.messages}, 400
+
+        email = validated_data['email']
+
+        user = User.query.filter_by(email=email).first()
+
+        # Always return the same response to prevent email enumeration
+        message = 'If an account with that email exists, a password reset email has been sent.'
+
+        if user:
+            # Generate a reset token
+            reset_token = jwt.encode({
+                'user_id': user.id,
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+            }, app.config['SECRET_KEY'], algorithm='HS256')
+
+            # Construct the password reset URL
+            reset_url = f"http://your-frontend-domain/reset-password?token={reset_token}"
+
+            # Send the email
+            try:
+                msg = Message("Password Reset Request",
+                              recipients=[user.email])
+                msg.body = f"""Hello {user.first_name},
+
+To reset your password, please click the following link:
+
+{reset_url}
+
+If you did not request a password reset, please ignore this email.
+
+Best regards,
+Table&Taste"""
+                mail.send(msg)
+            except Exception as e:
+                app.logger.error(f'Failed to send password reset email: {str(e)}')
+                return {'message': 'Failed to send password reset email'}, 500
+
+        return {'message': message}, 200
+
+
+@ns.route('/reset-password')
+class ResetPassword(Resource):
+    def post(self):
+        data = request.get_json()
+        schema = NewPasswordSchema()
+        try:
+            validated_data = schema.load(data)
+        except ValidationError as err:
+            return {'message': 'Invalid input', 'errors': err.messages}, 400
+
+        reset_token = validated_data['token']
+        new_password = validated_data['new_password']
+
+        try:
+            # Decode the token
+            payload = jwt.decode(reset_token, app.config['SECRET_KEY'], algorithms=['HS256'])
+            user_id = payload['user_id']
+        except jwt.ExpiredSignatureError:
+            return {'message': 'Reset token has expired'}, 401
+        except jwt.InvalidTokenError:
+            return {'message': 'Invalid reset token'}, 401
+
+        user = User.query.get(user_id)
+        if not user:
+            return {'message': 'User not found'}, 400
+
+        # Update the user's password
+        hashed_password = User.get_hashed_password(new_password)
+        user.password = hashed_password
+        db.session.commit()
+
+        return {'message': 'Password reset successful'}, 200
+
+@ns.route('/reservation')
+class CreateReservation(Resource):
+    @ns.expect(reservation_model)
+    @ns.response(201, 'Reservation created successfully')
+    @ns.response(400, 'Invalid input')
+    @ns.response(409, 'Conflict - Table already reserved')
+    @login_required
+    def post(self):
+        """
+        Create a new reservation
+        """
+
+        data = request.get_json()
+        schema = ReservationSchema()
+        try:
+            validated_data = schema.load(data)
+        except ValidationError as err:
+            return {'message': 'Invalid input', 'errors': err.messages}, 400
+
+        user_id = current_user.id
+        table_id = validated_data['table_id']
+        reservation_start = validated_data['reservation_start'].replace(tzinfo=timezone.utc)
+        reservation_end = validated_data['reservation_end'].replace(tzinfo=timezone.utc)
+        pending = validated_data.get('pending', True)
+
+        # Check if the table exists
+        table = Table.query.get(table_id)
+        if not table:
+            return {'message': f'Table {table_id} does not exist'}, 400
+        
+        # Check if the table is available
+        if not table.available:
+            return {'message': f'Table {table_id} is currently unavailable'}, 400
+
+        # Check for overlapping reservations
+        overlapping_reservations = Reservation.query.filter(
+            Reservation.table_id == table_id,
+            Reservation.reservation_end > reservation_start,
+            Reservation.reservation_start < reservation_end,
+            Reservation.pending == True  # Only consider pending reservations
+        ).first()
+
+        if overlapping_reservations:
+            return {'message': f'Table {table_id} is already reserved during that time'}, 409
+        
+
+        # Create the reservation
+        new_reservation = Reservation(
+            user_id=user_id,
+            table_id=table_id,
+            pending=pending,
+            created_at=datetime.datetime.utcnow(),
+            reservation_start=reservation_start,
+            reservation_end=reservation_end
+        )
+        db.session.add(new_reservation)
+        db.session.commit()
+
+        return {'message': 'Reservation created successfully'}, 201
+
+
+    @ns.doc(params={
+        'reservation_start': 'Start time of the time range to check (format: YYYY-MM-DDTHH:MM)',
+        'reservation_end': 'End time of the time range to check (format: YYYY-MM-DDTHH:MM)'
+    })
+    @ns.response(200, 'Success')
+    @ns.response(400, 'Invalid input')
+    def get(self):
+        reservation_start_str = request.args.get('reservation_start')
+        reservation_end_str = request.args.get('reservation_end')
+
+        if not reservation_start_str or not reservation_end_str:
+            return {'message': 'reservation_start and reservation_end query parameters are required'}, 400
+
+        try:
+            reservation_start = datetime.strptime(reservation_start_str, '%Y-%m-%dT%H:%M').replace(tzinfo=timezone.utc)
+            reservation_end = datetime.strptime(reservation_end_str, '%Y-%m-%dT%H:%M').replace(tzinfo=timezone.utc)
+        except ValueError as e:
+            return {'message': 'Invalid date format', 'errors': str(e)}, 400
+
+        if reservation_start >= reservation_end:
+            return {'message': 'reservation_start must be before reservation_end'}, 400
+
+        
+
+        # Get all overlapping reservations
+        overlapping_reservations = Reservation.query.filter(
+            Reservation.reservation_end > reservation_start,
+            Reservation.reservation_start < reservation_end,
+            Reservation.pending == True  # Only consider pending reservations
+        ).all()
+
+        # Extract occupied table IDs
+        occupied_table_ids = [reservation.table_id for reservation in overlapping_reservations]
+
+        return {'occupied_table_ids': occupied_table_ids}, 200
+
 
 api.add_namespace(ns)
 

@@ -1,9 +1,6 @@
 title: User
 type: object
 properties:
-  id:
-    type: integer
-    example: 1
   email:
     type: string
     example: user@example.com
@@ -19,9 +16,6 @@ properties:
   password:
     type: string
     example: pass123
-  is_admin:
-    type: boolean
-    example: false
 required:
   - email
   - phone_number
