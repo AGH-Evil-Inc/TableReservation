@@ -144,7 +144,7 @@ class Register(Resource):
         first_name = validated_data['first_name']
         last_name = validated_data['last_name']
         password = validated_data['password']
-        phone_number = validated_data.get('phone')
+        phone_number = validated_data.get('phone_number')
 
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
