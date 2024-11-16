@@ -1,0 +1,17 @@
+.reservation-form, .occupied-tables, .updates {
+    margin: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  
+  .reservation-form label, .reservation-form input, .reservation-form button {
+    display: block;
+    margin: 5px 0;
+  }
+  
+  .occupied-tables ul, .updates ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  

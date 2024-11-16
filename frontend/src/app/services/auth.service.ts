@@ -12,14 +12,14 @@ export class AuthService {
   constructor(private http: HttpClient) { }
 
   register(user: User): Observable<any> {
-    return this.http.post(backApiUrl(`/register`),  user );
+    return this.http.post(backApiUrl(`/auth/register`),  user );
   }
 
   login(user: LoginData): Observable<LoginResponse> {
-    return this.http.post<{ token: string, name: string }>(backApiUrl(`/login`),  user );
+    return this.http.post<{ token: string, name: string }>(backApiUrl(`/auth/login`),  user );
   }
 
   logout(): Observable<any> {
-    return this.http.post(backApiUrl(`/logout`), {});
+    return this.http.post(backApiUrl(`/auth/logout`), {});
   }
 }

@@ -1,0 +1,49 @@
+<div class="reservation-form">
+    <h2>Make a Reservation</h2>
+    <form (ngSubmit)="submitReservation()">
+      <label for="tableId">Table ID:</label>
+      <input 
+        id="tableId" 
+        [(ngModel)]="reservation.table_id" 
+        name="table_id" 
+        type="number" 
+        required 
+      />
+  
+      <label for="start">Start Time:</label>
+      <input 
+        id="start" 
+        [(ngModel)]="reservation.reservation_start" 
+        (ngModelChange)="onReservationTimeChange()" 
+        name="reservation_start" 
+        type="datetime-local" 
+        required 
+      />
+  
+      <label for="end">End Time:</label>
+      <input 
+        id="end" 
+        [(ngModel)]="reservation.reservation_end" 
+        (ngModelChange)="onReservationTimeChange()" 
+        name="reservation_end" 
+        type="datetime-local" 
+        required />
+      <button type="submit">Reserve</button>
+    </form>
+</div>
+  
+<div class="occupied-tables">
+    <h2>Occupied Tables</h2>
+    <p *ngIf="occupiedTables.length === 0">No tables are occupied.</p>
+    <ul>
+        <li *ngFor="let table of occupiedTables">Table ID: {{ table }}</li>
+    </ul>
+</div>
+
+<div class="updates">
+    <h2>Real-Time Updates</h2>
+    <ul>
+        <li *ngFor="let update of updates">{{ update | json }}</li>
+    </ul>
+</div>
+  

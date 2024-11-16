@@ -2,6 +2,7 @@ import yaml
 from flask import Flask, request, jsonify
 from flask_restx import Api, Resource, fields
 from flask_cors import CORS
+from flask_socketio import SocketIO, emit
 import jwt
 import datetime
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -10,11 +11,12 @@ import pandas as pd
 from flask_mail import Mail, Message
 from Marshmallow import UserSchema, LoginSchema, ResetPasswordSchema, NewPasswordSchema, ReservationSchema
 from marshmallow import ValidationError
-
+from datetime import timezone
 from extensions import db  # Import db from extensions.py
 
 app = Flask(__name__)
 CORS(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Configuration
 app.config.from_pyfile('config.cfg')
@@ -44,7 +46,7 @@ with open('../apispecification/defs/auth/RequestResetPassword.yaml', 'r') as fil
     reset_pass_schema = yaml.safe_load(file)
 with open('../apispecification/defs/auth/LoginResponse.yaml', 'r') as file:
     login_response_schema = yaml.safe_load(file)
-with open('../apispecification/defs/auth/Reservation.yaml', 'r') as file:
+with open('../apispecification/defs/reservation/Reservation.yaml', 'r') as file:
     reservation_schema = yaml.safe_load(file)
 
 # Dynamiczne tworzenie modelu
@@ -126,7 +128,7 @@ class Init(Resource):
 
 
 # Rejestracja nowego użytkownika
-@ns.route('/register')
+@ns.route('/auth/register')
 class Register(Resource):
     @ns.expect(user_model)
     @ns.response(201, 'User created successfully')
@@ -143,7 +145,7 @@ class Register(Resource):
         first_name = validated_data['first_name']
         last_name = validated_data['last_name']
         password = validated_data['password']
-        phone_number = validated_data.get('phone')
+        phone_number = validated_data.get('phone_number')
 
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
@@ -165,7 +167,7 @@ class Register(Resource):
 
 
 # Logowanie użytkownika
-@ns.route('/login')
+@ns.route('/auth/login')
 class Login(Resource):
     @ns.expect(login_data_model)
     @ns.response(200, 'Login successful')
@@ -197,7 +199,7 @@ class Login(Resource):
         return login_response_model, 200
 
 # Wylogowywanie:
-@ns.route('/logout')
+@ns.route('/auth/logout')
 class Logout(Resource):
     @ns.response(200, 'Logout successful')
     @ns.response(400, 'Logout invalid')
@@ -207,7 +209,7 @@ class Logout(Resource):
         return {'message': 'You are logged out'}, 200
 
 
-@ns.route('/request-password-reset')
+@ns.route('/auth/request-password-reset')
 class RequestPasswordReset(Resource):
     @ns.expect(reset_pass_model)
     @ns.response(200, 'Email to reset password has been sent')
@@ -259,7 +261,7 @@ Table&Taste"""
         return {'message': message}, 200
 
 
-@ns.route('/reset-password')
+@ns.route('/auth/reset-password')
 class ResetPassword(Resource):
     def post(self):
         data = request.get_json()
@@ -350,6 +352,13 @@ class CreateReservation(Resource):
         db.session.add(new_reservation)
         db.session.commit()
 
+        # Emitowanie aktualizacji do klientów
+        socketio.emit('reservation_update', {
+            'table_id': table_id,
+            'reservation_start': reservation_start.isoformat(),
+            'reservation_end': reservation_end.isoformat() 
+        })
+
         return {'message': 'Reservation created successfully'}, 201
 
 
@@ -367,8 +376,8 @@ class CreateReservation(Resource):
             return {'message': 'reservation_start and reservation_end query parameters are required'}, 400
 
         try:
-            reservation_start = datetime.strptime(reservation_start_str, '%Y-%m-%dT%H:%M').replace(tzinfo=timezone.utc)
-            reservation_end = datetime.strptime(reservation_end_str, '%Y-%m-%dT%H:%M').replace(tzinfo=timezone.utc)
+            reservation_start = datetime.datetime.strptime(reservation_start_str, '%Y-%m-%dT%H:%M').replace(tzinfo=timezone.utc)
+            reservation_end = datetime.datetime.strptime(reservation_end_str, '%Y-%m-%dT%H:%M').replace(tzinfo=timezone.utc)
         except ValueError as e:
             return {'message': 'Invalid date format', 'errors': str(e)}, 400
 
@@ -389,8 +398,17 @@ class CreateReservation(Resource):
 
         return {'occupied_table_ids': occupied_table_ids}, 200
 
-
+@socketio.on('connect') 
+def test_connect():
+     print('Client connected') 
+     emit('my_response', {'data': 'Connected'})
+     
+@socketio.on('disconnect') 
+def test_disconnect():
+    def test_disconnect(): print('Client disconnected')
+    
 api.add_namespace(ns)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, debug=True)
+    # app.run(debug=True)
