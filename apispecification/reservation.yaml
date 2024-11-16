@@ -1,0 +1,57 @@
+openapi: 3.0.0
+info:
+  title: Authentication API
+  description: API for user authentication (registration and login)
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:5000/api 
+paths:
+  /reservation:
+    post:
+      summary: Create a new reservation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './defs/reservation/Reservation.yaml'
+      responses:
+        '201':
+          description: Reservation created successfully
+        '400':
+          description: Invalid input
+        '409':
+          description: Conflict - Table already reserved
+      security:
+        - bearerAuth: []
+    get:
+      summary: Get occupied tables for a specific date and time range
+      parameters:
+        - in: query
+          name: reservation_start
+          schema:
+            type: string
+            format: date-time
+          required: true
+          description: Start time of the time range to check (ISO format)
+        - in: query
+          name: reservation_end
+          schema:
+            type: string
+            format: date-time
+          required: true
+          description: End time of the time range to check (ISO format)
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  occupied_table_ids:
+                    type: array
+                    items:
+                      type: integer
+        '400':
+          description: Invalid input

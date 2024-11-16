@@ -8,10 +8,8 @@ configuration.ts
 encoder.ts
 git_push.sh
 index.ts
-model/loginData.ts
-model/loginResponse.ts
 model/models.ts
-model/requestResetPassword.ts
-model/user.ts
+model/reservation.ts
+model/reservationGet200Response.ts
 param.ts
 variables.ts

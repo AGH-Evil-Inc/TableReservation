@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields as ma_fields, validate, ValidationError, validates_schema
-import datetime, timezone
+from datetime import datetime, timezone
 
 
 # Marshmallow Schemas for Validation
@@ -8,7 +8,7 @@ class UserSchema(Schema):
     first_name = ma_fields.Str(required=True, validate=validate.Regexp('^[A-Za-z]+$'))
     last_name = ma_fields.Str(required=True, validate=validate.Regexp('^[A-Za-z]+$'))
     password = ma_fields.Str(required=True, validate=validate.Length(min=6))
-    phone = ma_fields.Str(validate=validate.Regexp(r'^\d{9}$'))
+    phone_number = ma_fields.Str(validate=validate.Regexp(r'^\d{9}$'))
 
 class LoginSchema(Schema):
     email = ma_fields.Email(required=True)

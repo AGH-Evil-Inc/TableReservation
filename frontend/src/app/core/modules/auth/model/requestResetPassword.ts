@@ -9,11 +9,7 @@
  */
 
 
-export interface User { 
+export interface RequestResetPassword { 
     email: string;
-    first_name: string;
-    last_name: string;
-    phone_number: string;
-    password: string;
 }
 

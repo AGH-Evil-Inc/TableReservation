@@ -9,11 +9,7 @@
  */
 
 
-export interface User { 
-    email: string;
-    first_name: string;
-    last_name: string;
-    phone_number: string;
-    password: string;
+export interface ReservationGet200Response { 
+    occupied_table_ids?: Array<number>;
 }
 

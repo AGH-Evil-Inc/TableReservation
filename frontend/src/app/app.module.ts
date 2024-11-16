@@ -36,7 +36,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatInputModule } from '@angular/material/input'
 import { AuthComponentService } from './services/auth-component.service';
+import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
+import { ReservationPageComponent } from './reservation/reservation-page/reservation-page.component';
 
+const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
 
 @NgModule({ declarations: [
         AppComponent,
@@ -45,7 +48,8 @@ import { AuthComponentService } from './services/auth-component.service';
         HomePageComponent,
         ShellFooterComponent,
         ShellHeaderComponent,
-        CookieBannerComponent
+        CookieBannerComponent,
+        ReservationPageComponent
     ],
     bootstrap: [AppComponent],
     imports: [BrowserModule,
@@ -67,6 +71,7 @@ import { AuthComponentService } from './services/auth-component.service';
         MdbPopoverModule,
         MdbRadioModule,
         MdbRangeModule,
+        SocketIoModule.forRoot(config),
         CookieModule.forRoot(),
         MdbRippleModule,
         MdbScrollspyModule,
