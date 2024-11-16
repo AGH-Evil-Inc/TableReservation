@@ -1,49 +1,57 @@
-<div class="reservation-form">
-    <h2>Make a Reservation</h2>
-    <form (ngSubmit)="submitReservation()">
-      <label for="tableId">Table ID:</label>
-      <input 
-        id="tableId" 
-        [(ngModel)]="reservation.table_id" 
-        name="table_id" 
-        type="number" 
-        required 
-      />
+<div class="reservation-container">
+    <div class="form-section">
+      <h2>Zarezerwuj stolik</h2>
+      <form (ngSubmit)="submitReservation()">
+        <div class="form-group">
+          <label for="date">Wybierz datę</label>
+          <input id="date" type="date" [(ngModel)]="reservationFormData.date" (ngModelChange)="onReservationTimeChange()" name="date" required />
+        </div>
+        
+        <div class="form-group">
+          <label for="start-time">Godzina rozpoczęcia</label>
+          <input 
+            id="start-time" 
+            type="time" 
+            [(ngModel)]="reservationFormData.start_time" 
+            (ngModelChange)="onReservationTimeChange()" 
+            name="start_time" 
+            required 
+            /> 
+        </div>
+        
+        <div class="form-group">
+          <label for="duration">Długość rezerwacji</label>
+          <input 
+            id="duration" 
+            type="time" 
+            [(ngModel)]="reservationFormData.duration" 
+            (ngModelChange)="onReservationTimeChange()" 
+            name="duration" 
+            required 
+            /> 
+        </div>
+        
+        <div class="form-group">
+          <label for="tableId">Wybrany stolik</label>
+          <input id="tableId" type="number" [(ngModel)]="reservation.table_id" name="table_id" readonly />
+        </div>
+        
+        <button type="submit" class="submit-button">Wyślij rezerwację</button>
+      </form>
+    </div>
   
-      <label for="start">Start Time:</label>
-      <input 
-        id="start" 
-        [(ngModel)]="reservation.reservation_start" 
-        (ngModelChange)="onReservationTimeChange()" 
-        name="reservation_start" 
-        type="datetime-local" 
-        required 
-      />
-  
-      <label for="end">End Time:</label>
-      <input 
-        id="end" 
-        [(ngModel)]="reservation.reservation_end" 
-        (ngModelChange)="onReservationTimeChange()" 
-        name="reservation_end" 
-        type="datetime-local" 
-        required />
-      <button type="submit">Reserve</button>
-    </form>
-</div>
-  
-<div class="occupied-tables">
-    <h2>Occupied Tables</h2>
-    <p *ngIf="occupiedTables.length === 0">No tables are occupied.</p>
-    <ul>
-        <li *ngFor="let table of occupiedTables">Table ID: {{ table }}</li>
-    </ul>
-</div>
-
-<div class="updates">
-    <h2>Real-Time Updates</h2>
-    <ul>
-        <li *ngFor="let update of updates">{{ update | json }}</li>
-    </ul>
-</div>
+    <div class="plan-section">
+      <div class="plan" (click)="selectTable($event)">
+        <div
+          *ngFor="let table of tables"
+          class="table"
+          [class.occupied]="occupiedTables.includes(table.id)"
+          [class.selected]="reservation.table_id === table.id"
+          [attr.data-id]="table.id"
+        >
+          {{ table.id }}
+        </div>
+      </div>
+    </div>
+  </div>
   

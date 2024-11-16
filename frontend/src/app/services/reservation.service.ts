@@ -29,4 +29,9 @@ export class ReservationService {
   onReservationUpdate(): Observable<any> {
     return this.reservationUpdates.asObservable();
   }
+
+  disconnectSocket(): void {
+    this.socket.disconnect();
+  }
+  
 }

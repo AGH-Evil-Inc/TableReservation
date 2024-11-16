@@ -55,3 +55,12 @@ paths:
                       type: integer
         '400':
           description: Invalid input
+      security:
+      - bearerAuth: []  # Dodano zabezpieczenie Bearer dla GET
+      
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT  # Określenie formatu tokenu jako JWT

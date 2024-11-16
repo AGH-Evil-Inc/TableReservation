@@ -1,21 +1,20 @@
 import yaml
-from flask import Flask, request, jsonify
+from flask import Flask, logging, make_response, request, jsonify
 from flask_restx import Api, Resource, fields
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 import jwt
 import datetime
-from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-import os
-import pandas as pd
 from flask_mail import Mail, Message
 from Marshmallow import UserSchema, LoginSchema, ResetPasswordSchema, NewPasswordSchema, ReservationSchema
 from marshmallow import ValidationError
-from datetime import timezone
+from datetime import timedelta, timezone
 from extensions import db  # Import db from extensions.py
+from functools import wraps
+from flask import request
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Configuration
@@ -28,14 +27,12 @@ mail = Mail(app)
 # Now import models after db is initialized
 from database_model import User, Reservation, Table
 
-# Initialize LoginManager
-login_manager = LoginManager(app)
-login_manager.login_view = 'api_login'
+# Configuration for JWT
+app.config['SECRET_KEY'] = 'your-secret-key'  # Use a strong key for production
 
 # Konfiguracja API
 api = Api(app, version='1.0', title='Authentication API', description='API for user authentication (registration and login)')
 ns = api.namespace('api', description='Authentication operations')
-
 
 # Wczytanie schematu z pliku YAML
 with open('../apispecification/defs/auth/User.yaml', 'r') as file:
@@ -56,12 +53,42 @@ reset_pass_model = api.schema_model('RequestResetPassword', reset_pass_schema)
 login_response_model = api.schema_model('LoginResponse', login_response_schema)
 reservation_model = api.schema_model('Reservation', reservation_schema)
 
-# User loader callback for flask_login
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+# Helper function to validate JWT tokens
+def token_required(f):
+    @wraps(f)
+    def decorator(*args, **kwargs):
+        token = None
+        if 'Authorization' in request.headers:
+            token = request.headers['Authorization'].split(" ")[1]  # Extract token from Authorization header
 
+        if not token:
+            return {'message': 'Token is missing'}, 401
 
+        try:
+            # Decode the JWT token to get user_id
+            payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+            current_user = db.session.get(User, payload['user_id'])
+            if not current_user:
+                return {'message': 'User not found'}, 401
+        except jwt.ExpiredSignatureError:
+            return {'message': 'Token has expired'}, 401
+        except jwt.InvalidTokenError:
+            return {'message': 'Invalid token'}, 401
+
+        # Attach current_user to the request context
+        request.current_user = current_user
+        return f(*args, **kwargs)
+    return decorator
+
+def decode_jwt(token):
+    try:
+        payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        return payload
+    except jwt.ExpiredSignatureError:
+        return None  # Token wygasł
+    except jwt.InvalidTokenError:
+        return None  # Niepoprawny token
+    
 @ns.route('/init')
 class Init(Resource):
     def get(self):
@@ -85,47 +112,7 @@ class Init(Resource):
                 db.session.add(admin)
                 db.session.commit()
 
-            try:
-                tables_df = pd.read_excel("SampleData.xlsx", sheet_name="tables")
-                users_df = pd.read_excel("SampleData.xlsx", sheet_name="users")
-
-                # Populate the tables:
-                for _, t in tables_df.iterrows():
-                    existing_table = Table.query.filter_by(description=t["description"]).first()
-                    if not existing_table:
-                        new_table_entry = Table(
-                            available=bool(t["available"]),
-                            no_seats=t["no_seats"],
-                            description=t["description"],
-                            location_x=t["location_x"],
-                            location_y=t["location_y"]
-                        )
-                        db.session.add(new_table_entry)
-                # Populuj użytkowników (z pominięciem admina)
-                for _, u in users_df.iterrows():
-                    if u["email"] != 'admin@example.com':
-                        existing_user = User.query.filter_by(email=u["email"]).first()
-                        if not existing_user:
-                            hashed_password = User.get_hashed_password(u["password"])
-                            new_user_entry = User(
-                                first_name=u["first_name"],
-                                last_name=u["last_name"],
-                                email=u["email"],
-                                password=hashed_password,
-                                phone_number=u["phone_number"],
-                                is_admin=bool(u["is_admin"])
-                            )
-                            db.session.add(new_user_entry)
-
-                db.session.commit()
-                message = "Initial configuration done with sample data!"
-            except Exception as e:
-                db.session.rollback()
-                message = f"Error during initial configuration: {e}"
-                return {'message': message}, 500
-
             return {'message': 'Initial configuration done!'}, 200
-
 
 # Rejestracja nowego użytkownika
 @ns.route('/auth/register')
@@ -165,7 +152,6 @@ class Register(Resource):
 
         return {'message': 'User created successfully'}, 201
 
-
 # Logowanie użytkownika
 @ns.route('/auth/login')
 class Login(Resource):
@@ -188,26 +174,22 @@ class Login(Resource):
         if user is None or not User.verify_password(user.password, password):
             return {'message': 'Invalid credentials'}, 401
 
-        login_user(user)
-
         token = jwt.encode({
             'user_id': user.id,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+            'exp': datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=1)
         }, app.config['SECRET_KEY'], algorithm='HS256')
 
-        login_response_model = {"name" : user.first_name, 'token' : token}
-        return login_response_model, 200
+        return {'name': user.first_name, 'token': token}, 200
+
 
 # Wylogowywanie:
 @ns.route('/auth/logout')
 class Logout(Resource):
     @ns.response(200, 'Logout successful')
-    @ns.response(400, 'Logout invalid')
-    @login_required  # Użytkownik musi być zalogowany, aby móc się wylogować
+    @token_required
     def post(self):
-        logout_user()
+        # JWT does not require server-side logout, just inform the client to discard the token
         return {'message': 'You are logged out'}, 200
-
 
 @ns.route('/auth/request-password-reset')
 class RequestPasswordReset(Resource):
@@ -233,7 +215,7 @@ class RequestPasswordReset(Resource):
             # Generate a reset token
             reset_token = jwt.encode({
                 'user_id': user.id,
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+                'exp':  datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=1)
             }, app.config['SECRET_KEY'], algorithm='HS256')
 
             # Construct the password reset URL
@@ -300,7 +282,7 @@ class CreateReservation(Resource):
     @ns.response(201, 'Reservation created successfully')
     @ns.response(400, 'Invalid input')
     @ns.response(409, 'Conflict - Table already reserved')
-    @login_required
+    @token_required
     def post(self):
         """
         Create a new reservation
@@ -312,8 +294,23 @@ class CreateReservation(Resource):
             validated_data = schema.load(data)
         except ValidationError as err:
             return {'message': 'Invalid input', 'errors': err.messages}, 400
+        
+        token = request.headers.get('Authorization') 
 
-        user_id = current_user.id
+        if not token:
+            return {'message': 'Token is missing'}, 401
+
+        # Usuwamy "Bearer " z tokenu, jeśli jest obecne
+        token = token.replace("Bearer ", "")
+
+        # Dekodowanie tokenu
+        payload = decode_jwt(token)
+        
+        if not payload:
+            return {'message': 'Unauthorized'}, 401
+
+        # Wyciąganie user_id z payload
+        user_id = payload.get('user_id')
         table_id = validated_data['table_id']
         reservation_start = validated_data['reservation_start'].replace(tzinfo=timezone.utc)
         reservation_end = validated_data['reservation_end'].replace(tzinfo=timezone.utc)
@@ -345,7 +342,7 @@ class CreateReservation(Resource):
             user_id=user_id,
             table_id=table_id,
             pending=pending,
-            created_at=datetime.datetime.utcnow(),
+            created_at= datetime.datetime.now(datetime.UTC),
             reservation_start=reservation_start,
             reservation_end=reservation_end
         )
@@ -398,14 +395,15 @@ class CreateReservation(Resource):
 
         return {'occupied_table_ids': occupied_table_ids}, 200
 
-@socketio.on('connect') 
-def test_connect():
-     print('Client connected') 
-     emit('my_response', {'data': 'Connected'})
-     
-@socketio.on('disconnect') 
-def test_disconnect():
-    def test_disconnect(): print('Client disconnected')
+@socketio.on('connect')
+def handle_connect():
+    print('Client connected') 
+    emit('my_response', {'data': 'Connected'}, broadcast=True)  # Broadcast optional if needed globally
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Client disconnected')
+    emit('my_response', {'data': 'Disconnected'}, broadcast=True)
     
 api.add_namespace(ns)
 

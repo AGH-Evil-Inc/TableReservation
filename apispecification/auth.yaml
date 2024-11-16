@@ -41,6 +41,8 @@ paths:
   /logout:
     post:
       summary: Log out an existing user
+      security:
+      - bearerAuth: []  # Dodanie autoryzacji typu Bearer Token
       responses:
         '200':
           description: Logout successful
@@ -60,4 +62,10 @@ paths:
           description: Email to reset password has been sent
         '400':
           description: Cannot send email to reset password
-  
+      
+components:    
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
