@@ -38,6 +38,9 @@ import { MatInputModule } from '@angular/material/input'
 import { AuthComponentService } from './services/auth-component.service';
 import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
 import { ReservationPageComponent } from './reservation/reservation-page/reservation-page.component';
+import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
 
@@ -49,7 +52,9 @@ const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
         ShellFooterComponent,
         ShellHeaderComponent,
         CookieBannerComponent,
-        ReservationPageComponent
+        ReservationPageComponent,
+        ForgotPasswordComponent,
+        ResetPasswordComponent
     ],
     bootstrap: [AppComponent],
     imports: [BrowserModule,
@@ -61,6 +66,7 @@ const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
         MatIconModule,
         MatInputModule,
         MatFormFieldModule,
+        MatSnackBarModule,
         MdbAccordionModule,
         MdbCarouselModule,
         MdbCheckboxModule,

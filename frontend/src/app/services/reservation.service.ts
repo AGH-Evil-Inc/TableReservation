@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
-import { backApiUrl } from './modules-api-url';
+import { backApiUrl, createAuthHeaders } from './modules-api-url';
 import { Reservation, ReservationGet200Response } from '../core/modules/reservation';
 import { Socket } from 'ngx-socket-io';
 
@@ -18,12 +18,12 @@ export class ReservationService {
   }
 
   createReservation(reservation: Reservation): Observable<any> {
-    return this.http.post(backApiUrl('/reservation'), reservation);
+    return this.http.post(backApiUrl('/reservation'), reservation,{ headers: createAuthHeaders(), withCredentials:true });
   }
 
   getOccupiedTables(reservationStart: string, reservationEnd: string): Observable<ReservationGet200Response> {
     const params = { reservation_start: reservationStart, reservation_end: reservationEnd };
-    return this.http.get<ReservationGet200Response>(backApiUrl('/reservation'), { params });
+    return this.http.get<ReservationGet200Response>(backApiUrl('/reservation'), { params, headers: createAuthHeaders(), withCredentials:true });
   }
 
   onReservationUpdate(): Observable<any> {
@@ -33,5 +33,7 @@ export class ReservationService {
   disconnectSocket(): void {
     this.socket.disconnect();
   }
+
+   
   
 }

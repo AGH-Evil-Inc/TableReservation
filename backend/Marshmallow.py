@@ -18,8 +18,9 @@ class ResetPasswordSchema(Schema):
     email = ma_fields.Email(required=True)
 
 class NewPasswordSchema(Schema):
-    token = ma_fields.Str(required=True)
-    new_password = ma_fields.Str(required=True, validate=validate.Length(min=6))
+    print(Schema)
+    resetToken = ma_fields.Str(required=True)
+    newPassword = ma_fields.Str(required=True, validate=validate.Length(min=6))
 
 class ReservationSchema(Schema):
     table_id = ma_fields.Int(required=True)

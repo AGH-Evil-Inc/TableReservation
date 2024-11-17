@@ -62,6 +62,35 @@ paths:
           description: Email to reset password has been sent
         '400':
           description: Cannot send email to reset password
+
+  /reset-password:
+    post:
+      summary: Resetowanie hasła
+      description: Umożliwia użytkownikowi zresetowanie hasła.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './defs/auth/ResetPassword.yaml'
+      responses:
+        '200':
+          description: Hasło zostało pomyślnie zresetowane.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Password reset successfully."
+        '400':
+          description: Złe dane wejściowe.
+        '404':
+          description: Użytkownik nie został znaleziony.
+        '500':
+          description: Błąd wewnętrzny serwera.
+
       
 components:    
   securitySchemes:

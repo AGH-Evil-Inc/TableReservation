@@ -9,6 +9,7 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'home', component: HomePageComponent },
   { path: 'reservation', component: ReservationPageComponent, canActivate: [AuthGuard] },
+  { path: 'reset-password', component: HomePageComponent },
   { path: '', redirectTo: '/home', pathMatch: 'full' }
 ];
 

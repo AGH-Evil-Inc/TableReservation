@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
-import { backApiUrl } from './modules-api-url';
-import { LoginData, LoginResponse, User } from '../core/modules/auth';
+import { backApiUrl, createAuthHeaders } from './modules-api-url';
+import { LoginData, LoginResponse, RequestResetPassword, ResetPassword, User } from '../core/modules/auth';
+
 
 @Injectable({
   providedIn: 'root'
@@ -18,26 +19,19 @@ export class AuthService {
   }
 
   login(user: LoginData): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(backApiUrl(`/auth/login`), user, {withCredentials:true})
-        .pipe(tap(response => {
-          localStorage.setItem('token', response.token);
-        }));
+    return this.http.post<LoginResponse>(backApiUrl(`/auth/login`), user, {withCredentials:true});
   }
 
-
-   // Logout method
-   logout(): Observable<any> {
-    return this.http.post(backApiUrl(`/auth/logout`), {}, { headers: this.createAuthHeaders() })
-      .pipe(tap(() => {
-        // Clear the token from localStorage
-        localStorage.removeItem('token');
-      }));
+  forgot_password(user_email:RequestResetPassword): Observable<any> {
+    return this.http.post(backApiUrl('/auth/request-password-reset'),user_email, {withCredentials:true});
   }
 
-  // Helper method to create authorization headers with the stored token
-  private createAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
-    return token ? new HttpHeaders({ 'Authorization': `Bearer ${token}` }) : new HttpHeaders();
+  logout(): Observable<any> {
+    return this.http.post(backApiUrl(`/auth/logout`), {}, { headers: createAuthHeaders(), withCredentials:true });
   }
+
+  resetPassword(resetPassword: ResetPassword): Observable<any> {
+    return this.http.post(backApiUrl('/auth/reset-password'), resetPassword , {withCredentials:true});
+  }  
 
 }

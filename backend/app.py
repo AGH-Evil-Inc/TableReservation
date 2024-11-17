@@ -40,6 +40,8 @@ with open('../apispecification/defs/auth/User.yaml', 'r') as file:
 with open('../apispecification/defs/auth/LoginData.yaml', 'r') as file:
     login_data_schema = yaml.safe_load(file)
 with open('../apispecification/defs/auth/RequestResetPassword.yaml', 'r') as file:
+    req_reset_pass_schema = yaml.safe_load(file)
+with open('../apispecification/defs/auth/ResetPassword.yaml', 'r') as file:
     reset_pass_schema = yaml.safe_load(file)
 with open('../apispecification/defs/auth/LoginResponse.yaml', 'r') as file:
     login_response_schema = yaml.safe_load(file)
@@ -49,7 +51,8 @@ with open('../apispecification/defs/reservation/Reservation.yaml', 'r') as file:
 # Dynamiczne tworzenie modelu
 user_model = api.schema_model('User', user_schema)
 login_data_model = api.schema_model('LoginData', login_data_schema)
-reset_pass_model = api.schema_model('RequestResetPassword', reset_pass_schema)
+req_reset_pass_model = api.schema_model('RequestResetPassword', req_reset_pass_schema)
+reset_pass_model = api.schema_model('ResetPassword', reset_pass_schema)
 login_response_model = api.schema_model('LoginResponse', login_response_schema)
 reservation_model = api.schema_model('Reservation', reservation_schema)
 
@@ -193,7 +196,7 @@ class Logout(Resource):
 
 @ns.route('/auth/request-password-reset')
 class RequestPasswordReset(Resource):
-    @ns.expect(reset_pass_model)
+    @ns.expect(req_reset_pass_model)
     @ns.response(200, 'Email to reset password has been sent')
     @ns.response(400, 'Cannot send email to reset password')
     def post(self):
@@ -219,7 +222,7 @@ class RequestPasswordReset(Resource):
             }, app.config['SECRET_KEY'], algorithm='HS256')
 
             # Construct the password reset URL
-            reset_url = f"http://your-frontend-domain/reset-password?token={reset_token}"
+            reset_url = f"http://localhost:4200/reset-password?token={reset_token}"
 
             # Send the email
             try:
@@ -245,16 +248,18 @@ Table&Taste"""
 
 @ns.route('/auth/reset-password')
 class ResetPassword(Resource):
+    @ns.expect(reset_pass_model)
     def post(self):
         data = request.get_json()
+        
         schema = NewPasswordSchema()
         try:
             validated_data = schema.load(data)
         except ValidationError as err:
             return {'message': 'Invalid input', 'errors': err.messages}, 400
 
-        reset_token = validated_data['token']
-        new_password = validated_data['new_password']
+        reset_token = validated_data['resetToken']
+        new_password = validated_data['newPassword']
 
         try:
             # Decode the token
