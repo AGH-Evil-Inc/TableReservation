@@ -1,0 +1,40 @@
+.content {
+  padding: 2rem;
+
+  .hero-section {
+    background-color: $primary-color2;
+    color: $text-color-light;
+    text-align: center;
+    padding: 3rem 1.5rem;
+    border-radius: $border-radius;
+    margin-bottom: 2rem;
+    box-shadow: $box-shadow;
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .cta-button {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.8rem 1.5rem;
+      background-color: $accent-color;
+      color: $text-color-dark;
+      border-radius: $border-radius;
+      text-decoration: none;
+      transition: background-color 0.3s;
+      box-shadow: $box-shadow;
+      font-size: 1rem;
+
+      &:hover {
+        background-color: darken($accent-color, 10%);
+      }
+    }
+  }
+}

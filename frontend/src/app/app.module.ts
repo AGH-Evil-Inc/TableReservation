@@ -41,6 +41,7 @@ import { ReservationPageComponent } from './reservation/reservation-page/reserva
 import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { ReservationPageNologgedComponent } from './reservation/reservation-page-nologged/reservation-page-nologged.component';
 
 const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
 
@@ -54,7 +55,8 @@ const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
         CookieBannerComponent,
         ReservationPageComponent,
         ForgotPasswordComponent,
-        ResetPasswordComponent
+        ResetPasswordComponent,
+        ReservationPageNologgedComponent,
     ],
     bootstrap: [AppComponent],
     imports: [BrowserModule,

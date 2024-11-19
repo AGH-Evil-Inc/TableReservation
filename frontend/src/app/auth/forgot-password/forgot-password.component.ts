@@ -51,6 +51,6 @@ export class ForgotPasswordComponent {
 
   goToLogin() {
     this.closeDialog();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/home']);
   }
 }

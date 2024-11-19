@@ -370,6 +370,7 @@ class CreateReservation(Resource):
     })
     @ns.response(200, 'Success')
     @ns.response(400, 'Invalid input')
+    @token_required
     def get(self):
         reservation_start_str = request.args.get('reservation_start')
         reservation_end_str = request.args.get('reservation_end')

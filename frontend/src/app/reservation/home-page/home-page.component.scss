@@ -2,12 +2,13 @@
   padding: 2rem;
 
   .hero-section {
-    background-color: #1047ad;
-    color: #fff;
+    background-color: $primary-color2;
+    color: $text-color-light;
     text-align: center;
     padding: 3rem 1.5rem;
-    border-radius: 8px;
+    border-radius: $border-radius;
     margin-bottom: 2rem;
+    box-shadow: $box-shadow;
 
     h1 {
       font-size: 2rem;
@@ -18,14 +19,15 @@
       display: inline-block;
       margin-top: 1rem;
       padding: 0.8rem 1.5rem;
-      background-color: #ffeb3b;
-      color: #061531;
-      border-radius: 8px;
+      background-color: $accent-color;
+      color: $text-color-dark;
+      border-radius: $border-radius;
       text-decoration: none;
       transition: background-color 0.3s;
+      box-shadow: $box-shadow;
 
       &:hover {
-        background-color: #ffcc00;
+        background-color: darken($accent-color, 10%);
       }
     }
   }
@@ -37,11 +39,12 @@
     h2 {
       font-size: 1.75rem;
       margin-bottom: 1rem;
+      color: $primary-color1;
     }
 
     p {
       font-size: 1rem;
-      color: #333;
+      color: $text-color-dark;
     }
   }
 
@@ -52,12 +55,13 @@
     margin-top: 2rem;
 
     .promotion-card {
-      background: #528cef;
+      background: $secondary-color;
       padding: 1rem;
-      border-radius: 8px;
-      color: #fff;
+      border-radius: $border-radius;
+      color: $text-color-light;
       flex: 1;
       min-width: 250px;
+      box-shadow: $box-shadow;
 
       h3 {
         font-size: 1.25rem;
@@ -73,27 +77,29 @@
   .testimonials-section {
     margin-top: 2rem;
     padding: 1.5rem;
-    background: #f4f4f4;
-    border-radius: 8px;
+    background: $background-light;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
 
     h2 {
       text-align: center;
       font-size: 1.75rem;
       margin-bottom: 1rem;
+      color: $primary-color1;
     }
 
     blockquote {
       font-style: italic;
       margin: 1rem 0;
       padding-left: 1rem;
-      border-left: 4px solid #ffeb3b;
+      border-left: 4px solid $accent-color;
       font-size: 0.9rem;
-      color: #333;
+      color: $text-color-dark;
 
       footer {
         font-size: 0.85rem;
         margin-top: 0.5rem;
-        color: #555;
+        color: lighten($text-color-dark, 20%);
       }
     }
   }

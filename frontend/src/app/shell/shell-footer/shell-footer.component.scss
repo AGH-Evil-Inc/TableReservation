@@ -1,7 +1,7 @@
 // Definicje kolorów
-$footer-background: linear-gradient(0deg, #061531, #528cef);
-$footer-text-color: #fff;
-$footer-heading-color: #ffeb3b;
+$footer-background: linear-gradient(0deg, $primary-color11, $primary-color2);
+$footer-text-color: $text-color-light;
+$footer-heading-color: $accent-color;
 
 
 // Style dla stopki
@@ -10,7 +10,7 @@ $footer-heading-color: #ffeb3b;
   color: $footer-text-color;
   padding: 2rem 0;
   font-size: 0.9rem;
-  box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2); /* Subtelny cień */
+  box-shadow: $box-shadow; 
 
   .container {
     display: flex;
@@ -23,18 +23,18 @@ $footer-heading-color: #ffeb3b;
     flex: 1;
     min-width: 220px;
     padding: 1rem;
-    border-left: 1px solid rgba(255, 255, 255, 0.3);
+    border-left: $border;
     position: relative;
 
     &:first-of-type {
-      border-left: none; /* Usunięcie lewej granicy z pierwszej kolumny */
+      border-left: none; 
     }
 
     h3 {
       font-size: 1.4rem;
       margin-bottom: 0.8rem;
-      color: $footer-heading-color; /* Kolor nagłówka */
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      color: $footer-heading-color; 
+      text-shadow: $box-shadow;
     }
 
     ul {
@@ -82,7 +82,7 @@ $footer-heading-color: #ffeb3b;
     text-align: center;
     padding-top: 1rem;
     font-size: 0.9rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    border-top: $border;
     margin-top: 2rem;
     color:$footer-text-color;
   }

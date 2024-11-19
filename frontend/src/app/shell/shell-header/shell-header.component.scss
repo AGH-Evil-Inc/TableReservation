@@ -1,8 +1,8 @@
 .header {
-  background: linear-gradient(90deg, #061531, #528cef);
-  color: #fff;
+  background: linear-gradient(90deg, $primary-color1, $primary-color2);
+  color: $text-color-light;
   padding: 15px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: $border;
 
   .container {
     display: flex;
@@ -20,7 +20,7 @@
     transition: all 1s;
 
     a {
-      color: #fff;
+      color: $background-light;
       text-decoration: none;
 
       img {
@@ -46,7 +46,7 @@
         position: relative;
 
         a {
-          color: #f1f1f1;
+          color: $text-color-light;
           text-decoration: none;
           font-size: 1.1rem;
           padding: 5px 0;
@@ -54,7 +54,7 @@
           transition: all 0.5s;
 
           &:hover {
-            color: #ffeb3b;
+            color: $accent-color;
             transform: translateY(-2px);
           }
 
@@ -62,7 +62,7 @@
             content: '';
             display: block;
             height: 2px;
-            background: #ffeb3b;
+            background: $accent-color;
             width: 0;
             transition: width 0.5s;
             position: absolute;
@@ -81,19 +81,19 @@
 
   .login {
     button {
-      color: #fff;
+      color: $text-color-light;
       font-size: 2rem;
       scale: 1.5;
       transition: all 1s;
 
       &:hover {
-        color: #ffeb3b;
+        color: $accent-color;
         transform: rotate(25deg) scale(1.5);
       }
     }
 
     .user-name {
-      color: #fff;
+      color: $text-color-light;
       margin-right: 8px;
       font-size: 1rem;
       font-weight: bold;
