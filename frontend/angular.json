@@ -30,9 +30,11 @@
               "src/assets"
             ],
             "styles": [
+              "src/styles.scss",
+              "src/styles/index.scss",
               "@angular/material/prebuilt-themes/azure-blue.css",
-              "node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "src/styles.scss"
+              "node_modules/bootstrap/dist/css/bootstrap.min.css"
+              
             ],
             "scripts": [
               "node_modules/chart.js/dist/chart.js"
@@ -101,8 +103,9 @@
               "src/assets"
             ],
             "styles": [
-              "@angular/material/prebuilt-themes/azure-blue.css",
-              "src/styles.scss"
+              "src/styles.scss",
+              "src/styles/index.scss",
+              "@angular/material/prebuilt-themes/azure-blue.css"
             ],
             "scripts": []
           }
