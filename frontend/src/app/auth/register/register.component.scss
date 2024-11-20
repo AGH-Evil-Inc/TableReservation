@@ -1,6 +1,8 @@
+@use "../../../utils" as ds;
+
 ::ng-deep .mat-dialog-container {
   padding: 0;
-  border-radius: $border-radius;
+  border-radius: ds.$border-radius;
   overflow: hidden;
   width: 400px;
 }
@@ -10,12 +12,12 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background-color: $primary-color1;
-  color: $text-color-light;
+  background-color: ds.$primary-color1;
+  color: ds.$text-color-light;
 
   .close-button {
     background-color: transparent;
-    color: $text-color-light;
+    color: ds.$text-color-light;
     &:hover {
       background-color: rgba(255, 255, 255, 0.1);
     }
@@ -50,16 +52,16 @@
 
   button {
     width: 100%;
-    background-color: $primary-color2;
-    color: $text-color-light;
+    background-color: ds.$primary-color2;
+    color: ds.$text-color-light;
     border: none;
-    border-radius: $border-radius;
+    border-radius: ds.$border-radius;
     padding: 0.5rem 1rem;
     cursor: pointer;
     transition: background-color 0.3s;
 
     &:hover {
-      background-color: darken($primary-color2, 10%);
+      background-color: darken(ds.$primary-color2, 10%);
     }
   }
 }

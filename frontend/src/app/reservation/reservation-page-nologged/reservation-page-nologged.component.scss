@@ -1,14 +1,16 @@
+@use "../../../utils" as ds;
+
 .content {
   padding: 2rem;
 
   .hero-section {
-    background-color: $primary-color2;
-    color: $text-color-light;
+    background-color: ds.$primary-color2;
+    color: ds.$text-color-light;
     text-align: center;
     padding: 3rem 1.5rem;
-    border-radius: $border-radius;
+    border-radius: ds.$border-radius;
     margin-bottom: 2rem;
-    box-shadow: $box-shadow;
+    box-shadow: ds.$box-shadow;
 
     h1 {
       font-size: 2rem;
@@ -24,16 +26,16 @@
       display: inline-block;
       margin-top: 1rem;
       padding: 0.8rem 1.5rem;
-      background-color: $accent-color;
-      color: $text-color-dark;
-      border-radius: $border-radius;
+      background-color: ds.$accent-color;
+      color: ds.$text-color-dark;
+      border-radius: ds.$border-radius;
       text-decoration: none;
       transition: background-color 0.3s;
-      box-shadow: $box-shadow;
+      box-shadow: ds.$box-shadow;
       font-size: 1rem;
 
       &:hover {
-        background-color: darken($accent-color, 10%);
+        background-color: darken(ds.$accent-color, 10%);
       }
     }
   }

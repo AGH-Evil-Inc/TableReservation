@@ -1,5 +1,7 @@
+@use "../../../utils" as ds;
+
 $banner-bg-color: rgba(51, 51, 51, 0.9);
-$banner-text-color: $text-color-light;
+$banner-text-color: ds.$text-color-light;
 $button-bg-color: #ffffff;
 $button-text-color: #333;
 $button-hover-bg-color: #f1f1f1;

@@ -1,7 +1,9 @@
+@use "../../../utils" as ds;
+
 // Definicje kolorów
-$footer-background: linear-gradient(0deg, $primary-color11, $primary-color2);
-$footer-text-color: $text-color-light;
-$footer-heading-color: $accent-color;
+$footer-background: linear-gradient(0deg, ds.$primary-color1, ds.$primary-color2);
+$footer-text-color: ds.$text-color-light;
+$footer-heading-color: ds.$accent-color;
 
 
 // Style dla stopki
@@ -10,7 +12,7 @@ $footer-heading-color: $accent-color;
   color: $footer-text-color;
   padding: 2rem 0;
   font-size: 0.9rem;
-  box-shadow: $box-shadow; 
+  box-shadow: ds.$box-shadow; 
 
   .container {
     display: flex;
@@ -23,7 +25,7 @@ $footer-heading-color: $accent-color;
     flex: 1;
     min-width: 220px;
     padding: 1rem;
-    border-left: $border;
+    border-left: ds.$border;
     position: relative;
 
     &:first-of-type {
@@ -34,7 +36,7 @@ $footer-heading-color: $accent-color;
       font-size: 1.4rem;
       margin-bottom: 0.8rem;
       color: $footer-heading-color; 
-      text-shadow: $box-shadow;
+      text-shadow: ds.$box-shadow;
     }
 
     ul {
@@ -82,7 +84,7 @@ $footer-heading-color: $accent-color;
     text-align: center;
     padding-top: 1rem;
     font-size: 0.9rem;
-    border-top: $border;
+    border-top: ds.$border;
     margin-top: 2rem;
     color:$footer-text-color;
   }

@@ -1,3 +1,5 @@
+@use "../../../utils" as ds;
+
 .reservation-container {
   display: flex;
   flex-wrap: wrap;
@@ -8,15 +10,15 @@
   .form-section {
     flex: 1 1 300px;
     max-width: 400px;
-    background-color: $background-light;
-    border-radius: $border-radius;
+    background-color: ds.$background-light;
+    border-radius: ds.$border-radius;
     padding: 2rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
     h2 {
       font-size: 1.5rem;
       margin-bottom: 1rem;
-      color: $text-color-dark;
+      color: ds.$text-color-dark;
     }
 
     form {
@@ -27,25 +29,25 @@
           display: block;
           font-weight: bold;
           margin-bottom: 0.5rem;
-          color: $text-color-dark;
+          color: ds.$text-color-dark;
         }
 
         input {
           width: 100%;
           padding: 0.8rem;
           font-size: 1rem;
-          border: 1px solid $border;
+          border: 1px solid ds.$border;
           border-radius: 5px;
           box-sizing: border-box;
 
           &:focus {
-            border-color: $primary-color2;
+            border-color: ds.$primary-color2;
             outline: none;
           }
         }
 
         input[readonly] {
-          background-color: $background-light;
+          background-color: ds.$background-light;
         }
       }
 
@@ -53,8 +55,8 @@
         display: block;
         width: 100%;
         padding: 0.8rem;
-        background-color: $primary-color2;
-        color: $text-color-light;
+        background-color: ds.$primary-color2;
+        color: ds.$text-color-light;
         font-size: 1rem;
         font-weight: bold;
         border: none;
@@ -62,7 +64,7 @@
         cursor: pointer;
 
         &:hover {
-          background-color: darken($primary-color2, 10%);
+          background-color: darken(ds.$primary-color2, 10%);
         }
       }
     }
@@ -80,8 +82,8 @@
       max-width: 600px;
       height: 400px;
       border: 1px solid #ddd;
-      background-color: $background-light;
-      border-radius: $border-radius;
+      background-color: ds.$background-light;
+      border-radius: ds.$border-radius;
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
@@ -91,8 +93,8 @@
       .table {
         width: 60px;
         height: 60px;
-        background-color: $text-color-light;
-        border: 2px solid $primary-color2;
+        background-color: ds.$text-color-light;
+        border: 2px solid ds.$primary-color2;
         border-radius: 5px;
         display: flex;
         align-items: center;
