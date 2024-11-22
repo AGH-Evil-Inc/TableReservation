@@ -90,6 +90,16 @@ paths:
           description: Użytkownik nie został znaleziony.
         '500':
           description: Błąd wewnętrzny serwera.
+  /check-login:
+    get:
+      summary: Check if the user is still logged in
+      security:
+      - bearerAuth: []  # Autoryzacja JWT
+      responses:
+        '200':
+          description: User is still logged in
+        '401':
+          description: Invalid or expired token
 
       
 components:    

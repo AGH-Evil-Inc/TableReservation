@@ -42,6 +42,9 @@ import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.
 import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { ReservationPageNologgedComponent } from './reservation/reservation-page-nologged/reservation-page-nologged.component';
+import { NgxMatTimepickerModule } from 'ngx-mat-timepicker';
+import { TimepickerModule } from 'ngx-bootstrap/timepicker';
+import { NgbTimepickerModule } from '@ng-bootstrap/ng-bootstrap';
 
 const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
 
@@ -81,6 +84,9 @@ const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
         MdbRangeModule,
         SocketIoModule.forRoot(config),
         CookieModule.forRoot(),
+        NgbTimepickerModule,
+        NgxMatTimepickerModule,
+        TimepickerModule,
         MdbRippleModule,
         MdbScrollspyModule,
         MdbTabsModule,

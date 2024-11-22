@@ -193,6 +193,16 @@ class Logout(Resource):
     def post(self):
         # JWT does not require server-side logout, just inform the client to discard the token
         return {'message': 'You are logged out'}, 200
+    
+@ns.route('/auth/check-login')
+class CheckLoginStatus(Resource):
+    @token_required
+    def get(self):
+        """
+        Endpoint sprawdzający status logowania użytkownika.
+        Weryfikuje token JWT, zwracając informację o statusie logowania.
+        """
+        return {'status': 'logged_in'}, 200
 
 @ns.route('/auth/request-password-reset')
 class RequestPasswordReset(Resource):

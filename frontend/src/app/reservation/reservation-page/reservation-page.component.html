@@ -1,57 +1,84 @@
 <div class="reservation-container">
-    <div class="form-section">
-      <h2>Zarezerwuj stolik</h2>
-      <form (ngSubmit)="submitReservation()">
-        <div class="form-group">
-          <label for="date">Wybierz datę</label>
-          <input id="date" type="date" [(ngModel)]="reservationFormData.date" (ngModelChange)="onReservationTimeChange()" name="date" required />
-        </div>
-        
-        <div class="form-group">
-          <label for="start-time">Godzina rozpoczęcia</label>
-          <input 
-            id="start-time" 
-            type="time" 
-            [(ngModel)]="reservationFormData.start_time" 
-            (ngModelChange)="onReservationTimeChange()" 
-            name="start_time" 
-            required 
-            /> 
-        </div>
-        
-        <div class="form-group">
-          <label for="duration">Długość rezerwacji</label>
-          <input 
-            id="duration" 
-            type="time" 
-            [(ngModel)]="reservationFormData.duration" 
-            (ngModelChange)="onReservationTimeChange()" 
-            name="duration" 
-            required 
-            /> 
-        </div>
-        
-        <div class="form-group">
-          <label for="tableId">Wybrany stolik</label>
-          <input id="tableId" type="number" [(ngModel)]="reservation.table_id" name="table_id" readonly />
-        </div>
-        
-        <button type="submit" class="submit-button">Wyślij rezerwację</button>
-      </form>
-    </div>
-  
-    <div class="plan-section">
-      <div class="plan" (click)="selectTable($event)">
-        <div
-          *ngFor="let table of tables"
-          class="table"
-          [class.occupied]="occupiedTables.includes(table.id)"
-          [class.selected]="reservation.table_id === table.id"
-          [attr.data-id]="table.id"
-        >
-          {{ table.id }}
-        </div>
+  <div class="form-section">
+    <h2>Zarezerwuj stolik</h2>
+    <form (ngSubmit)="submitReservation()">
+      <div class="form-group">
+        <label for="date">
+          <mat-icon>calendar_today</mat-icon> Wybierz datę
+        </label>
+        <input
+          id="date"
+          type="date"
+          [(ngModel)]="reservationFormData.date"
+          (ngModelChange)="onReservationTimeChange()"
+          placeholder="yyyy-MM-dd"
+          name="date"
+          [min]="minDate"
+          [max]="maxDate"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="start-time">
+          <mat-icon>schedule</mat-icon> Godzina rozpoczęcia
+        </label>
+        <mat-form-field appearance="outline">
+          <mat-label>Godzina rozpoczęcia</mat-label>
+          <input
+            matInput
+            [ngxMatTimepicker]="picker"
+            [(ngModel)]="reservationFormData.start_time"
+            [min]="getMinTime(reservationFormData.date)"
+            [max]="getMaxTime(reservationFormData.date)"
+            (ngModelChange)="onReservationTimeChange()"
+            placeholder="24hr format"
+            aria-label="24hr format"
+            [format]="24"
+            name="start_time"
+            required
+            readonly
+          />
+          <ngx-mat-timepicker #picker [minutesGap]="15" [format]="24"></ngx-mat-timepicker>
+        </mat-form-field>
+      </div>
+
+      <div class="form-group">
+        <label for="duration">
+          <mat-icon>hourglass_bottom</mat-icon> Długość rezerwacji
+        </label>
+        <ngb-timepicker
+          [(ngModel)]="reservationFormData.duration"
+          (ngModelChange)="onReservationTimeChange()"
+          [minuteStep]="15"
+          name="duration"
+          required
+        ></ngb-timepicker>
+      </div>
+
+      <div class="form-group">
+        <label for="tableId">
+          <mat-icon>table_restaurant</mat-icon> Wybrany stolik
+        </label>
+        <input id="tableId" type="number" [(ngModel)]="reservation.table_id" name="table_id" readonly />
+      </div>
+
+      <button type="submit" class="submit-button">Wyślij rezerwację</button>
+    </form>
+  </div>
+
+  <div class="plan-section">
+    <div class="plan" (click)="selectTable($event)">
+      <div
+        *ngFor="let table of tables"
+        class="table"
+        [class.occupied]="occupiedTables.includes(table.id)"
+        [class.selected]="reservation.table_id === table.id"
+        [attr.data-id]="table.id"
+        matTooltip="Kliknij, aby wybrać stolik"
+      >
+        {{ table.id }}
       </div>
     </div>
   </div>
-  
+</div>

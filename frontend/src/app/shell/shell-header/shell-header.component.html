@@ -3,7 +3,6 @@
     <div class="logo">
       <a href="/home">
         <img src="/assets/ZP_logo.png" alt="Logo">
-        <!-- <img src="/assets/test.gif" alt="Animation"> -->
       </a>
     </div>
     <nav class="nav">
@@ -22,6 +21,9 @@
       <button mat-icon-button color="warn" (click)="logout()" *ngIf="isLoggedIn">
         <mat-icon>logout</mat-icon>
       </button>
+      <div *ngIf="isLoggedIn" class="timer">
+        <span>Czas do wylogowania: {{ formatTime(remainingTime) }}</span>
+      </div>
     </div>
   </div>
 </header>

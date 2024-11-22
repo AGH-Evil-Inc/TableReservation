@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { NgbTimeStruct } from '@ng-bootstrap/ng-bootstrap';
 import { Reservation } from 'src/app/core/modules/reservation';
 import { ReservationService } from 'src/app/services/reservation.service';
 
@@ -17,42 +18,29 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
   reservationFormData = {
     date: '',
     start_time: '',
-    duration: '',
+    duration: { hour: 1, minute: 0, second: 0 }
   };
 
-   // Minimalny i maksymalny czas rozpoczęcia rezerwacji
-   minStartTime: string = '08:00';  // np. 8:00 AM
-   maxStartTime: string = '22:00';  // np. 10:00 PM
- 
-   // Minimalna i maksymalna długość rezerwacji (w godzinach)
-   minDuration: string = '00:15';  // minimum 15 minut
-   maxDuration: string = '04:00';  // maksymalnie 4 godziny
-
-  occupiedTables: number[] = [];
-  updates: any[] = [];
+  minDate: string ='';
+  maxDate: string ='';
+  minDuration: NgbTimeStruct = { hour: 0, minute: 15, second: 0 }; // Minimalna godzina - 08:00 
+  maxDuration: NgbTimeStruct = { hour: 4, minute: 30, second: 0 };
+  occupiedTables: number[] = []; // Zajęte stoliki
 
   tables: { id: number; x: number; y: number }[] = [
     { id: 1, x: 50, y: 50 },
     { id: 2, x: 100, y: 50 },
     { id: 3, x: 200, y: 100 },
     { id: 4, x: 400, y: 500 },
-    { id: 5, x: 800, y: 500 },
-    // Dodaj więcej stołów w razie potrzeby
+    { id: 5, x: 800, y: 500 }
   ];
+
 
   constructor(private reservationService: ReservationService) {}
 
   ngOnInit(): void {
-    this.setInitialReservationTimes();
-    this.reservationService.onReservationUpdate().subscribe({
-      next: (update) => {
-        this.updates.push(update);
-        this.fetchOccupiedTables();
-      },
-      error: (err) => {
-        console.error('Error fetching reservation updates:', err);
-      }
-    });
+    this.setMinMaxDate();
+    this.subscribeToUpdates();
     this.fetchOccupiedTables();
   }
 
@@ -60,92 +48,119 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
     this.reservationService.disconnectSocket();
   }
 
-  setInitialReservationTimes(): void {
-    const now = new Date();
-    const oneHourLater = new Date(Date.now() + 60 * 60 * 1000);
-    this.reservation.reservation_start = this.formatToISO(now);
-    this.reservation.reservation_end = this.formatToISO(oneHourLater);
-  }
+  setMinMaxDate(): void {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    this.minDate = `${year}-${month}-${day}`;
 
-  formatToISO(date: Date): string {
-    return date.toISOString().slice(0, 16);
+    const futureDate = new Date(today.setMonth(today.getMonth() + 4));
+    const futureYear = futureDate.getFullYear();
+    const futureMonth = String(futureDate.getMonth() + 1).padStart(2, '0');
+    const futureDay = String(futureDate.getDate()).padStart(2, '0');
+    this.maxDate = `${futureYear}-${futureMonth}-${futureDay}`
   }
 
   submitReservation(): void {
     this.mapFormToReservation();
 
+    // Sprawdzenie, czy czas rezerwacji mieści się w dozwolonych godzinach
+    if (!this.isReservationValid()) {
+      alert('Rezerwacja przekracza dozwolony czas pracy restauracji.');
+      return;
+    }
+
     this.reservationService.createReservation(this.reservation).subscribe({
       next: () => {
+        alert('Rezerwacja została utworzona pomyślnie!');
         this.resetReservationForm();
         this.fetchOccupiedTables();
-        alert('Reservation created successfully!');
-       
       },
       error: (err) => {
         console.error('Error creating reservation:', err);
         alert(`Error: ${err.message}`);
       }
     });
-    this.resetReservationForm();
-    this.fetchOccupiedTables();
   }
 
   onReservationTimeChange(): void {
-    this.mapFormToReservation()
-    // Sprawdzamy, czy daty rezerwacji są wprowadzone
-    if (!this.reservation.reservation_start || !this.reservation.reservation_end) {
-      this.occupiedTables = [];
+    this.mapFormToReservation();
+
+    if (!this.isReservationValid()) {
+      alert('Nieprawidłowy czas rezerwacji.');
       return;
     }
 
-    // Sprawdzamy, czy data rozpoczęcia rezerwacji jest w przeszłości
-    const currentTime = new Date();
-    const reservationStart = new Date(this.reservation.reservation_start);
-    const reservationEnd = new Date(this.reservation.reservation_end);
-
-    if (reservationStart < currentTime || reservationEnd < currentTime) {
-      alert("Rezerwacja nie może dotyczyć przeszłości.");
-      this.occupiedTables = []; 
-      return;
-    }
-
-    // Sprawdzamy, czy czas zakończenia rezerwacji nie jest wcześniejszy niż czas rozpoczęcia
-    if (reservationEnd <= reservationStart) {
-      alert("Czas zakończenia rezerwacji musi być późniejszy niż czas rozpoczęcia.");
-      this.occupiedTables = [];
-      return;
-    }
-
-    // Jeśli wszystkie warunki są spełnione, wywołujemy fetchOccupiedTables
     this.fetchOccupiedTables();
   }
 
-  mapFormToReservation(): void {
+  private mapFormToReservation(): void {
     const { date, start_time, duration } = this.reservationFormData;
 
-    const [startHours, startMinutes] = start_time.split(':').map(Number);
-    const [durationHours, durationMinutes] = duration.split(':').map(Number);
+    if (this.compareTime(duration, this.minDuration) ||
+      this.compareTime(this.maxDuration, duration)) {
+        alert('Nieprawidłowa długość rezerwacji.');
+        return;
+      }
 
+    const [startHours, startMinutes] = start_time.split(':').map(Number);
     const startDateTime = new Date(date);
-    startDateTime.setHours(startHours, startMinutes);
+    startDateTime.setHours(startHours+1, startMinutes);
 
     const endDateTime = new Date(startDateTime);
-    endDateTime.setHours(endDateTime.getHours() + durationHours);
-    endDateTime.setMinutes(endDateTime.getMinutes() + durationMinutes);
+    endDateTime.setHours(endDateTime.getHours() + duration.hour);
+    endDateTime.setMinutes(endDateTime.getMinutes() + duration.minute);
 
     this.reservation.reservation_start = this.formatToISO(startDateTime);
     this.reservation.reservation_end = this.formatToISO(endDateTime);
   }
 
-  resetReservationForm(): void {
+  private resetReservationForm(): void {
     this.reservation = { table_id: 0, reservation_start: '', reservation_end: '' };
-    this.reservationFormData = { date: '', start_time: '', duration: '' };
+    this.reservationFormData = { date: '', start_time: '', duration: { hour: 1, minute: 0, second: 0 } };
+  }
+
+  private formatToISO(date: Date): string {
+    return date.toISOString().slice(0, 16); // Format ISO bez sekund
+  }
+
+  private isReservationValid(): boolean {
+    const { date, start_time, duration } = this.reservationFormData;
+
+    const [startHours, startMinutes] = start_time.split(':').map(Number);
+    const startDateTime = new Date(date);
+    startDateTime.setHours(startHours+1, startMinutes);
+
+    const endDateTime = new Date(startDateTime);
+    endDateTime.setHours(endDateTime.getHours() + duration.hour);
+    endDateTime.setMinutes(endDateTime.getMinutes() + duration.minute);
+
+    const dayOfWeek = startDateTime.getDay();
+    const openingTime = dayOfWeek >= 1 && dayOfWeek <= 5 ? '10:00' : '12:00';
+    const closingTime = dayOfWeek >= 1 && dayOfWeek <= 5 ? '22:00' : '24:00';
+
+    const [openingHours, openingMinutes] = openingTime.split(':').map(Number);
+    const [closingHours, closingMinutes] = closingTime.split(':').map(Number);
+
+    const openingDateTime = new Date(startDateTime);
+    openingDateTime.setHours(openingHours, openingMinutes);
+
+    const closingDateTime = new Date(startDateTime);
+    closingDateTime.setHours(closingHours - 1, closingMinutes + 30); // Rezerwacja musi kończyć się na 30 minut przed zamknięciem
+
+    return (
+      startDateTime >= openingDateTime &&
+      endDateTime <= closingDateTime &&
+      endDateTime > startDateTime &&
+      this.compareTime(this.minDuration, duration) &&
+      this.compareTime(duration, this.maxDuration)
+    );
   }
 
   fetchOccupiedTables(): void {
-    this.mapFormToReservation()
     if (!this.reservation.reservation_start || !this.reservation.reservation_end) {
-      alert('Please provide both start and end times for the reservation.');
+      alert('Podaj datę i czas rezerwacji.');
       return;
     }
 
@@ -155,27 +170,49 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error fetching occupied tables:', err);
-        alert(`Error fetching occupied tables: ${err.message}`);
       }
     });
   }
 
-  onTableClick(tableId: number): void {
-    this.reservation.table_id = tableId;
-  }
-
   selectTable(event: MouseEvent): void {
     const target = event.target as HTMLElement;
-
-    const tables = document.querySelectorAll('.table');
-    tables.forEach((table) => table.classList.remove('selected'));
-
     const tableId = target.getAttribute('data-id');
+
     if (tableId) {
       this.reservation.table_id = parseInt(tableId, 10);
-      target.classList.add('selected');
     } else {
-      alert('Kliknięto miejsce bez przypisanego stolika.');
+      alert('Nie wybrano stolika.');
     }
   }
+
+  private subscribeToUpdates(): void {
+    this.reservationService.onReservationUpdate().subscribe({
+      next: () => this.fetchOccupiedTables(),
+      error: (err) => console.error('Error fetching reservation updates:', err)
+    });
+  }
+
+  getMinTime(date: string): string {
+    if (!date) return '00:00';
+    const dayOfWeek = new Date(date).getDay();
+    return dayOfWeek === 0 || dayOfWeek === 6 ? '12:00' : '10:00';
+  }
+  
+  getMaxTime(date: string): string {
+    if (!date) return '23:59';
+    const dayOfWeek = new Date(date).getDay();
+    return dayOfWeek === 0 || dayOfWeek === 6 ? '23:30' : '21:30';
+  }
+
+  compareTime(first: NgbTimeStruct, second: NgbTimeStruct): boolean {
+    if (first.hour < second.hour) {
+      return true;
+    }
+    if (first.hour === second.hour && first.minute < second.minute) {
+       return true; 
+    } 
+    if (first.hour === second.hour && first.minute === second.minute && first.second < second.second) {
+       return true; 
+    } 
+    return false; }
 }

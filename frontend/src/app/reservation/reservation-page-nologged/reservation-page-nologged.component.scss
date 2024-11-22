@@ -1,42 +1,99 @@
-@use "../../../utils" as ds;
-
 .content {
   padding: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
 
   .hero-section {
-    background-color: ds.$primary-color2;
-    color: ds.$text-color-light;
-    text-align: center;
-    padding: 3rem 1.5rem;
-    border-radius: ds.$border-radius;
-    margin-bottom: 2rem;
-    box-shadow: ds.$box-shadow;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(145deg, #1b89ea, #1464a7);
+    color: #fff;
+    padding: 3rem 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    max-width: 900px;
+    width: 100%;
+    gap: 2rem;
 
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-    }
+    .hero-text {
+      flex: 1;
+      text-align: left;
 
-    p {
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
-    }
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+        animation: fadeInDown 1s ease;
+      }
 
-    .cta-button {
-      display: inline-block;
-      margin-top: 1rem;
-      padding: 0.8rem 1.5rem;
-      background-color: ds.$accent-color;
-      color: ds.$text-color-dark;
-      border-radius: ds.$border-radius;
-      text-decoration: none;
-      transition: background-color 0.3s;
-      box-shadow: ds.$box-shadow;
-      font-size: 1rem;
+      p {
+        font-size: 1.2rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+      }
 
-      &:hover {
-        background-color: darken(ds.$accent-color, 10%);
+      .cta-button {
+        display: inline-block;
+        padding: 0.8rem 1.5rem;
+        background: #ff6347;
+        color: #fff;
+        font-size: 1.1rem;
+        border: none;
+        border-radius: 2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(255, 99, 71, 0.3);
+
+        &:hover {
+          background: darken(#ff6347, 10%);
+          box-shadow: 0 10px 20px rgba(255, 99, 71, 0.4);
+          transform: translateY(-3px);
+        }
+
+        &:active {
+          transform: translateY(1px);
+          box-shadow: 0 5px 10px rgba(255, 99, 71, 0.2);
+        }
       }
     }
+
+    .hero-image {
+      flex: 1;
+      text-align: center;
+
+      img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 1rem;
+        animation: fadeInUp 1s ease;
+      }
+    }
+  }
+}
+
+/* Animacje */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

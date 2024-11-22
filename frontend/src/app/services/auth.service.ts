@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
-import { backApiUrl, createAuthHeaders } from './modules-api-url';
-import { LoginData, LoginResponse, RequestResetPassword, ResetPassword, User } from '../core/modules/auth';
+import { backApiUrl } from './modules-api-url';
+import { RequestResetPassword, ResetPassword, User } from '../core/modules/auth';
+import { HeartbeatService } from './heart-beat.service';
+import { AuthComponentService } from './auth-component.service';
 
 
 @Injectable({
@@ -12,22 +14,34 @@ export class AuthService {
 
   private token: string | null = null;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,
+    private authComponentService: AuthComponentService,
+    private heartbeatService: HeartbeatService) { }
 
   register(user: User): Observable<any> {
     return this.http.post(backApiUrl(`/auth/register`),  user, {withCredentials:true} );
   }
 
-  login(user: LoginData): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(backApiUrl(`/auth/login`), user, {withCredentials:true});
+  login(credentials: any) {
+    return this.http.post('/api/auth/login', credentials).pipe(
+      tap((response: any) => {
+        this.authComponentService.login(response.userName,response.token);
+        this.heartbeatService.start(); 
+      })
+    );
   }
 
   forgot_password(user_email:RequestResetPassword): Observable<any> {
     return this.http.post(backApiUrl('/auth/request-password-reset'),user_email, {withCredentials:true});
   }
 
-  logout(): Observable<any> {
-    return this.http.post(backApiUrl(`/auth/logout`), {}, { headers: createAuthHeaders(), withCredentials:true });
+  logout() {
+    return this.http.post('/api/auth/logout', {}).pipe(
+      tap(() => {
+        this.authComponentService.logout();
+        this.heartbeatService.stop();
+      })
+    );
   }
 
   resetPassword(resetPassword: ResetPassword): Observable<any> {
