@@ -1,107 +1,211 @@
-@use "../../../styles" as ds;
 .content {
   padding: 2rem;
+  font-family: 'Roboto', sans-serif;
+}
 
-  .hero-section {
-    background-color: ds.$primary-color2;
-    color: ds.$text-color-light;
-    text-align: center;
-    padding: 3rem 1.5rem;
-    border-radius: ds.$border-radius;
-    margin-bottom: 2rem;
-    box-shadow: ds.$box-shadow;
+/* Hero Section */
+.hero-section {
+  background: url('/assets/krakow.jpg') center/cover no-repeat, rgba(0, 0, 0, 0.5);
+  color: #f39f03;
+  text-align: center;
+  padding: 4rem 2rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+  position: relative;
+}
 
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-    }
 
-    .cta-button {
-      display: inline-block;
-      margin-top: 1rem;
-      padding: 0.8rem 1.5rem;
-      background-color: ds.$accent-color;
-      color: ds.$text-color-dark;
-      border-radius: ds.$border-radius;
-      text-decoration: none;
-      transition: background-color 0.3s;
-      box-shadow: ds.$box-shadow;
+.hero-text{
+  font-size: 2rem;
 
-      &:hover {
-        background-color: darken(ds.$accent-color, 10%);
-      }
-    }
-  }
-
-  .about-section {
-    text-align: center;
-    margin-top: 2rem;
-
-    h2 {
-      font-size: 1.75rem;
-      margin-bottom: 1rem;
-      color: ds.$primary-color1;
-    }
-
-    p {
-      font-size: 1rem;
-      color: ds.$text-color-dark;
-    }
-  }
-
-  .promotions-section {
-    display: flex;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-    margin-top: 2rem;
-
-    .promotion-card {
-      background: ds.$secondary-color;
-      padding: 1rem;
-      border-radius: ds.$border-radius;
-      color: ds.$text-color-light;
-      flex: 1;
-      min-width: 250px;
-      box-shadow: ds.$box-shadow;
-
-      h3 {
-        font-size: 1.25rem;
-        margin-bottom: 0.5rem;
-      }
-
-      p {
-        font-size: 0.95rem;
-      }
-    }
-  }
-
-  .testimonials-section {
-    margin-top: 2rem;
-    padding: 1.5rem;
-    background: ds.$background-light;
-    border-radius: ds.$border-radius;
-    box-shadow: ds.$box-shadow;
-
-    h2 {
-      text-align: center;
-      font-size: 1.75rem;
-      margin-bottom: 1rem;
-      color: ds.$primary-color1;
-    }
-
-    blockquote {
-      font-style: italic;
-      margin: 1rem 0;
-      padding-left: 1rem;
-      border-left: 4px solid ds.$accent-color;
-      font-size: 0.9rem;
-      color: ds.$text-color-dark;
-
-      footer {
-        font-size: 0.85rem;
-        margin-top: 0.5rem;
-        color: lighten(ds.$text-color-dark, 20%);
-      }
-    }
+  .h1 {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
   }
 }
+
+.cta-button {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.8rem 1.5rem;
+  background-color: #f4a261;
+  color: #fff;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.cta-button:hover {
+  background-color: #e76f51;
+}
+
+.about-section {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  margin: 3rem 0;
+  background: #f4f4f9;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.about-section h2 {
+  text-align: center;
+  font-size: 2rem;
+  color: #264653;
+  margin-bottom: 1.5rem;
+}
+
+.about-content {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.about-content img {
+  flex: 1;
+  max-width: 50%;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.about-text {
+  flex: 2;
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+.about-text p {
+  margin-bottom: 1rem;
+}
+
+.cta-button {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.8rem 1.5rem;
+  background-color: #264653;
+  color: #fff;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.cta-button:hover {
+  background-color: #2a9d8f;
+}
+
+
+/* Promotions Section */
+.promotions-section {
+  margin-top: 2rem;
+}
+
+.promotions-slider {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 1rem 0;
+}
+
+.promotion-slide {
+  background: #264653;
+  color: #fff;
+  padding: 1rem;
+  border-radius: 10px;
+  min-width: 250px;
+  flex: 0 0 auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.promotion-slide h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Testimonials Section */
+.testimonials-section {
+  background: #f1faee;
+  padding: 2rem;
+  border-radius: 10px;
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.testimonials-section blockquote {
+  font-style: italic;
+  margin: 1rem 0;
+  padding-left: 1rem;
+  border-left: 4px solid #ffeb3b;
+}
+
+.testimonials-section footer {
+  font-size: 0.85rem;
+  color: #555;
+}
+
+/* Reservation CTA */
+.reservation-section {
+  text-align: center;
+  margin-top: 2rem;
+  padding: 2rem;
+  background: #e9c46a;
+  color: #264653;
+  border-radius: 10px;
+}
+
+.reservation-section .cta-button {
+  background-color: #264653;
+  color: #fff;
+}
+
+.reservation-section .cta-button:hover {
+  background-color: #2a9d8f;
+}
+
+.dishes-section {
+  margin: 3rem 0;
+  text-align: center;
+}
+
+.dishes-section h2 {
+  font-size: 2rem;
+  color: #264653;
+  margin-bottom: 1.5rem;
+}
+
+.swiper-container {
+  width: 100%;
+  padding: 2rem 0;
+}
+
+.swiper-slide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1rem;
+}
+
+.swiper-slide img {
+  width: 100%;
+  max-width: 300px;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.swiper-slide h3 {
+  font-size: 1.5rem;
+  color: #264653;
+  margin-bottom: 0.5rem;
+}
+
+.swiper-slide p {
+  font-size: 1rem;
+  color: #555;
+}
+

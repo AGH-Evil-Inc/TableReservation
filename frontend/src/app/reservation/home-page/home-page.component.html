@@ -1,29 +1,48 @@
 <div class="content">
+  <!-- Hero Section -->
   <section class="hero-section">
     <div class="hero-text">
       <h1>Witamy w naszej Restauracji Pistacji</h1>
-      <p>Doświadcz wyjątkowych smaków i unikalnej atmosfery.</p>
       <a href="/menu" class="cta-button">Zobacz Menu</a>
     </div>
   </section>
 
+  <!-- About Section -->
   <section class="about-section">
     <h2>O nas</h2>
-    <p>Nasza restauracja łączy lokalne i międzynarodowe tradycje kulinarne, oferując naszym gościom niepowtarzalne doznania smakowe.</p>
+    <div class="about-content">
+      <img src="/assets/zespol.jpg" alt="Wnętrze restauracji" />
+      <div class="about-text">
+        <p>
+          Restauracja Pistacja to miejsce, gdzie pasja do gotowania spotyka się z zamiłowaniem do wyjątkowej atmosfery. Naszym celem jest dostarczenie gościom niezapomnianych doznań kulinarnych, łącząc najlepsze lokalne produkty z międzynarodowymi inspiracjami.
+        </p>
+        <p>
+          Każde danie przygotowujemy z najwyższą starannością, dbając o detale, które tworzą niezapomniany smak. W naszej karcie znajdziesz zarówno klasyczne potrawy w nowoczesnym wydaniu, jak i oryginalne kompozycje szefa kuchni.
+        </p>
+        <p>
+          Wnętrze restauracji zostało zaprojektowane tak, aby tworzyć ciepłą i przyjazną atmosferę, idealną zarówno na romantyczną kolację, jak i rodzinne spotkanie. Nasz zespół profesjonalistów zadba o to, aby każdy posiłek był wyjątkowy.
+        </p>
+        <a href="/about" class="cta-button">Dowiedz się więcej</a>
+      </div>
+    </div>
   </section>
 
+  <!-- Promotions Section -->
   <section class="promotions-section">
     <h2>Promocje</h2>
-    <div class="promotion-card">
-      <h3>Happy Hours</h3>
-      <p>Codziennie od 14:00 do 17:00 - 20% zniżki na wszystkie dania!</p>
-    </div>
-    <div class="promotion-card">
-      <h3>Weekendowe Specjały</h3>
-      <p>Specjalne menu degustacyjne w każdą sobotę i niedzielę.</p>
+    <div class="promotions-slider">
+      <div class="promotion-slide">
+        <h3><i class="fa fa-clock"></i> Happy Hours</h3>
+        <p>Codziennie od 14:00 do 17:00 - 20% zniżki na wszystkie dania!</p>
+      </div>
+      <div class="promotion-slide">
+        <h3><i class="fa fa-star"></i> Weekendowe Specjały</h3>
+        <p>Specjalne menu degustacyjne w każdą sobotę i niedzielę.</p>
+      </div>
     </div>
   </section>
 
+  <!-- Testimonials Section -->
   <section class="testimonials-section">
     <h2>Opinie naszych gości</h2>
     <blockquote>
@@ -34,5 +53,18 @@
       <p>„Niezapomniane doznania kulinarne! Polecam wszystkim smakoszom.”</p>
       <footer>- Anna Nowak</footer>
     </blockquote>
+  </section>
+
+  <!-- Carousel Section -->
+  <section class="carousel-section">
+    <h2>Nasze Specjały</h2>
+    <app-carousel [images]="['/assets/dishes/dish1.jpg', '/assets/dishes/dish2.jpg', '/assets/dishes/dish3.jpg']"></app-carousel>
+  </section>
+
+  <!-- Reservation CTA -->
+  <section class="reservation-section">
+    <h2>Zarezerwuj stolik</h2>
+    <p>Zadzwoń do nas pod numer <strong>123-456-789</strong> lub zarezerwuj online.</p>
+    <a href="/reservation" class="cta-button">Rezerwuj teraz</a>
   </section>
 </div>

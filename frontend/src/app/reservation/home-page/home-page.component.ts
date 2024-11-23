@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { ResetPasswordComponent } from 'src/app/auth/reset-password/reset-password.component';
@@ -11,6 +11,7 @@ import { ResetPasswordComponent } from 'src/app/auth/reset-password/reset-passwo
 })
 export class HomePageComponent implements OnInit{
   token: string | null = null;
+
   constructor(private route: ActivatedRoute, private dialog: MatDialog) {}
 
   ngOnInit(): void {
@@ -28,4 +29,5 @@ export class HomePageComponent implements OnInit{
       width: '400px'
     });
   }
+
 }

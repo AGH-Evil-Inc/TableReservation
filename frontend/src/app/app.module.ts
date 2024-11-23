@@ -33,6 +33,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { MatDialogModule } from '@angular/material/dialog'
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatInputModule } from '@angular/material/input'
 import { AuthComponentService } from './services/auth-component.service';
@@ -45,6 +46,7 @@ import { ReservationPageNologgedComponent } from './reservation/reservation-page
 import { NgxMatTimepickerModule } from 'ngx-mat-timepicker';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { NgbTimepickerModule } from '@ng-bootstrap/ng-bootstrap';
+import { CarouselComponent } from './reservation/carousel/carousel.component';
 
 const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
 
@@ -60,6 +62,7 @@ const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
         ForgotPasswordComponent,
         ResetPasswordComponent,
         ReservationPageNologgedComponent,
+        CarouselComponent
     ],
     bootstrap: [AppComponent],
     imports: [BrowserModule,
@@ -73,6 +76,7 @@ const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
         MatFormFieldModule,
         MatSnackBarModule,
         MdbAccordionModule,
+        MatCardModule,
         MdbCarouselModule,
         MdbCheckboxModule,
         MdbCollapseModule,

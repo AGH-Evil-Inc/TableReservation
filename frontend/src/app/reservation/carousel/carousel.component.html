@@ -1,0 +1,15 @@
+<div class="carousel-container">
+    <mat-card class="carousel-card">
+        <img [src]="images[currentIndex]" alt="carousel image" class="carousel-image" />
+    </mat-card>
+
+    <div class="carousel-controls">
+        <button mat-icon-button (click)="prev()">
+        <mat-icon>arrow_back</mat-icon>
+        </button>
+        <button mat-icon-button (click)="next()">
+        <mat-icon>arrow_forward</mat-icon>
+        </button>
+    </div>
+</div>
+  
