@@ -23,9 +23,9 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
 
   minDate: string ='';
   maxDate: string ='';
-  minDuration: NgbTimeStruct = { hour: 0, minute: 15, second: 0 }; // Minimalna godzina - 08:00 
+  minDuration: NgbTimeStruct = { hour: 0, minute: 15, second: 0 }; 
   maxDuration: NgbTimeStruct = { hour: 4, minute: 30, second: 0 };
-  occupiedTables: number[] = []; // Zajęte stoliki
+  occupiedTables: number[] = []; 
 
   tables: { id: number; x: number; y: number }[] = [
     { id: 1, x: 50, y: 50 },
@@ -214,5 +214,20 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
     if (first.hour === second.hour && first.minute === second.minute && first.second < second.second) {
        return true; 
     } 
-    return false; }
+    return false; 
+  }
+
+  adjustTime(direction: 'up' | 'down'): void {
+    const [hours, minutes] = this.reservationFormData.start_time.split(':').map(Number);
+
+    let newHours = hours;
+    if (direction === 'up') {
+      newHours = (hours + 1) % 24;  
+    } else if (direction === 'down') {
+      newHours = (hours - 1 + 24) % 24;  
+    }
+
+    this.reservationFormData.start_time = `${newHours}:${minutes < 10 ? '0' + minutes : minutes}`;
+    this.onReservationTimeChange()
+  }
 }

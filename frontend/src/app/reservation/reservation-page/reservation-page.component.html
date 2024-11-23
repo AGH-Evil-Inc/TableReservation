@@ -25,21 +25,31 @@
         </label>
         <mat-form-field appearance="outline">
           <mat-label>Godzina rozpoczęcia</mat-label>
-          <input
-            matInput
-            [ngxMatTimepicker]="picker"
-            [(ngModel)]="reservationFormData.start_time"
-            [min]="getMinTime(reservationFormData.date)"
-            [max]="getMaxTime(reservationFormData.date)"
-            (ngModelChange)="onReservationTimeChange()"
-            placeholder="24hr format"
-            aria-label="24hr format"
-            [format]="24"
-            name="start_time"
-            required
-            readonly
-          />
-          <ngx-mat-timepicker #picker [minutesGap]="15" [format]="24"></ngx-mat-timepicker>
+          <div class="timepicker-wrapper">
+            <input
+              matInput
+              [ngxMatTimepicker]="picker"
+              [(ngModel)]="reservationFormData.start_time"
+              [min]="getMinTime(reservationFormData.date)"
+              [max]="getMaxTime(reservationFormData.date)"
+              (ngModelChange)="onReservationTimeChange()"
+              placeholder="24hr format"
+              aria-label="24hr format"
+              [format]="24"
+              name="start_time"
+              required
+              readonly
+            />
+            <ngx-mat-timepicker #picker [minutesGap]="15" [format]="24"></ngx-mat-timepicker>
+            <div class="time-adjustment">
+              <button type="button" class="arrow-button" (click)="adjustTime('up')">
+                <mat-icon>arrow_upward</mat-icon>
+              </button>
+              <button type="button" class="arrow-button" (click)="adjustTime('down')">
+                <mat-icon>arrow_downward</mat-icon>
+              </button>
+            </div>
+          </div>
         </mat-form-field>
       </div>
 

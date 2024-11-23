@@ -7,11 +7,16 @@
 
   .form-section {
     flex: 1 1 300px;
-    max-width: 400px;
+    max-width: 450px;
     background-color: #f9f9f9;
     border-radius: 8px;
     padding: 2rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    }
 
     h2 {
       font-size: 1.8rem;
@@ -37,7 +42,7 @@
           }
         }
 
-        input {
+        input, mat-form-field, ngb-timepicker {
           width: 100%;
           padding: 0.8rem;
           font-size: 1rem;
@@ -103,7 +108,12 @@
       flex-wrap: wrap;
       gap: 10px;
       padding: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: scale(1.02);
+      }
 
       .table {
         position: relative;
@@ -137,4 +147,35 @@
       }
     }
   }
+
+  .timepicker-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .arrow-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    margin-left: 10px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+  }
+  
+  .arrow-button mat-icon {
+    font-size: 1.5rem;
+    color: #1976d2;
+  }
+  
+  .arrow-button:hover mat-icon {
+    color: #1565c0;
+  }
+  
+  .mat-form-field .mat-input-element {
+    width: 100%;
+  }
+  
 }
