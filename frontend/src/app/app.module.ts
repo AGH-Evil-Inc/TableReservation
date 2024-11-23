@@ -33,7 +33,9 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { MatDialogModule } from '@angular/material/dialog'
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCardActions } from '@angular/material/card';
 import { MatCardModule } from '@angular/material/card';
+import { MatTooltipModule } from '@angular/material/tooltip'
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatInputModule } from '@angular/material/input'
 import { AuthComponentService } from './services/auth-component.service';
@@ -47,6 +49,7 @@ import { NgxMatTimepickerModule } from 'ngx-mat-timepicker';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { NgbTimepickerModule } from '@ng-bootstrap/ng-bootstrap';
 import { CarouselComponent } from './reservation/carousel/carousel.component';
+import { ComingSoonComponent } from './shell/coming-soon/coming-soon.component';
 
 const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
 
@@ -62,7 +65,8 @@ const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
         ForgotPasswordComponent,
         ResetPasswordComponent,
         ReservationPageNologgedComponent,
-        CarouselComponent
+        CarouselComponent,
+        ComingSoonComponent
     ],
     bootstrap: [AppComponent],
     imports: [BrowserModule,
@@ -77,6 +81,7 @@ const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
         MatSnackBarModule,
         MdbAccordionModule,
         MatCardModule,
+        MatCardActions,
         MdbCarouselModule,
         MdbCheckboxModule,
         MdbCollapseModule,
@@ -86,6 +91,7 @@ const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
         MdbPopoverModule,
         MdbRadioModule,
         MdbRangeModule,
+        MatTooltipModule,
         SocketIoModule.forRoot(config),
         CookieModule.forRoot(),
         NgbTimepickerModule,

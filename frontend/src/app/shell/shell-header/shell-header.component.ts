@@ -16,6 +16,7 @@ export class ShellHeaderComponent implements OnInit {
   isLoggedIn: boolean = false;
   userName: string | null = '';
   remainingTime: number = 0;
+  isMenuOpen: boolean = false;
 
   constructor(private dialog: MatDialog, private authComponentService: AuthComponentService,
      private authService: AuthService, private sessionTimerService: SessionTimerService,
@@ -51,6 +52,10 @@ export class ShellHeaderComponent implements OnInit {
     const minutes = Math.floor(seconds / 60);
     const secondsLeft = seconds % 60;
     return `${minutes}:${secondsLeft < 10 ? '0' + secondsLeft : secondsLeft}`;
+  }
+
+  toggleMobileMenu(): void {
+    this.isMenuOpen = !this.isMenuOpen;
   }
 
   logout() {

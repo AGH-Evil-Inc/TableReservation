@@ -6,7 +6,14 @@ import { Component, Input, OnInit } from '@angular/core';
   styleUrls: ['./carousel.component.scss']
 })
 export class CarouselComponent implements OnInit {
-  @Input() images: string[] = [];  // Lista obrazków
+  @Input() images: { 
+    src: string; 
+    alt: string; 
+    name: string; 
+    description: string; 
+    id: string 
+  }[] = [];
+  
   currentIndex = 0;
 
   constructor() {}
@@ -19,5 +26,10 @@ export class CarouselComponent implements OnInit {
 
   prev() {
     this.currentIndex = (this.currentIndex - 1 + this.images.length) % this.images.length;
+  }
+
+  goToMenu(id: string) {
+    console.log(`Przejście do pozycji menu z ID: ${id}`);
+    // this.router.navigate(['/menu', id]);
   }
 }

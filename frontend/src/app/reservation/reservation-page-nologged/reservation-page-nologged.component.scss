@@ -10,7 +10,7 @@
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(145deg, #1b89ea, #1464a7);
+    background: linear-gradient(145deg, #2980b9, #6dd5fa);
     color: #fff;
     padding: 3rem 2rem;
     border-radius: 1rem;
@@ -39,7 +39,7 @@
       .cta-button {
         display: inline-block;
         padding: 0.8rem 1.5rem;
-        background: #ff6347;
+        background: #f39c12;
         color: #fff;
         font-size: 1.1rem;
         border: none;
@@ -49,7 +49,7 @@
         box-shadow: 0 5px 15px rgba(255, 99, 71, 0.3);
 
         &:hover {
-          background: darken(#ff6347, 10%);
+          background: darken(#f39c12, 10%);
           box-shadow: 0 10px 20px rgba(255, 99, 71, 0.4);
           transform: translateY(-3px);
         }

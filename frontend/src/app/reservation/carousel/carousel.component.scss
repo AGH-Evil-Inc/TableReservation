@@ -1,38 +1,115 @@
 .carousel-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-  }
-  
-  .carousel-card {
-    width: 80%;
-    max-width: 600px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .carousel-image {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-  }
-  
-  .carousel-controls {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    left: 0;
-    right: 0;
-    padding: 0 16px;
-  }
-  
-  button {
-    background: rgba(0, 0, 0, 0.3);
-    color: white;
-  }
-  
+  position: relative;
+  width: 100%;
+  max-width: 700px;
+  margin: 20px auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.carousel-card:hover {
+  transform: scale(1.02);
+}
+
+.md-card-image {
+  width: 100%;
+  height: auto;
+  border-bottom: 1px solid #ddd;
+}
+
+.mat-card-header {
+  padding: 16px;
+  background-color: #f9f9f9;
+}
+
+.md-headline {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.mat-card-content {
+  padding: 16px;
+  font-size: 1rem;
+  color: #666;
+}
+
+.mat-card-actions {
+  padding: 16px;
+  background-color: #f9f9f9;
+  display: flex;
+  justify-content: space-between;
+}
+
+.mat-card-actions button {
+  transition: color 0.3s ease;
+}
+
+.pink {
+  color: #e91e63;
+}
+
+.blue {
+  color: #2196f3; 
+}
+
+.pink:hover {
+  color: #ff4081; 
+}
+
+.blue:hover {
+  color: #64b5f6; 
+}
+
+
+.carousel-controls {
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  transform: translateY(-50%);
+}
+
+.carousel-controls button {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
+}
+
+.carousel-controls button:hover {
+  background-color: rgba(255, 255, 255, 1);
+}
+
+.carousel-indicators {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+}
+
+.carousel-indicators span {
+  width: 10px;
+  height: 10px;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.carousel-indicators span.active {
+  background-color: rgba(255, 255, 255, 1);
+}
+
+.carousel-indicators span:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+}

@@ -5,6 +5,8 @@
   color: ds.$text-color-light;
   padding: 15px 0;
   border-bottom: ds.$border;
+  position: relative;
+  z-index: 100; 
 
   .container {
     display: flex;
@@ -12,25 +14,20 @@
     justify-content: space-between;
     margin: 0 auto;
     padding: 0 20px;
-    flex-wrap: wrap; 
+    flex-wrap: wrap;
   }
 
   .logo {
-    font-size: 2rem;
-    font-weight: bold;
-    font-family: 'Montserrat', sans-serif;
-    transition: all 1s;
-
     a {
-      color: ds.$background-light;
-      text-decoration: none;
+      display: flex;
+      align-items: center;
 
       img {
-        max-width: 75px;
+        max-width: 80px;
         height: auto;
-      
+        transition: transform 0.3s ease;
         &:hover {
-          transform: scale(1.25);
+          transform: scale(1.1);
         }
       }
     }
@@ -53,7 +50,7 @@
           font-size: 1.1rem;
           padding: 5px 0;
           position: relative;
-          transition: all 0.5s;
+          transition: all 0.3s ease;
 
           &:hover {
             color: ds.$accent-color;
@@ -66,7 +63,7 @@
             height: 2px;
             background: ds.$accent-color;
             width: 0;
-            transition: width 0.5s;
+            transition: width 0.3s ease;
             position: absolute;
             left: 50%;
             bottom: -4px;
@@ -82,57 +79,74 @@
   }
 
   .login {
-    button {
-      color: ds.$text-color-light;
-      font-size: 2rem;
-      scale: 1.5;
-      transition: all 1s;
-
-      &:hover {
-        color: ds.$accent-color;
-        transform: rotate(25deg) scale(1.5);
-      }
-    }
+    display: flex;
+    flex-direction: column; 
+    align-items: flex-end;
+    gap: 5px;
 
     .user-name {
       color: ds.$text-color-light;
-      margin-right: 8px;
       font-size: 1rem;
       font-weight: bold;
     }
-  }
 
-  /* Stylizacja dla tabletów */
-  @media (max-width: 768px) {
-    .container {
-      flex-direction: column;
-      align-items: flex-start;
-      padding: 0 10px; 
+    .timer {
+      font-size: 0.9rem;
+      color: ds.$text-color-light;
     }
 
+    button {
+      color: ds.$text-color-light;
+      font-size: 1.5rem;
+      transition: transform 0.3s ease, color 0.3s ease;
+
+      &:hover {
+        color: ds.$accent-color;
+        transform: rotate(20deg) scale(1.2);
+      }
+    }
+  }
+
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    span {
+      display: block;
+      width: 25px;
+      height: 3px;
+      background: ds.$text-color-light;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    &:hover span {
+      background: ds.$accent-color;
+    }
+  }
+
+  /* Responsiveness */
+  @media (max-width: 768px) {
     .nav {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: ds.$primary-color2;
+      display: none;
+      flex-direction: column;
+      padding: 1rem 0;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 101;
+
       ul {
         flex-direction: column;
         gap: 1rem;
-        width: 100%; 
-      }
-    }
-
-    .logo {
-      margin-bottom: 10px;
-    }
-  }
-
-  /* Stylizacja dla smartfonów */
-  @media (max-width: 480px) {
-    .logo {
-      font-size: 1.5rem;
-    }
-
-    .nav {
-      ul {
-        gap: 0.5rem;
-        width: 100%; 
+        text-align: center;
 
         li a {
           font-size: 1rem;
@@ -140,14 +154,39 @@
       }
     }
 
+    .nav.active {
+      display: flex;
+    }
+
+    .hamburger {
+      display: flex;
+      align-self: flex-start; 
+      margin-top: 10px;
+    }
+
     .login {
+      align-items: center; 
+      gap: 10px;
+
+      .user-name {
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .login {
+      .user-name {
+        font-size: 0.85rem;
+      }
+
       button {
-        font-size: 1.5rem;
+        font-size: 1.2rem;
       }
     }
 
-    .container {
-      padding: 0 5px; 
+    .hamburger {
+      margin-top: 15px;
     }
   }
 }

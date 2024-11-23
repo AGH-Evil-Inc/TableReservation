@@ -25,7 +25,7 @@ export class HomePageComponent implements OnInit{
 
   openResetPasswordDialog(token: string): void {
     this.dialog.open(ResetPasswordComponent, {
-      data: { token }, // Przekazanie tokena do dialogu
+      data: { token }, 
       width: '400px'
     });
   }

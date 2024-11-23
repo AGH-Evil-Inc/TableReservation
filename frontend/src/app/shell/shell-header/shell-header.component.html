@@ -1,11 +1,14 @@
 <header class="header">
   <div class="container">
+    <!-- Logo -->
     <div class="logo">
       <a href="/home">
-        <img src="/assets/ZP_logo.png" alt="Logo">
+        <img src="/assets/ZP_logo.png" alt="Logo Restauracji Pistacji">
       </a>
     </div>
-    <nav class="nav">
+
+    <!-- Navigation -->
+    <nav class="nav" [class.active]="isMenuOpen">
       <ul>
         <li><a href="/home">Strona główna</a></li>
         <li><a href="/menu">Menu</a></li>
@@ -13,17 +16,26 @@
         <li><a href="/kontakt">Kontakt</a></li>
       </ul>
     </nav>
+
+    <!-- Login and Timer -->
     <div class="login">
-      <span *ngIf="isLoggedIn" class="user-name">{{ userName }}</span>
+      <span *ngIf="isLoggedIn" class="user-name">Cześć, {{ userName }}!</span>
+      <div *ngIf="isLoggedIn" class="timer">
+        <span>Wylogowanie za: {{ formatTime(remainingTime) }}</span>
+      </div>
       <button mat-icon-button color="accent" (click)="openLoginDialog()" *ngIf="!isLoggedIn">
         <mat-icon>person</mat-icon>
       </button>
       <button mat-icon-button color="warn" (click)="logout()" *ngIf="isLoggedIn">
         <mat-icon>logout</mat-icon>
       </button>
-      <div *ngIf="isLoggedIn" class="timer">
-        <span>Czas do wylogowania: {{ formatTime(remainingTime) }}</span>
-      </div>
     </div>
+
+    <!-- Hamburger Menu for Mobile -->
+    <button class="hamburger" (click)="toggleMobileMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
   </div>
 </header>
