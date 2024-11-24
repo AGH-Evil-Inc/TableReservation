@@ -1,0 +1,20 @@
+type: object
+properties:
+  table_id:
+    type: integer
+    description: ID of the table to reserve
+  reservation_start:
+    type: string
+    format: date-time
+    description: Start time of the reservation
+  reservation_end:
+    type: string
+    format: date-time
+    description: End time of the reservation
+  pending:
+    type: boolean
+    description: Whether the reservation is pending (optional)
+required:
+  - table_id
+  - reservation_start
+  - reservation_end

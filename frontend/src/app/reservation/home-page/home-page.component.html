@@ -1,38 +1,135 @@
 <div class="content">
+  <!-- Hero Section -->
   <section class="hero-section">
     <div class="hero-text">
       <h1>Witamy w naszej Restauracji Pistacji</h1>
-      <p>Doświadcz wyjątkowych smaków i unikalnej atmosfery.</p>
       <a href="/menu" class="cta-button">Zobacz Menu</a>
     </div>
   </section>
 
+  <!-- About Section -->
   <section class="about-section">
     <h2>O nas</h2>
-    <p>Nasza restauracja łączy lokalne i międzynarodowe tradycje kulinarne, oferując naszym gościom niepowtarzalne doznania smakowe.</p>
+    <div class="about-content">
+      <img src="/assets/zespol.jpg" alt="Wnętrze restauracji" />
+      <div class="about-text">
+        <p>
+          Restauracja Pistacja to miejsce, gdzie pasja do gotowania spotyka się z zamiłowaniem do wyjątkowej atmosfery. Naszym celem jest dostarczenie gościom niezapomnianych doznań kulinarnych, łącząc najlepsze lokalne produkty z międzynarodowymi inspiracjami.
+        </p>
+        <p>
+          Każde danie przygotowujemy z najwyższą starannością, dbając o detale, które tworzą niezapomniany smak. W naszej karcie znajdziesz zarówno klasyczne potrawy w nowoczesnym wydaniu, jak i oryginalne kompozycje szefa kuchni.
+        </p>
+        <p>
+          Wnętrze restauracji zostało zaprojektowane tak, aby tworzyć ciepłą i przyjazną atmosferę, idealną zarówno na romantyczną kolację, jak i rodzinne spotkanie. Nasz zespół profesjonalistów zadba o to, aby każdy posiłek był wyjątkowy.
+        </p>
+        <a href="/about" class="cta-button">Dowiedz się więcej</a>
+      </div>
+    </div>
   </section>
 
-  <section class="promotions-section">
-    <h2>Promocje</h2>
-    <div class="promotion-card">
-      <h3>Happy Hours</h3>
+ <!-- Promotions Section -->
+<section class="promotions-section">
+  <h2>Promocje</h2>
+  <div class="promotions-slider">
+    <div class="promotion-slide">
+      <h3><i class="fa fa-clock"></i> Happy Hours</h3>
       <p>Codziennie od 14:00 do 17:00 - 20% zniżki na wszystkie dania!</p>
     </div>
-    <div class="promotion-card">
-      <h3>Weekendowe Specjały</h3>
+    <div class="promotion-slide">
+      <h3><i class="fa fa-star"></i> Weekendowe Specjały</h3>
       <p>Specjalne menu degustacyjne w każdą sobotę i niedzielę.</p>
     </div>
-  </section>
+    <div class="promotion-slide">
+      <h3><i class="fa fa-glass-cheers"></i> Wine Wednesday</h3>
+      <p>Każda środa - 50% zniżki na wybrane wina z karty.</p>
+    </div>
+    <div class="promotion-slide">
+      <h3><i class="fa fa-child"></i> Rodzinna Niedziela</h3>
+      <p>Każda niedziela - dzieci jedzą za darmo przy zakupie pełnego dania przez osobę dorosłą.</p>
+    </div>
+    <div class="promotion-slide">
+      <h3><i class="fa fa-leaf"></i> Zielony Poniedziałek</h3>
+      <p>W każdy poniedziałek - 30% zniżki na wszystkie dania wegetariańskie i wegańskie.</p>
+    </div>
+  </div>
+</section>
 
+  <!-- Testimonials Section -->
   <section class="testimonials-section">
     <h2>Opinie naszych gości</h2>
-    <blockquote>
-      <p>„Najlepsza restauracja w mieście! Smaczne jedzenie i wspaniała obsługa.”</p>
-      <footer>- Jan Kowalski</footer>
-    </blockquote>
-    <blockquote>
-      <p>„Niezapomniane doznania kulinarne! Polecam wszystkim smakoszom.”</p>
-      <footer>- Anna Nowak</footer>
-    </blockquote>
+    <div class="testimonial">
+      <blockquote>
+        <p>„Najlepsza restauracja w mieście! Smaczne jedzenie i wspaniała obsługa.”</p>
+        <footer>- Jan Kowalski</footer>
+        <div class="rating">
+          <i class="fa fa-star"></i>
+          <i class="fa fa-star"></i>
+          <i class="fa fa-star"></i>
+          <i class="fa fa-star"></i>
+          <i class="fa fa-star-half-alt"></i>
+        </div>
+      </blockquote>
+      <div class="emoji">🍽️😊</div>
+    </div>
+    <div class="testimonial">
+      <blockquote>
+        <p>„Niezapomniane doznania kulinarne! Polecam wszystkim smakoszom.”</p>
+        <footer>- Anna Nowak</footer>
+        <div class="rating">
+          <i class="fa fa-star"></i>
+          <i class="fa fa-star"></i>
+          <i class="fa fa-star"></i>
+          <i class="fa fa-star"></i>
+          <i class="fa fa-star"></i>
+        </div>
+      </blockquote>
+      <div class="emoji">🌟👍</div>
+    </div>
+    <div class="shapes">
+      <div class="shape shape1"></div>
+      <div class="shape shape2"></div>
+    </div>
+  </section>  
+
+  <!-- Carousel Section -->
+  <section class="carousel-section">
+    <h2>Nasze Specjały</h2>
+    <app-carousel
+      [images]="[
+        { 
+          src: '/assets/dishes/dish1.jpg', 
+          alt: 'Krem z dyni', 
+          name: 'Krem z dyni', 
+          description: 'Aromatyczna zupa z prażonymi pestkami i nutą gałki muszkatołowej.', 
+          id: '1' 
+        },
+        { 
+          src: '/assets/dishes/dish2.jpg', 
+          alt: 'Polędwica wołowa', 
+          name: 'Polędwica wołowa', 
+          description: 'Smażona do perfekcji, podawana z sosem pieprzowym i puree ziemniaczanym.', 
+          id: '2' 
+        },
+        { 
+          src: '/assets/dishes/dish3.jpg', 
+          alt: 'Tarta malinowa', 
+          name: 'Tarta malinowa', 
+          description: 'Krucha baza z kremem waniliowym i świeżymi malinami.', 
+          id: '3' 
+        }
+      ]"
+    ></app-carousel>
   </section>
+
+  <!-- Reservation CTA -->
+  <section class="reservation-section">
+    <div class="reservation-content">
+      <h2>Zarezerwuj stolik</h2>
+      <p> Zadzwoń do nas pod numer <strong>123-456-789</strong> <i class="fa fa-phone"></i> lub  zarezerwuj online.</p>
+      <a href="/reservation" class="cta-button">Rezerwuj teraz <i class="fa fa-calendar-alt"></i></a>
+    </div>
+    <div class="reservation-image">
+      <img src="/assets/reservation.jpg" alt="Rezerwacja stolika" />
+    </div>
+  </section>  
 </div>

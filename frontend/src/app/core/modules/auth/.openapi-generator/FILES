@@ -11,6 +11,9 @@ index.ts
 model/loginData.ts
 model/loginResponse.ts
 model/models.ts
+model/requestResetPassword.ts
+model/resetPassword.ts
+model/resetPasswordPost200Response.ts
 model/user.ts
 param.ts
 variables.ts

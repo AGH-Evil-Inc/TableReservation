@@ -21,7 +21,8 @@
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
-              "zone.js"
+              "zone.js",
+              "@angular/localize/init"
             ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
@@ -30,9 +31,11 @@
               "src/assets"
             ],
             "styles": [
+              "src/styles.scss",
+              "src/utils/index.scss",
               "@angular/material/prebuilt-themes/azure-blue.css",
-              "node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "src/styles.scss"
+              "node_modules/bootstrap/dist/css/bootstrap.min.css"
+              
             ],
             "scripts": [
               "node_modules/chart.js/dist/chart.js"
@@ -92,7 +95,8 @@
           "options": {
             "polyfills": [
               "zone.js",
-              "zone.js/testing"
+              "zone.js/testing",
+              "@angular/localize/init"
             ],
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
@@ -101,8 +105,9 @@
               "src/assets"
             ],
             "styles": [
-              "@angular/material/prebuilt-themes/azure-blue.css",
-              "src/styles.scss"
+              "src/styles.scss",
+              "src/utils/index.scss",
+              "@angular/material/prebuilt-themes/azure-blue.css"
             ],
             "scripts": []
           }

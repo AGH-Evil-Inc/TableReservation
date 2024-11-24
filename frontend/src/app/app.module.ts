@@ -33,10 +33,25 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { MatDialogModule } from '@angular/material/dialog'
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCardActions } from '@angular/material/card';
+import { MatCardModule } from '@angular/material/card';
+import { MatTooltipModule } from '@angular/material/tooltip'
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatInputModule } from '@angular/material/input'
 import { AuthComponentService } from './services/auth-component.service';
+import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
+import { ReservationPageComponent } from './reservation/reservation-page/reservation-page.component';
+import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { ReservationPageNologgedComponent } from './reservation/reservation-page-nologged/reservation-page-nologged.component';
+import { NgxMatTimepickerModule } from 'ngx-mat-timepicker';
+import { TimepickerModule } from 'ngx-bootstrap/timepicker';
+import { NgbTimepickerModule } from '@ng-bootstrap/ng-bootstrap';
+import { CarouselComponent } from './reservation/carousel/carousel.component';
+import { ComingSoonComponent } from './shell/coming-soon/coming-soon.component';
 
+const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
 
 @NgModule({ declarations: [
         AppComponent,
@@ -45,7 +60,13 @@ import { AuthComponentService } from './services/auth-component.service';
         HomePageComponent,
         ShellFooterComponent,
         ShellHeaderComponent,
-        CookieBannerComponent
+        CookieBannerComponent,
+        ReservationPageComponent,
+        ForgotPasswordComponent,
+        ResetPasswordComponent,
+        ReservationPageNologgedComponent,
+        CarouselComponent,
+        ComingSoonComponent
     ],
     bootstrap: [AppComponent],
     imports: [BrowserModule,
@@ -57,7 +78,10 @@ import { AuthComponentService } from './services/auth-component.service';
         MatIconModule,
         MatInputModule,
         MatFormFieldModule,
+        MatSnackBarModule,
         MdbAccordionModule,
+        MatCardModule,
+        MatCardActions,
         MdbCarouselModule,
         MdbCheckboxModule,
         MdbCollapseModule,
@@ -67,7 +91,12 @@ import { AuthComponentService } from './services/auth-component.service';
         MdbPopoverModule,
         MdbRadioModule,
         MdbRangeModule,
+        MatTooltipModule,
+        SocketIoModule.forRoot(config),
         CookieModule.forRoot(),
+        NgbTimepickerModule,
+        NgxMatTimepickerModule,
+        TimepickerModule,
         MdbRippleModule,
         MdbScrollspyModule,
         MdbTabsModule,

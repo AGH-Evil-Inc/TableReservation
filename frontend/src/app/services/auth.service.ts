@@ -1,25 +1,51 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { backApiUrl } from './modules-api-url';
-import { LoginData, LoginResponse, User } from '../core/modules/auth';
+import { RequestResetPassword, ResetPassword, User } from '../core/modules/auth';
+import { HeartbeatService } from './heart-beat.service';
+import { AuthComponentService } from './auth-component.service';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  constructor(private http: HttpClient) { }
+  private token: string | null = null;
+
+  constructor(private http: HttpClient,
+    private authComponentService: AuthComponentService,
+    private heartbeatService: HeartbeatService) { }
 
   register(user: User): Observable<any> {
-    return this.http.post(backApiUrl(`/register`),  user );
+    return this.http.post(backApiUrl(`/auth/register`),  user, {withCredentials:true} );
   }
 
-  login(user: LoginData): Observable<LoginResponse> {
-    return this.http.post<{ token: string, name: string }>(backApiUrl(`/login`),  user );
+  login(credentials: any) {
+    return this.http.post('/api/auth/login', credentials).pipe(
+      tap((response: any) => {
+        this.authComponentService.login(response.userName,response.token);
+        this.heartbeatService.start(); 
+      })
+    );
   }
 
-  logout(): Observable<any> {
-    return this.http.post(backApiUrl(`/logout`), {});
+  forgot_password(user_email:RequestResetPassword): Observable<any> {
+    return this.http.post(backApiUrl('/auth/request-password-reset'),user_email, {withCredentials:true});
   }
+
+  logout() {
+    return this.http.post('/api/auth/logout', {}).pipe(
+      tap(() => {
+        this.authComponentService.logout();
+        this.heartbeatService.stop();
+      })
+    );
+  }
+
+  resetPassword(resetPassword: ResetPassword): Observable<any> {
+    return this.http.post(backApiUrl('/auth/reset-password'), resetPassword , {withCredentials:true});
+  }  
+
 }

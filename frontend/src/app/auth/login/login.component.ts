@@ -5,6 +5,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { RegisterComponent } from '../register/register.component';
 import { AuthComponentService } from 'src/app/services/auth-component.service';
+import { ForgotPasswordComponent } from '../forgot-password/forgot-password.component';
 
 @Component({
   selector: 'app-login',
@@ -45,8 +46,10 @@ export class LoginComponent {
   }
 
   forgotPassword() {
+    const dialogRef = this.dialog.open(ForgotPasswordComponent, {
+      width: '400px'
+    });
     this.closeDialog();
-    this.router.navigate(['/forgot-password']);
   }
 
   closeDialog() {

@@ -6,14 +6,14 @@
 </h2>
 <div mat-dialog-content class="dialog-content">
   <form (ngSubmit)="login()" #loginForm="ngForm">
-    <mat-form-field appearance="outline" class="w-100">
+    <mat-form-field appearance="outline" class="w-100 form-field">
       <mat-label>Email</mat-label>
       <input matInput type="email" [(ngModel)]="user.email" name="email" required email>
       <mat-error *ngIf="loginForm.controls['email']?.invalid && loginForm.controls['email']?.touched">
         Proszę podać poprawny email
       </mat-error>
     </mat-form-field>
-    <mat-form-field appearance="outline" class="w-100">
+    <mat-form-field appearance="outline" class="w-100 form-field">
       <mat-label>Hasło</mat-label>
       <input matInput type="password" [(ngModel)]="user.password" name="password" required>
       <mat-error *ngIf="loginForm.controls['password']?.invalid && loginForm.controls['password']?.touched">
@@ -25,6 +25,6 @@
   </form>
 </div>
 <div mat-dialog-actions class="dialog-actions">
-  <button mat-button (click)="goToRegister()">Nie masz konta? Zarejestruj się</button>
-  <button mat-button (click)="forgotPassword()">Zapomniałeś hasła?</button>
+  <button mat-button class="w-100" (click)="goToRegister()">Nie masz konta? Zarejestruj się</button>
+  <button mat-button class="w-100" (click)="forgotPassword()">Zapomniałeś hasła?</button>
 </div>

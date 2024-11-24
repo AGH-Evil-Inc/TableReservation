@@ -1,40 +1,46 @@
-// Definicje kolorów
-$footer-background: linear-gradient(0deg, #061531, #528cef);
-$footer-text-color: #fff;
-$footer-heading-color: #ffeb3b;
+@use "../../../utils" as ds;
 
+// Definicje kolorów
+$footer-background: #1a1a1a; // Ciemnografitowy kolor
+$footer-text-color: #e0e0e0; // Jasnoszary kolor tekstu
+$footer-heading-color: #ff7043; // Pomarańczowy kolor nagłówków
+$footer-link-hover-color: #ffa726; // Jaśniejszy pomarańczowy kolor na hover
 
 // Style dla stopki
 .footer {
   background: $footer-background;
   color: $footer-text-color;
   padding: 2rem 0;
-  font-size: 0.9rem;
-  box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2); /* Subtelny cień */
+  font-size: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
   .container {
     display: flex;
     flex-wrap: wrap;
     gap: 2rem;
     text-align: left;
+    justify-content: space-between;
+    padding: 0 20px;
+    max-width: 1200px;
+    margin: 0 auto;
   }
 
   .footer-column {
     flex: 1;
     min-width: 220px;
     padding: 1rem;
-    border-left: 1px solid rgba(255, 255, 255, 0.3);
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
     position: relative;
 
     &:first-of-type {
-      border-left: none; /* Usunięcie lewej granicy z pierwszej kolumny */
+      border-left: none;
     }
 
     h3 {
       font-size: 1.4rem;
       margin-bottom: 0.8rem;
-      color: $footer-heading-color; /* Kolor nagłówka */
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      color: $footer-heading-color;
+      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
     ul {
@@ -48,11 +54,11 @@ $footer-heading-color: #ffeb3b;
       a {
         color: $footer-text-color;
         text-decoration: none;
-        transition: all 0.5s;
+        transition: all 0.3s;
 
         &:hover {
-          transform: translateX(5px); /* Efekt przesunięcia */
-          color: $footer-heading-color;
+          transform: translateX(5px);
+          color: $footer-link-hover-color;
         }
       }
     }
@@ -66,15 +72,17 @@ $footer-heading-color: #ffeb3b;
     display: flex;
     gap: 1rem;
     margin-top: 1.2rem;
-  }
 
-  .icon {
-    font-size: 2rem;
-    display: inline-block;
-    transition: all 0.3s;
+    .icon {
+      font-size: 2rem;
+      display: inline-block;
+      transition: transform 0.3s, color 0.3s;
+      color: $footer-text-color;
 
-    &:hover {
-      transform: scale(1.4) rotate(15deg); 
+      &:hover {
+        transform: scale(1.4) rotate(15deg); 
+        color: $footer-heading-color;
+      }
     }
   }
 
@@ -82,24 +90,24 @@ $footer-heading-color: #ffeb3b;
     text-align: center;
     padding-top: 1rem;
     font-size: 0.9rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
     margin-top: 2rem;
-    color:$footer-text-color;
+    color: $footer-text-color;
   }
 
   @media (max-width: 768px) {
-    .footer {
-      font-size: 0.8rem; 
-  
-      .container {
-        flex-direction: column; 
-        align-items: center; 
-      }
-  
-      .footer-column {
-        text-align: center; 
-        min-width: 100%; 
-      }
+    .container {
+      flex-direction: column;
+      align-items: center;
     }
-  } 
+
+    .footer-column {
+      text-align: center;
+      min-width: 100%;
+    }
+
+    .social-icons {
+      justify-content: center;
+    }
+  }
 }
