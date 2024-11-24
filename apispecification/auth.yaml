@@ -4,7 +4,7 @@ info:
   description: API for user authentication (registration and login)
   version: 1.0.0
 servers:
-  - url: http://127.0.0.1:5000/api 
+  - url: http://127.0.0.1:5000/api/auth 
 paths:
   /register:
     post:
@@ -41,9 +41,70 @@ paths:
   /logout:
     post:
       summary: Log out an existing user
+      security:
+      - bearerAuth: []  # Dodanie autoryzacji typu Bearer Token
       responses:
         '200':
           description: Logout successful
         '400':
           description: Logout invalid
+  /request-password-reset:
+    post:
+      summary: Reset the password using email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './defs/auth/RequestResetPassword.yaml'
+      responses:
+        '200':
+          description: Email to reset password has been sent
+        '400':
+          description: Cannot send email to reset password
+
+  /reset-password:
+    post:
+      summary: Resetowanie hasła
+      description: Umożliwia użytkownikowi zresetowanie hasła.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './defs/auth/ResetPassword.yaml'
+      responses:
+        '200':
+          description: Hasło zostało pomyślnie zresetowane.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Password reset successfully."
+        '400':
+          description: Złe dane wejściowe.
+        '404':
+          description: Użytkownik nie został znaleziony.
+        '500':
+          description: Błąd wewnętrzny serwera.
+  /check-login:
+    get:
+      summary: Check if the user is still logged in
+      security:
+      - bearerAuth: []  # Autoryzacja JWT
+      responses:
+        '200':
+          description: User is still logged in
+        '401':
+          description: Invalid or expired token
+
       
+components:    
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
