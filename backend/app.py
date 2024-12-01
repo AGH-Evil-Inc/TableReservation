@@ -4,14 +4,15 @@ from flask_restx import Api, Resource, fields
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 import jwt
-import datetime
+from datetime import datetime, timedelta, timezone, time
 from flask_mail import Mail, Message
 from Marshmallow import UserSchema, LoginSchema, ResetPasswordSchema, NewPasswordSchema, ReservationSchema
 from marshmallow import ValidationError
-from datetime import timedelta, timezone
 from extensions import db  # Import db from extensions.py
 from functools import wraps
 from flask import request
+from dateutil.relativedelta import relativedelta
+
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -99,7 +100,27 @@ class Init(Resource):
             # Utworzenie wszystkich tabel w bazie danych
             db.create_all()
 
-            # Sprawdzenie, czy użytkownik admin już istnieje
+            # Inicjalizacja domyślnych godzin otwarcia
+            existing_hours = OpeningHours.query.first()
+            if not existing_hours:
+                opening_hours_data = [
+                    # Poniedziałek (0) do Piątku (4): 10:00 - 22:00
+                    {'day_of_week': i, 'opening_time': time(10, 0), 'closing_time': time(22, 0)} for i in range(0, 5)
+                ] + [
+                    # Sobota (5) i Niedziela (6): 12:00 - 00:00
+                    {'day_of_week': i, 'opening_time': time(12, 0), 'closing_time': time(0, 0)} for i in range(5, 7)
+                ]
+
+                for oh in opening_hours_data:
+                    opening_hour = OpeningHours(
+                        day_of_week=oh['day_of_week'],
+                        opening_time=oh['opening_time'],
+                        closing_time=oh['closing_time']
+                    )
+                    db.session.add(opening_hour)
+                db.session.commit()
+
+            # Inicjalizacja użytkownika admin (pozostała część kodu bez zmian)
             admin = User.query.filter_by(email='admin@example.com').first()
             if admin is None:
                 # Jeśli admin nie istnieje, utwórz go
@@ -179,7 +200,7 @@ class Login(Resource):
 
         token = jwt.encode({
             'user_id': user.id,
-            'exp': datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=1)
+            'exp': datetime.now(timezone.utc) + timedelta(hours=1)
         }, app.config['SECRET_KEY'], algorithm='HS256')
 
         return {'name': user.first_name, 'token': token}, 200
@@ -228,7 +249,7 @@ class RequestPasswordReset(Resource):
             # Generate a reset token
             reset_token = jwt.encode({
                 'user_id': user.id,
-                'exp':  datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=1)
+                'exp':  datetime.now(timezone.utc) + timedelta(hours=1)
             }, app.config['SECRET_KEY'], algorithm='HS256')
 
             # Construct the password reset URL
@@ -326,52 +347,134 @@ class CreateReservation(Resource):
 
         # Wyciąganie user_id z payload
         user_id = payload.get('user_id')
-        table_id = validated_data['table_id']
+        table_ids = validated_data['table_ids']
         reservation_start = validated_data['reservation_start'].replace(tzinfo=timezone.utc)
         reservation_end = validated_data['reservation_end'].replace(tzinfo=timezone.utc)
         pending = validated_data.get('pending', True)
 
-        # Check if the table exists
-        table = Table.query.get(table_id)
-        if not table:
-            return {'message': f'Table {table_id} does not exist'}, 400
-        
-        # Check if the table is available
-        if not table.available:
-            return {'message': f'Table {table_id} is currently unavailable'}, 400
+        # Walidacja godzin otwarcia
+        day_of_week = reservation_start.weekday()
+        opening_hours = OpeningHours.query.filter_by(day_of_week=day_of_week).first()
+        if not opening_hours:
+            return {
+                'message': 'The openning hours are not set up',
+                'errors': {'reservation_start': ['Opening hours are not set up']}
+            }, 400
 
-        # Check for overlapping reservations
-        overlapping_reservations = Reservation.query.filter(
-            Reservation.table_id == table_id,
-            Reservation.reservation_end > reservation_start,
-            Reservation.reservation_start < reservation_end,
-            Reservation.pending == True  # Only consider pending reservations
-        ).first()
+        opening_time = opening_hours.opening_time
+        closing_time = opening_hours.closing_time
 
-        if overlapping_reservations:
-            return {'message': f'Table {table_id} is already reserved during that time'}, 409
+        # Połączenie daty rezerwacji z godzinami otwarcia i zamknięcia
+        opening_datetime = datetime.combine(reservation_start.date(), opening_time).replace(tzinfo=timezone.utc)
+        closing_datetime = datetime.combine(reservation_start.date(), closing_time).replace(tzinfo=timezone.utc)
+
+        # Obsługa zamknięcia po północy
+        if closing_time <= opening_time:
+            closing_datetime += timedelta(days=1)
+
+        # Sprawdzenie, czy rezerwacja mieści się w godzinach otwarcia
+        if not (opening_datetime <= reservation_start < closing_datetime and
+                opening_datetime < reservation_end <= closing_datetime):
+            return {
+                'message': 'The reservation must be during opening hours',
+                'errors': {'reservation_start': ['The reservation must be during opening hours']}
+            }, 400
         
+        # Sprawdzenie, czy rezerwacja jest dokonana co najmniej 30 minut przed zamknięciem
+        last_reservation_time = closing_datetime - timedelta(minutes=30)
+        if reservation_start > last_reservation_time:
+            return {
+                'message': 'The last reservation can be made no later than 30 minutes before closing',
+                'errors': {'reservation_start': ['The last reservation can be made no later than 30 minutes before closing']}
+            }, 400
+
+        # Sprawdzenie minimalnego i maksymalnego czasu trwania rezerwacji
+        duration = reservation_end - reservation_start
+        min_duration = timedelta(minutes=15)
+        max_duration = timedelta(hours=4, minutes=30)
+
+        if duration < min_duration:
+            return {
+                'message': 'The minimal time of the reservation is 15 minutes',
+                'errors': {'reservation_end': ['The minimal time of the reservation is 15 minutes']}
+            }, 400
+        if duration > max_duration:
+            return {
+                'message': 'The maximal time of the reservation is 4.5 hours',
+                'errors': {'reservation_end': ['The maximal time of the reservation is 4.5 hours']}
+            }, 400
+        
+        # Sprawdzenie maksymalnego wyprzedzenia (dokładnie 4 miesiące)
+        current_time = datetime.now(timezone.utc)
+        max_advance = current_time + relativedelta(months=4)
+        if reservation_start > max_advance:
+            return {
+                'message': 'Rezerwację można dokonać maksymalnie na 4 miesiące do przodu.',
+                'errors': {'reservation_start': ['Rezerwację można dokonać maksymalnie na 4 miesiące do przodu.']}
+            }, 400
+
+        # Sprawdzenie, czy rezerwacja jest w przyszłości
+        if reservation_start < current_time:
+            return {
+                'message': 'Rezerwacja nie może być w przeszłości.',
+                'errors': {'reservation_start': ['Rezerwacja nie może być w przeszłości.']}
+            }, 400
+
+        # Sprawdzenie dostępności każdego stolika
+        unavailable_tables = []
+        for table_id in table_ids:
+            # Check if the table exists
+            table = Table.query.get(table_id)
+            if not table:
+                return {'message': f'Table {table_id} does not exist'}, 400
+            
+            # Check if the table is available
+            if not table.available:
+                return {'message': f'Table {table_id} is currently unavailable'}, 400
+
+            # Check for overlapping reservations
+            overlapping_reservations = Reservation.query.filter(
+                Reservation.table_id == table_id,
+                Reservation.reservation_end > reservation_start,
+                Reservation.reservation_start < reservation_end,
+                Reservation.pending == True  # Only consider pending reservations
+            ).first()
+
+            if overlapping_reservations:
+                unavailable_tables.append(table_id)
+
+        if unavailable_tables:
+            return {'message': f'Table {unavailable_tables} is already reserved during that time'}, 409
+            
 
         # Create the reservation
-        new_reservation = Reservation(
-            user_id=user_id,
-            table_id=table_id,
-            pending=pending,
-            created_at= datetime.datetime.now(datetime.UTC),
-            reservation_start=reservation_start,
-            reservation_end=reservation_end
-        )
-        db.session.add(new_reservation)
-        db.session.commit()
+        reserved_tables = []
+        for table_id in table_ids:
+            new_reservation = Reservation(
+                user_id=user_id,
+                table_id=table_id,
+                pending=pending,
+                created_at=datetime.now(timezone.utc),
+                reservation_start=reservation_start,
+                reservation_end=reservation_end
+            )
+            db.session.add(new_reservation)
+            reserved_tables.append(table_id)
 
+        db.session.commit()
         # Emitowanie aktualizacji do klientów
         socketio.emit('reservation_update', {
-            'table_id': table_id,
+            'table_ids': reserved_tables,
             'reservation_start': reservation_start.isoformat(),
             'reservation_end': reservation_end.isoformat() 
         })
 
-        return {'message': 'Reservation created successfully'}, 201
+        return {
+            'message': 'Reservation has been created sucessfully',
+            'reserved_tables': reserved_tables,
+            'reservation_start': reservation_start.isoformat(),
+            'reservation_end': reservation_end.isoformat()
+        }, 201
 
 
     @ns.doc(params={
@@ -389,8 +492,8 @@ class CreateReservation(Resource):
             return {'message': 'reservation_start and reservation_end query parameters are required'}, 400
 
         try:
-            reservation_start = datetime.datetime.strptime(reservation_start_str, '%Y-%m-%dT%H:%M').replace(tzinfo=timezone.utc)
-            reservation_end = datetime.datetime.strptime(reservation_end_str, '%Y-%m-%dT%H:%M').replace(tzinfo=timezone.utc)
+            reservation_start = datetime.strptime(reservation_start_str, '%Y-%m-%dT%H:%M').replace(tzinfo=timezone.utc)
+            reservation_end = datetime.strptime(reservation_end_str, '%Y-%m-%dT%H:%M').replace(tzinfo=timezone.utc)
         except ValueError as e:
             return {'message': 'Invalid date format', 'errors': str(e)}, 400
 

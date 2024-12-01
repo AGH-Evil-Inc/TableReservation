@@ -80,6 +80,17 @@ class Reservation(db.Model):
     table = db.relationship("Table", back_populates="reservations")
 
 
+class OpeningHours(db.Model):
+    __tablename__ = 'opening_hours'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    day_of_week = db.Column(db.Integer, nullable=False, unique=True)  # 0 - poniedziałek, 6 - niedziela
+    opening_time = db.Column(db.Time, nullable=False)
+    closing_time = db.Column(db.Time, nullable=False)
+
+    __table_args__ = (
+        db.UniqueConstraint('day_of_week', name='unique_day_of_week'),
+    )
 
 # engine.connect()
 # Base.metadata.create_all(engine)
