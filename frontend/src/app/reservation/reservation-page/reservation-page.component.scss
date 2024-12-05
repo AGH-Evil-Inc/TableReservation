@@ -114,37 +114,6 @@
       &:hover {
         transform: scale(1.02);
       }
-
-      .table {
-        position: relative;
-        width: 60px;
-        height: 60px;
-        background-color: #eff6fa;
-        border: 1px solid #1976d2;
-        border-radius: 5px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1rem;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background-color 0.3s ease, border-color 0.3s ease;
-
-        &.selected {
-          border-color: #28a745;
-          background-color: #d4edda;
-        }
-
-        &.occupied {
-          border-color: #dc3545;
-          background-color: #f8d7da;
-          cursor: not-allowed;
-        }
-
-        &:hover:not(.occupied) {
-          background-color: #bbdefb;
-        }
-      }
     }
   }
 
@@ -153,7 +122,8 @@
     align-items: center;
     justify-content: space-between;
   }
-  
+
+
   .arrow-button {
     background: transparent;
     border: none;

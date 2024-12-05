@@ -122,6 +122,13 @@ export class DefaultService {
 
         let localVarHeaders = this.defaultHeaders;
 
+        let localVarCredential: string | undefined;
+        // authentication (bearerAuth) required
+        localVarCredential = this.configuration.lookupCredential('bearerAuth');
+        if (localVarCredential) {
+            localVarHeaders = localVarHeaders.set('Authorization', 'Bearer ' + localVarCredential);
+        }
+
         let localVarHttpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
         if (localVarHttpHeaderAcceptSelected === undefined) {
             // to determine the Accept header
@@ -186,6 +193,13 @@ export class DefaultService {
         }
 
         let localVarHeaders = this.defaultHeaders;
+
+        let localVarCredential: string | undefined;
+        // authentication (bearerAuth) required
+        localVarCredential = this.configuration.lookupCredential('bearerAuth');
+        if (localVarCredential) {
+            localVarHeaders = localVarHeaders.set('Authorization', 'Bearer ' + localVarCredential);
+        }
 
         let localVarHttpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
         if (localVarHttpHeaderAcceptSelected === undefined) {

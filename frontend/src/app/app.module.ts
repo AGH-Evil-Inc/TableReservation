@@ -50,6 +50,7 @@ import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { NgbTimepickerModule } from '@ng-bootstrap/ng-bootstrap';
 import { CarouselComponent } from './reservation/carousel/carousel.component';
 import { ComingSoonComponent } from './shell/coming-soon/coming-soon.component';
+import { TablePlanComponent } from './reservation/table-plan/table-plan.component';
 
 const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
 
@@ -66,7 +67,8 @@ const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
         ResetPasswordComponent,
         ReservationPageNologgedComponent,
         CarouselComponent,
-        ComingSoonComponent
+        ComingSoonComponent,
+        TablePlanComponent
     ],
     bootstrap: [AppComponent],
     imports: [BrowserModule,

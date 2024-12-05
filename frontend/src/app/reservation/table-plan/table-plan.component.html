@@ -1,0 +1,25 @@
+<div class="plan-section">
+    <div class="plan">
+      <div
+        *ngFor="let table of tables"
+        class="table"
+        [attr.data-id]="table.id"
+        matTooltip="Kliknij, aby wybrać stolik"
+        (click)="selectTable(table.id)"
+      >
+        <div
+          class="table-shape"
+          [ngClass]="{
+            'circle': table.shape === 'circle',
+            'rectangle': table.shape === 'rectangle'
+          }"
+          [class.occupied]="occupiedTables.includes(table.id)"
+          [class.selected]="selectedTables.includes(table.id)"
+        >
+          <span>{{ table.id }}</span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  

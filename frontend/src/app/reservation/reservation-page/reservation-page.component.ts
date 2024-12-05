@@ -10,7 +10,7 @@ import { ReservationService } from 'src/app/services/reservation.service';
 })
 export class ReservationPageComponent implements OnInit, OnDestroy {
   reservation: Reservation = {
-    table_id: 0,
+    table_ids: [],
     reservation_start: '',
     reservation_end: ''
   };
@@ -27,12 +27,12 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
   maxDuration: NgbTimeStruct = { hour: 4, minute: 30, second: 0 };
   occupiedTables: number[] = []; 
 
-  tables: { id: number; x: number; y: number }[] = [
-    { id: 1, x: 50, y: 50 },
-    { id: 2, x: 100, y: 50 },
-    { id: 3, x: 200, y: 100 },
-    { id: 4, x: 400, y: 500 },
-    { id: 5, x: 800, y: 500 }
+  tables: { id: number; x: number; y: number, shape: string }[] = [
+    { id: 1, x: 50, y: 50, shape: 'circle' },
+    { id: 2, x: 100, y: 50,  shape: 'rectangle' },
+    { id: 4, x: 200, y: 100, shape: 'circle' },
+    { id: 3, x: 400, y: 500,  shape: 'rectangle' },
+    { id: 15, x: 800, y: 500,  shape: 'rectangle' }
   ];
 
 
@@ -111,13 +111,13 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
     const endDateTime = new Date(startDateTime);
     endDateTime.setHours(endDateTime.getHours() + duration.hour);
     endDateTime.setMinutes(endDateTime.getMinutes() + duration.minute);
-
+  
     this.reservation.reservation_start = this.formatToISO(startDateTime);
     this.reservation.reservation_end = this.formatToISO(endDateTime);
   }
 
   private resetReservationForm(): void {
-    this.reservation = { table_id: 0, reservation_start: '', reservation_end: '' };
+    this.reservation = { table_ids: [], reservation_start: '', reservation_end: '' };
     this.reservationFormData = { date: '', start_time: '', duration: { hour: 1, minute: 0, second: 0 } };
   }
 
@@ -125,12 +125,13 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
     return date.toISOString().slice(0, 16); // Format ISO bez sekund
   }
 
-  private isReservationValid(): boolean {
+  protected isReservationValid(): boolean {
     const { date, start_time, duration } = this.reservationFormData;
 
     const [startHours, startMinutes] = start_time.split(':').map(Number);
     const startDateTime = new Date(date);
-    startDateTime.setHours(startHours+1, startMinutes);
+    startDateTime.setHours(startHours, startMinutes);
+    
 
     const endDateTime = new Date(startDateTime);
     endDateTime.setHours(endDateTime.getHours() + duration.hour);
@@ -147,10 +148,14 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
     openingDateTime.setHours(openingHours, openingMinutes);
 
     const closingDateTime = new Date(startDateTime);
-    closingDateTime.setHours(closingHours - 1, closingMinutes + 30); // Rezerwacja musi kończyć się na 30 minut przed zamknięciem
+    closingDateTime.setHours(closingHours, closingMinutes); 
+    
+    const lastOpeningDateTime = new Date(startDateTime);
+    lastOpeningDateTime.setHours(closingHours-1, closingMinutes+30); // Rezerwacja musi kończyć się na 30 minut przed zamknięciem
 
     return (
       startDateTime >= openingDateTime &&
+      startDateTime <= lastOpeningDateTime &&
       endDateTime <= closingDateTime &&
       endDateTime > startDateTime &&
       this.compareTime(this.minDuration, duration) &&
@@ -159,11 +164,7 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
   }
 
   fetchOccupiedTables(): void {
-    if (!this.reservation.reservation_start || !this.reservation.reservation_end) {
-      alert('Podaj datę i czas rezerwacji.');
-      return;
-    }
-
+  
     this.reservationService.getOccupiedTables(this.reservation.reservation_start, this.reservation.reservation_end).subscribe({
       next: (response) => {
         this.occupiedTables = response.occupied_table_ids || [];
@@ -174,14 +175,11 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  selectTable(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    const tableId = target.getAttribute('data-id');
-
-    if (tableId) {
-      this.reservation.table_id = parseInt(tableId, 10);
+  selectTable(tableId: number): void {
+    if (!this.reservation.table_ids.includes(tableId)) {
+      this.reservation.table_ids.push(tableId);
     } else {
-      alert('Nie wybrano stolika.');
+      this.reservation.table_ids = this.reservation.table_ids.filter(id => id !== tableId);
     }
   }
 
@@ -214,6 +212,9 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
     if (first.hour === second.hour && first.minute === second.minute && first.second < second.second) {
        return true; 
     } 
+    if (first.hour === second.hour && first.minute === second.minute && first.second == second.second) {
+      return true; 
+   } 
     return false; 
   }
 

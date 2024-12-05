@@ -26,7 +26,7 @@ db.init_app(app)
 mail = Mail(app)
 
 # Now import models after db is initialized
-from database_model import User, Reservation, Table
+from database_model import OpeningHours, User, Reservation, Table
 
 # Configuration for JWT
 app.config['SECRET_KEY'] = 'your-secret-key'  # Use a strong key for production
