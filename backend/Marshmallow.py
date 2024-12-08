@@ -57,7 +57,7 @@ class ReservationSchema(Schema):
             raise ValidationError('The reservations can be made up to 4 months ahead', field_name='reservation_start')
         
 
-class OpeningHoursSchema(Schema):
+class SettingsSchema(Schema):
     day_of_week = ma_fields.Int(required=True, validate=validate.Range(min=0, max=6))
     opening_time = ma_fields.Time(required=True, format='%H:%M:%S')
     closing_time = ma_fields.Time(required=True, format='%H:%M:%S')

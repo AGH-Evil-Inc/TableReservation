@@ -55,15 +55,31 @@ class User(db.Model, UserMixin):
 
 class Table(db.Model):
     __tablename__ = 'tables'
-    
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     available = db.Column(db.Boolean)
-    no_seats = db.Column(db.Integer)
-    description = db.Column(db.Text)
-    location_x = db.Column(db.Float)
-    location_y = db.Column(db.Float)
+    x = db.Column(db.Float, nullable=False) 
+    y = db.Column(db.Float, nullable=False)  
+    width = db.Column(db.Float, nullable=False)  
+    height = db.Column(db.Float, nullable=False)  
+    shape = db.Column(db.String(50), nullable=False)  
+    tooltip = db.Column(db.String(255), nullable=False)  
     
     reservations = db.relationship("Reservation", back_populates="table")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'available': self.available,
+            'x': self.x,
+            'y': self.y,
+            'width': self.width,
+            'height': self.height,
+            'shape': self.shape,
+            'tooltip': self.tooltip,
+        }
+
+
 
 class Reservation(db.Model):
     __tablename__ = 'reservations'
@@ -79,18 +95,14 @@ class Reservation(db.Model):
     user = db.relationship("User", back_populates="reservations")
     table = db.relationship("Table", back_populates="reservations")
 
-
-class OpeningHours(db.Model):
-    __tablename__ = 'opening_hours'
-
+class Settings(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    day_of_week = db.Column(db.Integer, nullable=False, unique=True)  # 0 - poniedziałek, 6 - niedziela
+    day_of_week = db.Column(db.Integer, nullable=False)
     opening_time = db.Column(db.Time, nullable=False)
     closing_time = db.Column(db.Time, nullable=False)
+    min_reservation_length = db.Column(db.Integer, default=30)
+    max_reservation_length = db.Column(db.Integer, default=120)
 
-    __table_args__ = (
-        db.UniqueConstraint('day_of_week', name='unique_day_of_week'),
-    )
 
 # engine.connect()
 # Base.metadata.create_all(engine)

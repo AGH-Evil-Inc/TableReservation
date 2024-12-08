@@ -1,25 +1,7 @@
 <div class="plan-section">
-    <div class="plan">
-      <div
-        *ngFor="let table of tables"
-        class="table"
-        [attr.data-id]="table.id"
-        matTooltip="Kliknij, aby wybrać stolik"
-        (click)="selectTable(table.id)"
-      >
-        <div
-          class="table-shape"
-          [ngClass]="{
-            'circle': table.shape === 'circle',
-            'rectangle': table.shape === 'rectangle'
-          }"
-          [class.occupied]="occupiedTables.includes(table.id)"
-          [class.selected]="selectedTables.includes(table.id)"
-        >
-          <span>{{ table.id }}</span>
-          
-        </div>
-      </div>
-    </div>
-  </div>
-  
+  <div id="canvas-container"></div>
+  <div *ngIf="isManager" class="actions">
+    <button mat-raised-button color="primary" (click)="addTable()">Dodaj stolik</button>
+    <button mat-raised-button color="primary" (click)="saveLayout()">Zapisz układ stolików</button>
+  </div>  
+</div>

@@ -26,7 +26,7 @@ db.init_app(app)
 mail = Mail(app)
 
 # Now import models after db is initialized
-from database_model import OpeningHours, User, Reservation, Table
+from database_model import Settings, User, Reservation, Table
 
 # Configuration for JWT
 app.config['SECRET_KEY'] = 'your-secret-key'  # Use a strong key for production
@@ -48,6 +48,8 @@ with open('../apispecification/defs/auth/LoginResponse.yaml', 'r') as file:
     login_response_schema = yaml.safe_load(file)
 with open('../apispecification/defs/reservation/Reservation.yaml', 'r') as file:
     reservation_schema = yaml.safe_load(file)
+with open('../apispecification/defs/reservation/Table.yaml', 'r') as file:
+    table_schema = yaml.safe_load(file)
 
 # Dynamiczne tworzenie modelu
 user_model = api.schema_model('User', user_schema)
@@ -56,6 +58,7 @@ req_reset_pass_model = api.schema_model('RequestResetPassword', req_reset_pass_s
 reset_pass_model = api.schema_model('ResetPassword', reset_pass_schema)
 login_response_model = api.schema_model('LoginResponse', login_response_schema)
 reservation_model = api.schema_model('Reservation', reservation_schema)
+table_model = api.schema_model('Table', table_schema)
 
 # Helper function to validate JWT tokens
 def token_required(f):
@@ -101,7 +104,7 @@ class Init(Resource):
             db.create_all()
 
             # Inicjalizacja domyślnych godzin otwarcia
-            existing_hours = OpeningHours.query.first()
+            existing_hours = Settings.query.first()
             if not existing_hours:
                 opening_hours_data = [
                     # Poniedziałek (0) do Piątku (4): 10:00 - 22:00
@@ -112,7 +115,7 @@ class Init(Resource):
                 ]
 
                 for oh in opening_hours_data:
-                    opening_hour = OpeningHours(
+                    opening_hour = Settings(
                         day_of_week=oh['day_of_week'],
                         opening_time=oh['opening_time'],
                         closing_time=oh['closing_time']
@@ -137,6 +140,37 @@ class Init(Resource):
                 db.session.commit()
 
             return {'message': 'Initial configuration done!'}, 200
+@ns.route('/settings')
+class SettingsAPI(Resource):
+    @token_required
+    def get(self):
+        settings = Settings.query.all()
+        return jsonify([{
+            'day_of_week': s.day_of_week,
+            'opening_time': s.opening_time.strftime('%H:%M'),
+            'closing_time': s.closing_time.strftime('%H:%M'),
+            'min_reservation_length': s.min_reservation_length,
+            'max_reservation_length': s.max_reservation_length,
+        } for s in settings])
+
+    @token_required
+    def put(self):
+        data = request.json
+        try:
+            for day, values in data.items():
+                setting = Settings.query.filter_by(day_of_week=day).first()
+                if not setting:
+                    setting = Settings(day_of_week=day)
+                    db.session.add(setting)
+                setting.opening_time = datetime.strptime(values['opening_time'], '%H:%M').time()
+                setting.closing_time = datetime.strptime(values['closing_time'], '%H:%M').time()
+                setting.min_reservation_length = values['min_reservation_length']
+                setting.max_reservation_length = values['max_reservation_length']
+            db.session.commit()
+            return {'message': 'Settings updated successfully'}, 200
+        except Exception as e:
+            return {'message': 'Failed to update settings', 'error': str(e)}, 400
+
 
 # Rejestracja nowego użytkownika
 @ns.route('/auth/register')
@@ -311,6 +345,71 @@ class ResetPassword(Resource):
         db.session.commit()
 
         return {'message': 'Password reset successful'}, 200
+    
+@ns.route('/tables')
+class TableList(Resource):
+    @ns.response(200, 'Success', [table_model])
+    @ns.response(400, 'Invalid input')
+    def get(self):
+        """Get all tables"""
+        tables = Table.query.all()
+        return jsonify([table.to_dict() for table in tables])
+      
+
+    @ns.expect(table_model)
+    @ns.response(201, 'Table created successfully')
+    @ns.response(400, 'Invalid input')
+    def post(self):
+        """Create a new table"""
+        data = request.get_json()
+        new_table = Table(**data)
+        db.session.add(new_table)
+        db.session.commit()
+        return {'message': 'Table created successfully', 'id': new_table.id}, 201
+      
+
+
+@ns.route('/tables/<int:table_id>')
+class TableDetail(Resource):
+    @ns.response(200, 'Success', table_model)
+    @ns.response(404, 'Table not found')
+    def get(self, table_id):
+        """Get a specific table by ID"""
+        table = Table.query.get(table_id)
+        if not table:
+            return {'message': 'Table not found'}, 404
+        return jsonify(table.to_dict())
+
+    @ns.expect(table_model)
+    @ns.response(200, 'Table updated successfully')
+    @ns.response(404, 'Table not found')
+    @ns.response(400, 'Invalid input')
+    def put(self, table_id):
+        """Update an existing table"""
+        data = request.get_json()
+        table = Table.query.get(table_id)
+        if not table:
+            return {'message': 'Table not found'}, 404
+
+    
+        for key, value in data.items():
+            setattr(table, key, value)
+        db.session.commit()
+        return {'message': 'Table updated successfully'}
+
+
+    @ns.response(204, 'Table deleted successfully')
+    @ns.response(404, 'Table not found')
+    def delete(self, table_id):
+        """Delete a table by ID"""
+        table = Table.query.get(table_id)
+        if not table:
+            return {'message': 'Table not found'}, 404
+
+        db.session.delete(table)
+        db.session.commit()
+        return '', 204
+       
 
 @ns.route('/reservation')
 class CreateReservation(Resource):
@@ -354,7 +453,7 @@ class CreateReservation(Resource):
 
         # Walidacja godzin otwarcia
         day_of_week = reservation_start.weekday()
-        opening_hours = OpeningHours.query.filter_by(day_of_week=day_of_week).first()
+        opening_hours = Settings.query.filter_by(day_of_week=day_of_week).first()
         if not opening_hours:
             return {
                 'message': 'The openning hours are not set up',

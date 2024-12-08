@@ -1,0 +1,38 @@
+type: object
+properties:
+  id:
+    type: integer
+    description: ID of the table
+    readOnly: true
+  available:
+    type: boolean
+    description: Availability of the table
+  x:
+    type: number
+    format: float
+    description: X-coordinate of the table
+  y:
+    type: number
+    format: float
+    description: Y-coordinate of the table
+  width:
+    type: number
+    format: float
+    description: Width of the table
+  height:
+    type: number
+    format: float
+    description: Height of the table
+  shape:
+    type: string
+    description: Shape of the table
+  tooltip:
+    type: string
+    description: Tooltip information for the table
+required:
+  - x
+  - y
+  - width
+  - height
+  - shape
+  - tooltip
