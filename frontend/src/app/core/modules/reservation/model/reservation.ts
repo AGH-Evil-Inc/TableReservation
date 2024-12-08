@@ -11,9 +11,9 @@
 
 export interface Reservation { 
     /**
-     * ID of the table to reserve
+     * IDs of the table to reserve
      */
-    table_id: number;
+    table_ids: Array<number>;
     /**
      * Start time of the reservation
      */

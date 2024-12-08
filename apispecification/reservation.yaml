@@ -57,7 +57,94 @@ paths:
           description: Invalid input
       security:
       - bearerAuth: []  # Dodano zabezpieczenie Bearer dla GET
-      
+
+  /tables:
+      get:
+        summary: Get all tables
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: './defs/reservation/Table.yaml'
+          '400':
+            description: Invalid input
+      post:
+        summary: Create a new table
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: './defs/reservation/Table.yaml'
+        responses:
+          '201':
+            description: Table created successfully
+          '400':
+            description: Invalid input
+  /tables/{tableId}:
+      get:
+        summary: Get a specific table by ID
+        parameters:
+          - in: path
+            name: tableId
+            schema:
+              type: integer
+            required: true
+            description: ID of the table to fetch
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: './defs/reservation/Table.yaml'
+          '400':
+            description: Invalid input
+          '404':
+            description: Table not found
+      put:
+        summary: Update an existing table
+        parameters:
+          - in: path
+            name: tableId
+            schema:
+              type: integer
+            required: true
+            description: ID of the table to update
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: './defs/reservation/Table.yaml'
+        responses:
+          '200':
+            description: Table updated successfully
+          '400':
+            description: Invalid input
+          '404':
+            description: Table not found
+      delete:
+        summary: Delete a table by ID
+        parameters:
+          - in: path
+            name: tableId
+            schema:
+              type: integer
+            required: true
+            description: ID of the table to delete
+        responses:
+          '204':
+            description: Table deleted successfully
+          '400':
+            description: Invalid input
+          '404':
+            description: Table not found
+
 components:
   securitySchemes:
     bearerAuth:

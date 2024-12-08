@@ -1,0 +1,79 @@
+<h2 mat-dialog-title class="dialog-title">
+    Dodanie nowego stolika
+    <button mat-icon-button (click)="closeDialog()" class="close-button" aria-label="Zamknij">
+      <mat-icon>close</mat-icon>
+    </button>
+  </h2>
+  
+  <div mat-dialog-content class="dialog-content">
+    <form>
+      <mat-form-field appearance="outline" class="full-width margin-top-input">
+        <mat-label>ID Stolika</mat-label>
+        <input
+          matInput
+          [(ngModel)]="tableData.id"
+          name="id"
+          type="number"
+          disabled = true
+          readonly
+          placeholder="Automatycznie przypisane"
+        />
+      </mat-form-field>
+  
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Szerokość</mat-label>
+        <input
+          matInput
+          [(ngModel)]="tableData.width"
+          name="width"
+          type="number"
+          required
+          placeholder="Szerokość w pikselach"
+        />
+      </mat-form-field>
+  
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Wysokość</mat-label>
+        <input
+          matInput
+          [(ngModel)]="tableData.height"
+          name="height"
+          type="number"
+          required
+          placeholder="Wysokość w pikselach"
+        />
+      </mat-form-field>
+  
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Kształt</mat-label>
+        <mat-select [(ngModel)]="tableData.shape" name="shape" required>
+          <mat-option *ngFor="let shape of shapes" [value]="shape.value">
+            <fa-icon [icon]="shape.icon"></fa-icon> {{ shape.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Liczba miejsc</mat-label>
+        <input
+        matInput
+        [(ngModel)]="tableData.seats"
+        name="seats"
+        />
+      </mat-form-field>
+      
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Tooltip</mat-label>
+        <input
+        matInput
+        [(ngModel)]="tableData.tooltip"
+        name="tooltip"
+        placeholder="Opis stolika"
+        />
+      </mat-form-field>
+    </form>
+    </div>
+  <div mat-dialog-actions class="dialog-actions">
+    <button mat-raised-button color="primary" class="w-100" (click)="saveTable()">Zatwierdź</button>
+  </div>
+  

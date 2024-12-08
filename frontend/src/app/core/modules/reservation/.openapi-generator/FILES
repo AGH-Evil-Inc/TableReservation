@@ -1,5 +1,4 @@
 .gitignore
-.openapi-generator-ignore
 README.md
 api.module.ts
 api/api.ts
@@ -11,5 +10,6 @@ index.ts
 model/models.ts
 model/reservation.ts
 model/reservationGet200Response.ts
+model/table.ts
 param.ts
 variables.ts

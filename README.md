@@ -26,6 +26,7 @@ https://nodejs.org/en/download/prebuilt-installer
 Do the following to run frontend:
 -  run second terminal
 -  cd .\frontend\
+-  npm install 
 -  ng serve 
 
 ## Other

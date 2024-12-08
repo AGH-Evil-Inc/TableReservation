@@ -1,8 +1,10 @@
 type: object
 properties:
-  table_id:
-    type: integer
-    description: ID of the table to reserve
+  table_ids:
+    type: array
+    items:
+      type: integer
+    description: IDs of the table to reserve
   reservation_start:
     type: string
     format: date-time
@@ -15,6 +17,6 @@ properties:
     type: boolean
     description: Whether the reservation is pending (optional)
 required:
-  - table_id
+  - table_ids
   - reservation_start
   - reservation_end
