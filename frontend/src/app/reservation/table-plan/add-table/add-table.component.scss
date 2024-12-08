@@ -1,0 +1,53 @@
+@use "../../../../utils" as ds;
+
+::ng-deep .mat-dialog-container {
+  padding: 16px;
+  border-radius: ds.$border-radius;
+  overflow: hidden;
+}
+
+.dialog-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: ds.$primary-color1;
+  color: ds.$text-color-light;
+
+  .close-button {
+    color: ds.$text-color-light;
+
+    &:hover {
+      color: ds.$secondary-color;
+    }
+  }
+}
+
+.dialog-content {
+  padding: 1rem;
+  .full-width {
+    margin-bottom: 1rem;
+  }
+
+  .mat-form-field {
+    width: 100%;
+
+    mat-error {
+      color: ds.$secondary-color;
+    }
+  }
+}
+
+.margin-top-input {
+    margin-top: 8px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+
+  button {
+    width: 100%;
+  }
+}
