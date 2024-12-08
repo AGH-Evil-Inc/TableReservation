@@ -295,4 +295,8 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
       console.error('Błąd pobierania stolików:', error);
     });
   }
+
+  restoreLayout(occupied: Table[]): void {
+    this.fetchTables()
+  }
 }

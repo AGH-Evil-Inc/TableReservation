@@ -29,6 +29,9 @@ properties:
   tooltip:
     type: string
     description: Tooltip information for the table
+  seats:
+    type: integer
+    description: Number of seats
 required:
   - x
   - y
@@ -36,3 +39,4 @@ required:
   - height
   - shape
   - tooltip
+  - seats

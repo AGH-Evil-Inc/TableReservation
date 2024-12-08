@@ -42,5 +42,9 @@ export interface Table {
      * Tooltip information for the table
      */
     tooltip: string;
+    /**
+     * Number of seats
+     */
+    seats: number;
 }
 

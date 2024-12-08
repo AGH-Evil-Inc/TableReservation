@@ -63,7 +63,8 @@ class Table(db.Model):
     width = db.Column(db.Float, nullable=False)  
     height = db.Column(db.Float, nullable=False)  
     shape = db.Column(db.String(50), nullable=False)  
-    tooltip = db.Column(db.String(255), nullable=False)  
+    tooltip = db.Column(db.String(255), nullable=False) 
+    seats = db.Column(db.Integer,  nullable=False) 
     
     reservations = db.relationship("Reservation", back_populates="table")
 
@@ -77,6 +78,7 @@ class Table(db.Model):
             'height': self.height,
             'shape': self.shape,
             'tooltip': self.tooltip,
+            'seats': self.seats
         }
 
 

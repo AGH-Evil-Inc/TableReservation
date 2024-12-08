@@ -405,7 +405,7 @@ class TableDetail(Resource):
         table = Table.query.get(table_id)
         if not table:
             return {'message': 'Table not found'}, 404
-
+        
         db.session.delete(table)
         db.session.commit()
         return '', 204

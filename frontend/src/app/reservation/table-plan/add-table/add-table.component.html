@@ -52,6 +52,15 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Liczba miejsc</mat-label>
+        <input
+        matInput
+        [(ngModel)]="tableData.seats"
+        name="seats"
+        />
+      </mat-form-field>
       
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Tooltip</mat-label>

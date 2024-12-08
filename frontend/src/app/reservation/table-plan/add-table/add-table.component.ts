@@ -16,6 +16,7 @@ export class AddTableComponent implements OnInit {
     height: 60,
     shape: 'rectangle', 
     tooltip: '',
+    seats: 0,
     available: true
   };
 
@@ -55,4 +56,4 @@ export class AddTableComponent implements OnInit {
       alert('Proszę wypełnić wszystkie pola poprawnie!');
     }
   }
-}
+ }

@@ -4,7 +4,7 @@ import gsap from 'gsap';
 import Konva from 'konva';
 import { AddTableComponent } from './add-table/add-table.component';
 import { Table } from 'src/app/core/modules/reservation';
-import { Tooltip } from 'chart.js';
+
 
 @Component({
   selector: 'app-table-plan',
@@ -17,7 +17,8 @@ export class TablePlanComponent implements AfterViewInit {
   @Input() selectedTables: number[] = [];
   @Input() isManager: boolean = false; 
   @Output() tableSelected = new EventEmitter<number>();
-  @Output() layoutSaved = new EventEmitter<any[]>(); 
+  @Output() layoutSaved = new EventEmitter<Table[]>(); 
+  @Output() restore = new EventEmitter<any>();
 
   private stage!: Konva.Stage;
   private layer!: Konva.Layer;
@@ -49,6 +50,7 @@ export class TablePlanComponent implements AfterViewInit {
       this.layer = new Konva.Layer();
       this.layer.listening(true);
       this.stage.add(this.layer);
+      console.log(this.tables)
 
       this.updateScale();
       this.renderTables();
@@ -171,7 +173,7 @@ export class TablePlanComponent implements AfterViewInit {
         tableText = new Konva.Text({
           x: table.x,
           y: table.y,
-          text: `${table.id}`,
+          text: `${table.id} (${table.seats} os)`,
           fontSize: 14,
           fontFamily: 'Arial',
           fill: '#000',
@@ -376,6 +378,7 @@ export class TablePlanComponent implements AfterViewInit {
           height: result.shape === 'circle' ? result.width : result.height,
           shape: result.shape,
           tooltip: result.tooltip || '',
+          seats: result.seats,
           available: true
         };
         this.tables.push(newTable);
@@ -395,5 +398,10 @@ export class TablePlanComponent implements AfterViewInit {
     this.renderTables();
     this.layoutSaved.emit(this.tables); // Emit the updated layout
     alert('Układ stolików zapisany!');
+  }
+
+  restoreLayout(): void {
+    this.restore.emit(this.occupiedTables);
+    this.initStage();
   }
 }
