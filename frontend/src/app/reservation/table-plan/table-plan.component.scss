@@ -1,0 +1,28 @@
+.plan-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#canvas-container {
+  flex-grow: 1;
+  width: 100%;
+  max-width: 1000px;
+  height: 80%;
+  border: 2px solid #ddd;
+  background-color: #fff;
+  border-radius: 12px;
+}
+
+.actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}

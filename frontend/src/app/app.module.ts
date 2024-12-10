@@ -50,6 +50,11 @@ import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { NgbTimepickerModule } from '@ng-bootstrap/ng-bootstrap';
 import { CarouselComponent } from './reservation/carousel/carousel.component';
 import { ComingSoonComponent } from './shell/coming-soon/coming-soon.component';
+import { TablePlanComponent } from './reservation/table-plan/table-plan.component';
+import { AddTableComponent } from './reservation/table-plan/add-table/add-table.component';
+import { MatOptionModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'; 
 
 const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
 
@@ -66,7 +71,9 @@ const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
         ResetPasswordComponent,
         ReservationPageNologgedComponent,
         CarouselComponent,
-        ComingSoonComponent
+        ComingSoonComponent,
+        TablePlanComponent,
+        AddTableComponent
     ],
     bootstrap: [AppComponent],
     imports: [BrowserModule,
@@ -77,11 +84,14 @@ const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
         MatButtonModule,
         MatIconModule,
         MatInputModule,
+        MatOptionModule,
+        MatSelectModule,
         MatFormFieldModule,
         MatSnackBarModule,
         MdbAccordionModule,
         MatCardModule,
         MatCardActions,
+        FontAwesomeModule,
         MdbCarouselModule,
         MdbCheckboxModule,
         MdbCollapseModule,
@@ -109,4 +119,4 @@ const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
         provideAnimations(),
         provideAnimationsAsync()
     ] })
-export class AppModule { }
+export class AppModule {}
