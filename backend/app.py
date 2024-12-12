@@ -237,7 +237,7 @@ class Login(Resource):
             'exp': datetime.now(timezone.utc) + timedelta(hours=1)
         }, app.config['SECRET_KEY'], algorithm='HS256')
 
-        return {'name': user.first_name, 'token': token}, 200
+        return {'name': user.first_name, 'token': token, 'isAdmin': user.is_admin}, 200
 
 
 # Wylogowywanie:

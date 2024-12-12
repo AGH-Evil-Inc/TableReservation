@@ -23,7 +23,7 @@ export class LoginComponent {
     this.authService.login(this.user).subscribe(
       response => {
         if (response.token) {
-          this.authComponentService.login(response.name,response.token)
+          this.authComponentService.login(response.name,response.token, response.isAdmin)
           this.closeDialog();
         } else {
           this.message = 'Login failed! Invalid credentials.';
