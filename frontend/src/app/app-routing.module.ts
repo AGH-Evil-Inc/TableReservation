@@ -15,6 +15,7 @@ const routes: Routes = [
   { path: 'reset-password', component: HomePageComponent },
   { path: 'menu', component: ComingSoonComponent },
   { path: 'kontakt', component: ComingSoonComponent },
+  { path: 'manager', component: ComingSoonComponent },
   { path: 'about', component: ComingSoonComponent },
   { path: '', redirectTo: '/home', pathMatch: 'full' },
 ];

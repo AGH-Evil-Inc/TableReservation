@@ -17,6 +17,7 @@ export class ShellHeaderComponent implements OnInit {
   userName: string | null = '';
   remainingTime: number = 0;
   isMenuOpen: boolean = false;
+  isUserManager = localStorage.getItem('isAdmin') === 'true';
 
   constructor(private dialog: MatDialog, private authComponentService: AuthComponentService,
      private authService: AuthService, private sessionTimerService: SessionTimerService,
@@ -26,6 +27,10 @@ export class ShellHeaderComponent implements OnInit {
     // Subskrypcja na status logowania
     this.authComponentService.isLoggedIn$.subscribe(status => {
       this.isLoggedIn = status;
+    });
+
+    this.authComponentService.isLoggedIn$.subscribe(isAdmin => {
+      this.isUserManager = isAdmin;
     });
 
     // Subskrypcja na nazwisko użytkownika
