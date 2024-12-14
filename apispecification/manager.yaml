@@ -1,0 +1,186 @@
+openapi: 3.0.0
+info:
+  title: Manager API
+  description: Endpoints for administrative (manager) operations
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:5000/api
+paths:
+  /manager/settings:
+    get:
+      summary: Get all settings (manager only)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of settings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    day_of_week:
+                      type: integer
+                    opening_time:
+                      type: string
+                    closing_time:
+                      type: string
+                    min_reservation_length:
+                      type: integer
+                    max_reservation_length:
+                      type: integer
+    put:
+      summary: Update settings (partial updates allowed)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: object
+                properties:
+                  opening_time:
+                    type: string
+                  closing_time:
+                    type: string
+                  min_reservation_length:
+                    type: integer
+                  max_reservation_length:
+                    type: integer
+      responses:
+        '200':
+          description: Settings updated successfully
+        '400':
+          description: Failed to update settings
+
+  /manager/users:
+    get:
+      summary: Get all users (manager only)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of users
+
+  /manager/users/{user_id}:
+    delete:
+      summary: Delete a user by ID (manager only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User deleted successfully
+        '404':
+          description: User not found
+    put:
+      summary: Update user data (manager only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUser'
+      responses:
+        '200':
+          description: User updated successfully
+        '404':
+          description: User not found
+
+  /manager/reservations:
+    get:
+      summary: Get all reservations (manager only)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of reservations
+
+  /manager/reservations/{reservation_id}:
+    delete:
+      summary: Delete a reservation by ID (manager only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: reservation_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Reservation deleted successfully
+        '404':
+          description: Reservation not found
+    put:
+      summary: Update reservation data (manager only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: reservation_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReservation'
+      responses:
+        '200':
+          description: Reservation updated successfully
+        '404':
+          description: Reservation not found
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    UpdateUser:
+      type: object
+      properties:
+        email:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        phone_number:
+          type: string
+        is_admin:
+          type: boolean
+    UpdateReservation:
+      type: object
+      properties:
+        table_id:
+          type: integer
+        pending:
+          type: boolean
+        reservation_start:
+          type: string
+          format: date-time
+        reservation_end:
+          type: string
+          format: date-time
