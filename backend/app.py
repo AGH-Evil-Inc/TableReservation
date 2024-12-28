@@ -52,7 +52,11 @@ with open('../apispecification/defs/reservation/Table.yaml', 'r') as file:
     table_schema = yaml.safe_load(file)
 with open('../apispecification/manager.yaml', 'r') as file:
     manager_spec = yaml.safe_load(file)
-with open('../apispecification/update_settings_model.yaml', 'r') as file:
+with open('../apispecification/defs/manager/UpdateReservation.yaml', 'r') as file:
+    update_reservation_schema = yaml.safe_load(file)
+with open('../apispecification/defs/manager/UpdateUser.yaml', 'r') as file:
+    update_user_schema = yaml.safe_load(file)
+with open('../apispecification/defs/manager/ReservationSchema.yaml', 'r') as file:
     update_settings_schema = yaml.safe_load(file)
 
 # Dynamiczne tworzenie modelu
@@ -63,8 +67,8 @@ reset_pass_model = api.schema_model('ResetPassword', reset_pass_schema)
 login_response_model = api.schema_model('LoginResponse', login_response_schema)
 reservation_model = api.schema_model('Reservation', reservation_schema)
 table_model = api.schema_model('Table', table_schema)
-update_user_model = api.schema_model('UpdateUser', manager_spec['components']['schemas']['UpdateUser'])
-update_reservation_model = api.schema_model('UpdateReservation', manager_spec['components']['schemas']['UpdateReservation'])
+update_user_model = api.schema_model('UpdateUser', update_user_schema)
+update_reservation_model = api.schema_model('UpdateReservation', update_reservation_schema)
 update_settings_model = api.schema_model('UpdateSettings', update_settings_schema)
 
 # Helper function to validate JWT tokens
@@ -157,38 +161,6 @@ class Init(Resource):
                 db.session.commit()
 
             return {'message': 'Initial configuration done!'}, 200
-@ns.route('/settings')
-class SettingsAPI(Resource):
-    @token_required
-    def get(self):
-        settings = Settings.query.all()
-        return jsonify([{
-            'day_of_week': s.day_of_week,
-            'opening_time': s.opening_time.strftime('%H:%M'),
-            'closing_time': s.closing_time.strftime('%H:%M'),
-            'min_reservation_length': s.min_reservation_length,
-            'max_reservation_length': s.max_reservation_length,
-        } for s in settings])
-
-    @token_required
-    def put(self):
-        data = request.json
-        try:
-            for day, values in data.items():
-                setting = Settings.query.filter_by(day_of_week=day).first()
-                if not setting:
-                    setting = Settings(day_of_week=day)
-                    db.session.add(setting)
-                setting.opening_time = datetime.strptime(values['opening_time'], '%H:%M').time()
-                setting.closing_time = datetime.strptime(values['closing_time'], '%H:%M').time()
-                setting.min_reservation_length = values['min_reservation_length']
-                setting.max_reservation_length = values['max_reservation_length']
-            db.session.commit()
-            return {'message': 'Settings updated successfully'}, 200
-        except Exception as e:
-            return {'message': 'Failed to update settings', 'error': str(e)}, 400
-
-
 # Rejestracja nowego użytkownika
 @ns.route('/auth/register')
 class Register(Resource):
@@ -669,10 +641,10 @@ class ManagerSettings(Resource):
         settings = Settings.query.all()
         return jsonify([{
             'day_of_week': s.day_of_week,
-            'opening_time': s.opening_time.strftime('%H:%M'),
-            'closing_time': s.closing_time.strftime('%H:%M'),
-            'min_reservation_length': s.min_reservation_length,
-            'max_reservation_length': s.max_reservation_length,
+            'opening_time': s.opening_time.strftime('%H:%M') if s.opening_time else None,
+            'closing_time': s.closing_time.strftime('%H:%M') if s.closing_time else None,
+            'min_reservation_length': s.min_reservation_length.total_seconds() // 60 if s.min_reservation_length else None,
+            'max_reservation_length': s.max_reservation_length.total_seconds() // 60 if s.max_reservation_length else None,
         } for s in settings])
 
     @ns.expect(update_settings_model)

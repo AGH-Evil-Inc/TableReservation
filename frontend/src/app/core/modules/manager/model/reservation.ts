@@ -1,5 +1,5 @@
 /**
- * Authentication API
+ * Manager API
  *
  * 
  *

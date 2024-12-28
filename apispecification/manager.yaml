@@ -15,22 +15,9 @@ paths:
         '200':
           description: List of settings
           content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    day_of_week:
-                      type: integer
-                    opening_time:
-                      type: string
-                    closing_time:
-                      type: string
-                    min_reservation_length:
-                      type: integer
-                    max_reservation_length:
-                      type: integer
+           application/json:
+            schema:
+              $ref: './defs/manager/ReservationSchema.yaml'
     put:
       summary: Update settings (partial updates allowed)
       security:
@@ -38,20 +25,9 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+           application/json:
             schema:
-              type: object
-              additionalProperties:
-                type: object
-                properties:
-                  opening_time:
-                    type: string
-                  closing_time:
-                    type: string
-                  min_reservation_length:
-                    type: integer
-                  max_reservation_length:
-                    type: integer
+              $ref: './defs/manager/ReservationSchema.yaml'
       responses:
         '200':
           description: Settings updated successfully
@@ -66,6 +42,12 @@ paths:
       responses:
         '200':
           description: List of users
+          content:
+           application/json:
+            schema:
+              type: array
+              items:
+                $ref: './defs/auth/User.yaml'
 
   /manager/users/{user_id}:
     delete:
@@ -98,7 +80,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateUser'
+              $ref: './defs/manager/UpdateUser.yaml'
       responses:
         '200':
           description: User updated successfully
@@ -113,6 +95,12 @@ paths:
       responses:
         '200':
           description: List of reservations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: './defs/reservation/Reservation.yaml'
 
   /manager/reservations/{reservation_id}:
     delete:
@@ -145,7 +133,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateReservation'
+              $ref: './defs/manager/UpdateReservation.yaml'
       responses:
         '200':
           description: Reservation updated successfully
@@ -156,31 +144,4 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT
-  schemas:
-    UpdateUser:
-      type: object
-      properties:
-        email:
-          type: string
-        first_name:
-          type: string
-        last_name:
-          type: string
-        phone_number:
-          type: string
-        is_admin:
-          type: boolean
-    UpdateReservation:
-      type: object
-      properties:
-        table_id:
-          type: integer
-        pending:
-          type: boolean
-        reservation_start:
-          type: string
-          format: date-time
-        reservation_end:
-          type: string
-          format: date-time
+      bearerFormat: JWT  # Określenie formatu tokenu jako JWT

@@ -1,5 +1,5 @@
 /**
- * Authentication API
+ * Manager API
  *
  * 
  *
@@ -9,15 +9,14 @@
  */
 
 
-export interface User { 
+export interface UpdateReservation { 
     /**
-     * ID of the user
+     * ID of the Reservation
      */
     readonly id?: number;
-    email: string;
-    first_name: string;
-    last_name: string;
-    phone_number: string;
-    password: string;
+    table_id: number;
+    pending?: boolean;
+    reservation_start: string;
+    reservation_end: string;
 }
 

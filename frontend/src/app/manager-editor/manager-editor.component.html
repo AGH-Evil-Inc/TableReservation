@@ -1,1 +1,93 @@
-<p>manager-editor works!</p>
+<div class="manager-editor">
+  <h1>Panel Managera</h1>
+
+  <!-- Tab Navigation -->
+  <div class="tabs">
+    <button 
+      class="tab-button" 
+      (click)="activeTab = 'users'" 
+      [class.active]="activeTab === 'users'">
+      Użytkownicy
+    </button>
+    <button 
+      class="tab-button" 
+      (click)="activeTab = 'reservations'" 
+      [class.active]="activeTab === 'reservations'">
+      Rezerwacje
+    </button>
+    <button 
+      class="tab-button" 
+      (click)="activeTab = 'settings'" 
+      [class.active]="activeTab === 'settings'">
+      Ustawienia
+    </button>
+  </div>
+
+  <!-- Users Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'users'">
+    <h2 class="section-title">Zarządzanie użytkownikami</h2>
+    <ul class="list">
+      <li class="card" *ngFor="let user of users">
+        <div class="card-header">
+          <span>{{ user.first_name }} {{ user.last_name }}</span>
+          <button (click)="deleteUser(user.id ?? 0)" class="btn btn-delete">Usuń</button>
+        </div>
+        <div class="card-body">
+          <form (ngSubmit)="updateUser(user)" class="form">
+            <input [(ngModel)]="user.first_name" name="first_name" placeholder="Imię" required>
+            <input [(ngModel)]="user.last_name" name="last_name" placeholder="Nazwisko" required>
+            <input [(ngModel)]="user.email" name="email" placeholder="Email" required>
+            <input [(ngModel)]="user.phone_number" name="phone_number" placeholder="Numer telefonu">
+            <button type="submit" class="btn btn-update">Aktualizuj</button>
+          </form>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Reservations Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'reservations'">
+    <h2 class="section-title">Rezerwacje</h2>
+    <ul class="list">
+      <li class="card" *ngFor="let reservation of reservations">
+        <div class="card-header">
+          <span>Rezerwacja #{{ reservation.id }}</span>
+          <button (click)="deleteReservation(reservation.id ?? 0)" class="btn btn-delete">Usuń</button>
+        </div>
+        <div class="card-body">
+          <form (ngSubmit)="updateReservation(reservation)" class="form">
+            <input [(ngModel)]="reservation.table_id" name="table_id" placeholder="ID stolika" required>
+            <input [(ngModel)]="reservation.reservation_start" name="reservation_start" type="datetime-local" required>
+            <input [(ngModel)]="reservation.reservation_end" name="reservation_end" type="datetime-local" required>
+            <label>
+              <input [(ngModel)]="reservation.pending" name="pending" type="checkbox"> Oczekujące
+            </label>
+            <button type="submit" class="btn btn-update">Aktualizuj</button>
+          </form>
+        </div>
+      </li>
+    </ul>
+    <div class="gantt-chart">
+      <app-gantt-chart></app-gantt-chart>
+    </div>
+  </div>
+
+  <!-- Settings Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'settings'">
+    <h2 class="section-title">Ustawienia</h2>
+    <ul class="list">
+      <li class="card" *ngFor="let setting of settings">
+        <div class="card-body">
+          <form (ngSubmit)="updateSetting(setting)" class="form">
+            <input [(ngModel)]="setting.day_of_week" name="day_of_week" readonly>
+            <input [(ngModel)]="setting.opening_time" name="opening_time" type="time" required>
+            <input [(ngModel)]="setting.closing_time" name="closing_time" type="time" required>
+            <input [(ngModel)]="setting.min_reservation_length" name="min_reservation_length" type="number" required>
+            <input [(ngModel)]="setting.max_reservation_length" name="max_reservation_length" type="number" required>
+            <button type="submit" class="btn btn-update">Zapisz ustawienia</button>
+          </form>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
