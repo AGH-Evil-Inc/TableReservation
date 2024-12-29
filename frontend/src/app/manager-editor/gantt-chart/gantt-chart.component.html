@@ -1,9 +1,11 @@
 <div>
   <!-- Dropdown do wyboru stolika -->
-  <label for="table-select">Wybierz stolik:</label>
-  <select id="table-select" (change)="onTableSelect($event)">
-    <option *ngFor="let table of tableIds" [value]="table">{{ table }}</option>
-  </select>
+  <mat-form-field appearance="fill">
+    <mat-label>Wybierz stolik</mat-label>
+    <mat-select id="table-select" (selectionChange)="onTableSelect($event)">
+      <mat-option *ngFor="let table of tableIds" [value]="table">{{ table }}</mat-option>
+    </mat-select>
+  </mat-form-field>
 </div>
 
 <!-- Wykres Gantt -->

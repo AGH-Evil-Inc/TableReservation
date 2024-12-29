@@ -33,6 +33,10 @@ export class ShellHeaderComponent implements OnInit {
       this.isUserManager = isAdmin;
     });
 
+    this.heartbeatService.isAdmin$.subscribe(isAdmin => {
+      this.isUserManager = isAdmin;
+    });
+
     // Subskrypcja na nazwisko użytkownika
     this.authComponentService.userName$.subscribe(name => {
       this.userName = name;

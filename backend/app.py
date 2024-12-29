@@ -246,7 +246,10 @@ class CheckLoginStatus(Resource):
         Endpoint sprawdzający status logowania użytkownika.
         Weryfikuje token JWT, zwracając informację o statusie logowania.
         """
-        return {'status': 'logged_in'}, 200
+        return {
+            'status': 'logged_in',
+            'isAdmin': request.current_user.is_admin  # Zwróć wartość 'is_admin' użytkownika
+        }, 200
 
 @ns.route('/auth/request-password-reset')
 class RequestPasswordReset(Resource):

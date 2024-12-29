@@ -27,7 +27,6 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
   minDuration: NgbTimeStruct = { hour: 0, minute: 15, second: 0 }; 
   maxDuration: NgbTimeStruct = { hour: 4, minute: 30, second: 0 };
   occupiedTables: number[] = []; 
-  isUserManager = localStorage.getItem('isAdmin') === 'true';
 
   @ViewChild(TablePlanComponent) 
   tablePlanComponent!: TablePlanComponent;

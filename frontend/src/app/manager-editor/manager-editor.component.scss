@@ -1,48 +1,28 @@
+$primary-color: #007bff;
+$primary-hover: #0056b3;
+$danger-color: #e74c3c;
+$danger-hover: #c0392b;
+$success-color: #2ecc71;
+$success-hover: #27ae60;
+$text-color: #2c3e50;
+
 .manager-editor {
-  font-family: 'Arial', sans-serif;
-  padding: 20px;
+  font-family: 'Roboto', sans-serif;
+  padding: 2rem;
+  background-color: #fdfdfd;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
   h1 {
     text-align: center;
-    color: #2f4f4f;
-    margin-bottom: 20px;
-  }
-
-  .tabs {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-
-    .tab-button {
-      padding: 10px 20px;
-      margin: 0 5px;
-      border: none;
-      border-radius: 5px;
-      background-color: #e0e0e0;
-      color: #333;
-      cursor: pointer;
-      transition: all 0.3s;
-
-      &.active {
-        background-color: #007bff;
-        color: #fff;
-        font-weight: bold;
-      }
-
-      &:hover {
-        background-color: #007bff;
-        color: #fff;
-      }
-    }
-  }
-
-  .section-title {
-    color: #2c3e50;
-    text-align: center;
-    margin-bottom: 20px;
+    color: $text-color;
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
   }
 
   .list {
+    display: grid;
+    gap: 1.5rem;
     list-style: none;
     padding: 0;
   }
@@ -52,62 +32,135 @@
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
     overflow: hidden;
 
     .card-header {
       background: #f9f9f9;
-      padding: 10px 15px;
+      padding: 1rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-weight: bold;
+
+      button {
+        font-size: 1.2rem;
+      }
     }
 
     .card-body {
-      padding: 15px;
-    }
-  }
+      padding: 1rem;
 
-  .btn {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+      .form {
+        display: grid;
+        gap: 1.5rem;
 
-    &.btn-delete {
-      background-color: #e74c3c;
-      color: #fff;
+        mat-form-field {
+          width: 100%;
+          .mat-form-field-flex {
+            background-color: #fff !important;
+          }
 
-      &:hover {
-        background-color: #c0392b;
+          .mat-form-field-label {
+            color: #333;
+            font-weight: bold;
+          }
+
+          .mat-form-field-underline {
+            border-bottom: 2px solid #ccc !important;
+            transition: border-bottom-color 0.3s ease;
+          }
+
+          .mat-form-field-underline.mat-focused {
+            border-bottom: 2px solid $primary-color !important;
+          }
+
+          input {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 0.8rem;
+            box-sizing: border-box;
+            transition: border 0.3s ease-in-out;
+          }
+
+          input:focus {
+            border-color: $primary-color;
+            outline: none;
+          }
+        }
+
+        .btn {
+          padding: 0.8rem 1.2rem;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 1rem;
+
+          &.btn-delete {
+            background-color: $danger-color;
+            color: #fff;
+
+            &:hover {
+              background-color: $danger-hover;
+            }
+          }
+
+          &.btn-update {
+            background-color: $success-color;
+            color: #fff;
+
+            &:hover {
+              background-color: $success-hover;
+            }
+          }
+        }
       }
     }
+  }
 
-    &.btn-update {
-      background-color: #2ecc71;
-      color: #fff;
+  .sidenav-container {
+    height: 100vh;
+  }
 
-      &:hover {
-        background-color: #27ae60;
-      }
+  .sidenav {
+    width: 250px;
+    transition: width 0.3s;
+  }
+
+  .sidenav.collapsed {
+    width: 60px;
+  }
+
+  .tab-content {
+    padding: 20px;
+  }
+
+  .mat-checkbox {
+    margin: 0.5rem 0;
+    display: flex;
+    align-items: center;
+
+    .mat-checkbox-label {
+      color: $text-color;
+      font-size: 1rem;
     }
   }
 
-  .form {
-    display: grid;
-    gap: 10px;
-
-    input[type='text'],
-    input[type='email'],
-    input[type='number'],
-    input[type='time'],
-    input[type='datetime-local'] {
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      width: 100%;
+  .toggle-button {
+    position: absolute;
+    top: 10px;
+    left: 10px; /* lub dostosuj pozycję do wyglądu aplikacji */
+    z-index: 1000; /* Aby zawsze był na wierzchu */
+    background-color: #fff; /* Opcjonalnie: tło dla czytelności */
+    border-radius: 50%; /* Zaokrąglenie przycisku */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  
+    &:hover {
+      background-color: #f0f0f0; /* Opcjonalnie: zmiana tła po najechaniu */
+    }
+  
+    mat-icon {
+      color: #333; /* Kolor ikony */
     }
   }
+  
 }

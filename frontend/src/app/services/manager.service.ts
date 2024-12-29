@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { backApiUrl } from './modules-api-url';
-import { ReservationSchema, User } from '../core/modules/manager';
+import { ReservationSchema, UpdateReservation, UpdateUser, User } from '../core/modules/manager';
 import { Reservation } from '../core/modules/reservation';
 
 
@@ -31,7 +31,7 @@ export class ManagerService {
     return this.http.delete(backApiUrl(`/manager/users/${userId}`));
   }
 
-  updateUser(userData: User): Observable<any> {
+  updateUser(userData: UpdateUser): Observable<any> {
     return this.http.put(backApiUrl(`/manager/users/${userData.id}`), userData);
   }
 
@@ -44,7 +44,7 @@ export class ManagerService {
     return this.http.delete(backApiUrl(`/manager/reservations/${reservationId}`));
   }
 
-  updateReservation(reservationData: Reservation): Observable<any> {
+  updateReservation(reservationData: UpdateReservation): Observable<any> {
     return this.http.put(backApiUrl(`/manager/reservations/${reservationData.id}`), reservationData);
   }
 }

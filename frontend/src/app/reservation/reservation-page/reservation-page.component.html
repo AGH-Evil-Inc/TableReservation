@@ -86,7 +86,7 @@
     [tables]="tables"
     [occupiedTables]="occupiedTables"
     [selectedTables]="reservation.table_ids"
-    [isManager]="isUserManager"
+    [isManager]= false
     (tableSelected)="selectTable($event)"
     (layoutSaved)="handleLayoutSave($event)"
     (restore)="restoreLayout($event)"

@@ -4,12 +4,16 @@ import { MatDialog } from '@angular/material/dialog';
 import { LoginComponent } from '../auth/login/login.component';
 import { AuthComponentService } from './auth-component.service';
 import { backApiUrl, createAuthHeaders } from './modules-api-url';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class HeartbeatService {
   private intervalId: any = null;
+
+  private isAdminSubject = new BehaviorSubject<boolean>(!!localStorage.getItem('isAdmin'));
+  isAdmin$ = this.isAdminSubject.asObservable();
 
   constructor(
     private http: HttpClient,
@@ -26,8 +30,11 @@ export class HeartbeatService {
 
     this.intervalId = setInterval(() => {
       this.checkLoginStatus().subscribe(
-        () => {
+        (response: any) => {
           console.log('Użytkownik jest nadal zalogowany.');
+          const isAdmin = response.isAdmin;
+          localStorage.setItem('isAdmin', isAdmin.toString());
+          this.isAdminSubject.next(isAdmin);
         },
         (error) => {
           console.error('Błąd heartbeat:', error);

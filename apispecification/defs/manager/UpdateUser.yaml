@@ -1,5 +1,9 @@
 type: object
 properties:
+  id:
+      type: integer
+      description: ID of the user
+      readOnly: true
   email:
     type: string
   first_name:
