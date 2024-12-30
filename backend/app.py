@@ -246,10 +246,7 @@ class CheckLoginStatus(Resource):
         Endpoint sprawdzający status logowania użytkownika.
         Weryfikuje token JWT, zwracając informację o statusie logowania.
         """
-        return {
-            'status': 'logged_in',
-            'isAdmin': request.current_user.is_admin  # Zwróć wartość 'is_admin' użytkownika
-        }, 200
+        return {'status': 'logged_in'}, 200
 
 @ns.route('/auth/request-password-reset')
 class RequestPasswordReset(Resource):
@@ -646,8 +643,8 @@ class ManagerSettings(Resource):
             'day_of_week': s.day_of_week,
             'opening_time': s.opening_time.strftime('%H:%M') if s.opening_time else None,
             'closing_time': s.closing_time.strftime('%H:%M') if s.closing_time else None,
-            'min_reservation_length': s.min_reservation_length.total_seconds() // 60 if s.min_reservation_length else None,
-            'max_reservation_length': s.max_reservation_length.total_seconds() // 60 if s.max_reservation_length else None,
+            'min_reservation_length': s.min_reservation_length if s.min_reservation_length else None,
+            'max_reservation_length': s.max_reservation_length if s.max_reservation_length else None,
         } for s in settings])
 
     @ns.expect(update_settings_model)

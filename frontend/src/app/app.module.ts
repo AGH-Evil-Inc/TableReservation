@@ -56,13 +56,14 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'; 
 import { ManagerEditorComponent } from './manager-editor/manager-editor.component';
-import { ClarityModule } from '@clr/angular'; // Import ClarityModule
+import { ClarityModule } from '@clr/angular'; 
 import { GanttComponent } from './manager-editor/gantt-chart/gantt-chart.component';
-import { MatSidenavModule } from '@angular/material/sidenav'; // Import MatSidenavModule
-import { MatListModule } from '@angular/material/list'; // Import MatListModule
+import { MatSidenavModule } from '@angular/material/sidenav'; 
+import { MatListModule } from '@angular/material/list'; 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import {MatSlideToggleModule} from '@angular/material/slide-toggle'
+import { MatSlideToggleModule } from '@angular/material/slide-toggle'
+import { MatAutocompleteModule } from '@angular/material/autocomplete'; 
 
 const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
 
@@ -96,6 +97,7 @@ const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
         MatInputModule,
         MatOptionModule,
         MatSelectModule,
+        MatAutocompleteModule,
         MatFormFieldModule,
         MatSidenavModule,
         MatCheckboxModule,

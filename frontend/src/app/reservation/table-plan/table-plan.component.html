@@ -1,8 +1,14 @@
 <div class="plan-section">
   <div id="canvas-container"></div>
   <div *ngIf="isManager" class="actions">
-    <button mat-raised-button color="primary" (click)="addTable()">Dodaj stolik</button>
-    <button mat-raised-button color="primary" (click)="saveLayout()">Zapisz układ stolików</button>
-    <button mat-raised-button color="primary" (click)="restoreLayout()">Przywróc poprzedni</button>
-  </div>  
+    <button mat-fab color="primary" (click)="addTable()" matTooltip="Dodaj stolik">
+      <mat-icon>add</mat-icon>
+    </button>
+    <button mat-fab color="accent" (click)="saveLayout()" matTooltip="Zapisz układ stolików">
+      <mat-icon>save</mat-icon>
+    </button>
+    <button mat-fab color="warn" (click)="restoreLayout()" matTooltip="Przywróć poprzedni">
+      <mat-icon>restore</mat-icon>
+    </button>
+  </div>
 </div>

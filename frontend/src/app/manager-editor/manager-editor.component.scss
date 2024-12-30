@@ -148,18 +148,173 @@ $text-color: #2c3e50;
   .toggle-button {
     position: absolute;
     top: 10px;
-    left: 10px; /* lub dostosuj pozycję do wyglądu aplikacji */
-    z-index: 1000; /* Aby zawsze był na wierzchu */
-    background-color: #fff; /* Opcjonalnie: tło dla czytelności */
-    border-radius: 50%; /* Zaokrąglenie przycisku */
+    left: 10px;
+    z-index: 1000;
+    background-color: #fff;
+    border-radius: 50%;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  
+
     &:hover {
-      background-color: #f0f0f0; /* Opcjonalnie: zmiana tła po najechaniu */
+      background-color: #f0f0f0;
+    }
+
+    mat-icon {
+      color: #333;
+    }
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    background: #f4f5f7;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+
+    .filter-field {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .btn-filter {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+
+      mat-icon {
+        font-size: 20px;
+      }
+
+      &:hover {
+        background-color: $primary-hover;
+        color: white;
+      }
+    }
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .day-select {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .form-field {
+    width: 100%;
+  }
+
+  .timepicker-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .btn-update {
+    padding: 10px 20px;
+  }
+
+  // Responsive Adjustments
+  @media (max-width: 768px) {
+    .manager-editor {
+      padding: 1rem;
+    }
+
+    .sidenav {
+      width: 200px;
+    }
+
+    .card {
+      margin-bottom: 1rem;
+    }
+
+    .filters {
+      flex-direction: column;
+    }
+
+    .toggle-button {
+      top: 15px;
+      left: 15px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .manager-editor {
+      padding: 1rem;
+    }
+
+    .card {
+      padding: 1rem;
+    }
+
+    .filters {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .btn {
+      font-size: 0.9rem;
+      padding: 0.6rem 1rem;
+    }
+  }
+
+  .search-field {
+    width: 100%;
+    max-width: 500px; /* Możesz dostosować szerokość, aby pasowała do Twojego layoutu */
+  }
+  
+  .input-wrapper {
+    position: relative;
+  }
+  
+  .search-icon {
+    position: absolute;
+    right: 10px; /* Ustalamy, aby ikona była po prawej */
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(0, 0, 0, 0.54); /* Kolor ikony */
+  }
+  
+  input {
+    padding-right: 40px; /* Zwiększamy odstęp po prawej, aby ikona się nie nakładała */
+  }
+  
+  mat-form-field {
+    width: 100%;
+  }
+  
+  mat-autocomplete {
+    max-height: 300px; /* Ograniczenie wysokości listy, aby była bardziej responsywna */
+  }
+  
+  @media (max-width: 600px) {
+    .search-field {
+      max-width: 100%;
     }
   
-    mat-icon {
-      color: #333; /* Kolor ikony */
+    .input-wrapper {
+      padding-left: 40px; /* Umożliwia lepsze wyświetlanie na małych ekranach */
     }
   }
   

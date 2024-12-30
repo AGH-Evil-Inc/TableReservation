@@ -20,11 +20,29 @@ export class ManagerEditorComponent implements OnInit {
   tables: Table[] = [];
   activeTab: string = 'users'; 
   sidenavOpened: boolean = true;
+  filteredReservations: UpdateReservation[] = [];
+  filterDate: string = '';
+  sortOrder: 'asc' | 'desc' = 'asc';
+  tableIds: number[] = [];
+  selectedTable: number | null = null;
+  selectedDay: number | null = null; 
+  selectedSetting: ReservationSchema | null = null; 
+  filteredUsers: UpdateUser[] = [];
+  searchQuery: string = ''; 
+
+  daysOfWeek = [
+    { value: 0, name: 'Poniedziałek' },
+    { value: 1, name: 'Wtorek' },
+    { value: 2, name: 'Środa' },
+    { value: 3, name: 'Czwartek' },
+    { value: 4, name: 'Piątek' },
+    { value: 5, name: 'Sobota' },
+    { value: 6, name: 'Niedziela' }
+  ];
 
   @ViewChild(TablePlanComponent)
   tablePlanComponent!: TablePlanComponent;
   isAdmin: boolean = localStorage.getItem('isAdmin') === 'true';
-;
 
   constructor(
     private managerService: ManagerService,
@@ -42,12 +60,6 @@ export class ManagerEditorComponent implements OnInit {
       if (!this.isAdmin) {
         alert('Nie masz już uprawnień administratora. Zostaniesz przekierowany na stronę główną.');
         this.router.navigate(['/']); // Przekierowanie na stronę główną
-      } else {
-        // Jeśli isAdmin jest prawdziwe, załaduj dane
-        this.loadUsers();
-        this.loadReservations();
-        this.loadSettings();
-        this.fetchTables();
       }
     });
     
@@ -63,6 +75,7 @@ export class ManagerEditorComponent implements OnInit {
   loadUsers(): void {
     this.managerService.getUsers().subscribe({
       next: (data: User[]) => {
+        this.filteredUsers = data;
         this.users = data;
         if (!this.isAdmin) {
           // Jeśli użytkownik nie jest adminem, przeładuj stronę i przekieruj na stronę główną
@@ -85,6 +98,9 @@ export class ManagerEditorComponent implements OnInit {
           reservation_start: this.formatToISO(new Date(reservation.reservation_start)),
           reservation_end: this.formatToISO(new Date(reservation.reservation_end))
         }));
+        this.tableIds = [...new Set(this.reservations.map((res) => res.table_id))];
+        this.filteredReservations = [...this.reservations];
+        this.applyFilters();
       },
       (error: any) => {
         console.error('Error fetching reservations', error);
@@ -122,7 +138,16 @@ export class ManagerEditorComponent implements OnInit {
   }
 
   updateSetting(setting: ReservationSchema): void {
-    this.managerService.updateSettings([setting]).subscribe({
+    const formattedSettings: Record<string, any> = {
+      [String(setting.day_of_week)]: {
+        opening_time: setting.opening_time,
+        closing_time: setting.closing_time,
+        min_reservation_length: setting.min_reservation_length,
+        max_reservation_length: setting.max_reservation_length,
+      }
+    };
+  
+    this.managerService.updateSettings(formattedSettings).subscribe({
       next: () => this.loadSettings(),
       error: (error: any) => {
         console.error('Error updating setting', error);
@@ -152,6 +177,18 @@ export class ManagerEditorComponent implements OnInit {
         console.error('Error updating reservation', error);
       }
     });
+  }
+
+  applyFilters(): void {
+    this.filteredReservations = this.reservations
+      .filter((reservation) =>
+        this.selectedTable !== null ? reservation.table_id === this.selectedTable : true
+      )
+      .sort((a, b) => {
+        const dateA = new Date(a.reservation_start).getTime();
+        const dateB = new Date(b.reservation_start).getTime();
+        return this.sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+      });
   }
 
   private formatToISO(date: Date): string {
@@ -216,12 +253,24 @@ export class ManagerEditorComponent implements OnInit {
     if (dayIndex === undefined) {
       return 'Invalid day';
     }
-    const days = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'];
-    return days[dayIndex] || 'Invalid day';
+    return this.daysOfWeek[dayIndex].name || 'Invalid day';
   }
   
 
   restoreLayout(occupied: Table[]): void {
     this.fetchTables()
+  }
+
+  onDaySelect(day: number): void {
+    this.selectedDay = day;
+    this.selectedSetting = this.settings.find((setting) => setting.day_of_week === day) || null;
+  }
+
+  onSearch(): void {
+    const query = this.searchQuery.toLowerCase().replace(/\s+/g, '');
+    this.filteredUsers = this.users.filter(user => {
+    const fullName = `${user.first_name} ${user.last_name}`.toLowerCase().replace(/\s+/g, '');
+    return fullName.includes(query) || user.first_name?.toLowerCase().includes(query) || user.last_name?.toLowerCase().includes(query);
+});
   }
 }

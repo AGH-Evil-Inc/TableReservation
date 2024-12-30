@@ -18,7 +18,7 @@ export class ManagerService {
     return this.http.get(backApiUrl('/manager/settings'));
   }
 
-  updateSettings(settings: ReservationSchema[]): Observable<any> {
+  updateSettings(settings: any): Observable<any> {
     return this.http.put(backApiUrl('/manager/settings'), settings);
   }
 
