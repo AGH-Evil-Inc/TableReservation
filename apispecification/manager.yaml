@@ -139,6 +139,94 @@ paths:
           description: Reservation updated successfully
         '404':
           description: Reservation not found
+  /manager/contact-info:
+    get:
+      summary: Get all contact information
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of contact information
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: ID of the contact information
+                    street:
+                      type: string
+                      description: Street address
+                    city:
+                      type: string
+                      description: City name
+                    zip_code:
+                      type: string
+                      description: ZIP code
+                    phone:
+                      type: string
+                      description: Phone number
+                    email:
+                      type: string
+                      description: Email address
+                    facebook_url:
+                      type: string
+                      description: Facebook URL
+                    twitter_url:
+                      type: string
+                      description: Twitter URL
+                    google_url:
+                      type: string
+                      description: Google URL
+                    instagram_url:
+                      type: string
+                      description: Instagram URL
+    put:
+      summary: Update contact information
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                street:
+                  type: string
+                  description: Street address
+                city:
+                  type: string
+                  description: City name
+                zip_code:
+                  type: string
+                  description: ZIP code
+                phone:
+                  type: string
+                  description: Phone number
+                email:
+                  type: string
+                  description: Email address
+                facebook_url:
+                  type: string
+                  description: Facebook URL
+                twitter_url:
+                  type: string
+                  description: Twitter URL
+                google_url:
+                  type: string
+                  description: Google URL
+                instagram_url:
+                  type: string
+                  description: Instagram URL
+      responses:
+        '200':
+          description: Contact information updated successfully
+        '400':
+          description: Failed to update contact information
 components:
   securitySchemes:
     bearerAuth:

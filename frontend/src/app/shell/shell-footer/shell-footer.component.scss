@@ -110,4 +110,17 @@ $footer-link-hover-color: #ffa726; // Jaśniejszy pomarańczowy kolor na hover
       justify-content: center;
     }
   }
+
+  .footer-column {
+    h3 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+  
+    p {
+      margin: 5px 0;
+      font-size: 1rem;
+    }
+  }
+  
 }

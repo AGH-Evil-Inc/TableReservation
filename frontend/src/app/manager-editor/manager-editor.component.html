@@ -28,6 +28,10 @@
           <mat-icon>settings</mat-icon>
           <span *ngIf="sidenavOpened">Ustawienia</span>
         </mat-list-item>
+        <mat-list-item (click)="setActiveTab('contact')" [class.active]="activeTab === 'contact'">
+          <mat-icon>contact_mail</mat-icon>
+          <span *ngIf="sidenavOpened">Dane kontaktowe</span>
+        </mat-list-item>        
       </mat-nav-list>
     </mat-sidenav>
     
@@ -252,6 +256,117 @@
       </form>
     </div>
   </div>
+
+  <div class="tab-content" *ngIf="activeTab === 'contact'">
+    <h2 class="section-title">Zarządzanie danymi kontaktowymi</h2>
+    <form 
+      *ngIf="contactInfo" 
+      (ngSubmit)="saveContactInfo()" 
+      class="contact-form"
+      [formGroup]="contactForm"
+    >
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Ulica</mat-label>
+          <mat-icon matPrefix>location_on</mat-icon>
+          <input 
+            matInput 
+            formControlName="street" 
+            placeholder="Podaj ulicę">
+          <mat-error *ngIf="contactForm.get('street')?.hasError('required')">
+            Ulica jest wymagana.
+          </mat-error>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Miasto</mat-label>
+          <mat-icon matPrefix>location_city</mat-icon>
+          <input 
+            matInput 
+            formControlName="city" 
+            placeholder="Podaj miasto">
+          <mat-error *ngIf="contactForm.get('city')?.hasError('required')">
+            Miasto jest wymagane.
+          </mat-error>
+        </mat-form-field>
+      </div>
+  
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Kod pocztowy</mat-label>
+          <mat-icon matPrefix>mail</mat-icon>
+          <input 
+            matInput 
+            formControlName="zip_code" 
+            placeholder="Podaj kod pocztowy">
+          <mat-error *ngIf="contactForm.get('zip_code')?.hasError('pattern')">
+            Podaj poprawny kod pocztowy.
+          </mat-error>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Telefon</mat-label>
+          <mat-icon matPrefix>phone</mat-icon>
+          <input 
+            matInput 
+            formControlName="phone" 
+            placeholder="Podaj numer telefonu">
+          <mat-error *ngIf="contactForm.get('phone')?.hasError('pattern')">
+            Podaj poprawny numer telefonu.
+          </mat-error>
+        </mat-form-field>
+      </div>
+  
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Email</mat-label>
+        <mat-icon matPrefix>email</mat-icon>
+        <input 
+          matInput 
+          formControlName="email" 
+          placeholder="Podaj adres e-mail">
+        <mat-error *ngIf="contactForm.get('email')?.hasError('email')">
+          Podaj poprawny adres e-mail.
+        </mat-error>
+      </mat-form-field>
+  
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Facebook</mat-label>
+          <mat-icon matPrefix>facebook</mat-icon>
+          <input matInput formControlName="facebook_url" placeholder="Link do profilu Facebook">
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Twitter</mat-label>
+          <mat-icon matPrefix><i class="fab fa-twitter"></i></mat-icon>
+          <input matInput formControlName="twitter_url" placeholder="Link do profilu Twitter">
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Instagram</mat-label>
+          <mat-icon matPrefix><i class="fab fa-instagram"></i></mat-icon>
+          <input matInput formControlName="instagram_url" placeholder="Link do profilu Instagram">
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Google</mat-label>
+          <mat-icon matPrefix><i class="fab fa-google"></i></mat-icon>
+          <input matInput formControlName="google_url" placeholder="Link do profilu Google">
+        </mat-form-field>
+      </div>
+  
+      <div class="form-actions">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          type="submit" 
+          [disabled]="contactForm.invalid"
+        >
+          <mat-icon>save</mat-icon> Zapisz
+        </button>
+      </div>
+    </form>
+  </div>  
+  
 </mat-sidenav-content>
 </mat-sidenav-container>
 </div>

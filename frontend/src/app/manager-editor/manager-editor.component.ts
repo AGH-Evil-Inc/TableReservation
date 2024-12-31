@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { UpdateReservation, UpdateUser, User } from '../core/modules/manager';
+import { ManagerContactInfoGet200ResponseInner, ManagerContactInfoPutRequest, UpdateReservation, UpdateUser, User } from '../core/modules/manager';
 import { Reservation, Table } from '../core/modules/reservation';
 import { ManagerService } from '../services/manager.service';
 import { ReservationSchema } from '../core/modules/manager';
@@ -7,6 +7,7 @@ import { ReservationService } from '../services/reservation.service';
 import { TablePlanComponent } from '../reservation/table-plan/table-plan.component';
 import { HeartbeatService } from '../services/heart-beat.service';
 import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-manager-editor',
@@ -29,7 +30,9 @@ export class ManagerEditorComponent implements OnInit {
   selectedSetting: ReservationSchema | null = null; 
   filteredUsers: UpdateUser[] = [];
   searchQuery: string = ''; 
-
+  contactInfo: ManagerContactInfoGet200ResponseInner | null = {};
+  contactForm!: FormGroup;
+  
   daysOfWeek = [
     { value: 0, name: 'Poniedziałek' },
     { value: 1, name: 'Wtorek' },
@@ -48,8 +51,21 @@ export class ManagerEditorComponent implements OnInit {
     private managerService: ManagerService,
     private reservationService: ReservationService,
     private heartbeatService: HeartbeatService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private fb: FormBuilder
+  ) {
+    this.contactForm = this.fb.group({
+      street: ['', Validators.required],
+      city: ['', Validators.required],
+      zip_code: ['', [Validators.required, Validators.pattern(/^\d{2}-\d{3}$/)]],
+      phone: ['', [Validators.required, Validators.pattern(/^\+?\d{9,15}$/)]],
+      email: ['', [Validators.required, Validators.email]],
+      facebook_url: [''],
+      twitter_url: [''],
+      google_url: [''],
+      instagram_url: ['']
+    });
+  }
 
   ngOnInit(): void {
     // Subskrypcja zmiany stanu isAdmin
@@ -68,6 +84,7 @@ export class ManagerEditorComponent implements OnInit {
       this.loadUsers();
       this.loadReservations();
       this.loadSettings();
+      this.loadContactInfo();
       this.fetchTables();
     }
   }
@@ -179,6 +196,47 @@ export class ManagerEditorComponent implements OnInit {
     });
   }
 
+  loadContactInfo(): void {
+    this.managerService.getContactInfo().subscribe({
+      next: (data: any) => {
+        this.contactInfo = data[0];
+        if (this.contactInfo) {
+          this.contactForm.patchValue({
+            street: this.contactInfo.street || '',
+            city: this.contactInfo.city || '',
+            zip_code: this.contactInfo.zip_code || '',
+            phone: this.contactInfo.phone || '',
+            email: this.contactInfo.email || '',
+            facebook_url: this.contactInfo.facebook_url || '',
+            twitter_url: this.contactInfo.twitter_url || '',
+            instagram_url: this.contactInfo.instagram_url || '',
+          });
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching contact info:', error);
+      }
+    });
+  }
+  
+  saveContactInfo(): void {
+    if (this.contactForm.invalid) {
+      alert('Formularz zawiera błędy. Proszę poprawić dane.');
+      return;
+    }
+
+    const updatedContactInfo: ManagerContactInfoPutRequest = this.contactForm.value;
+    this.managerService.putContactInfo(updatedContactInfo).subscribe({
+      next: () => {
+        this.loadContactInfo(); 
+      },
+      error: (error) => {
+        console.error('Error updating contact info:', error);
+        alert('Wystąpił błąd podczas zapisywania danych kontaktowych.');
+      }
+    });
+  }
+
   applyFilters(): void {
     this.filteredReservations = this.reservations
       .filter((reservation) =>
@@ -267,10 +325,10 @@ export class ManagerEditorComponent implements OnInit {
   }
 
   onSearch(): void {
-    const query = this.searchQuery.toLowerCase().replace(/\s+/g, '');
-    this.filteredUsers = this.users.filter(user => {
-    const fullName = `${user.first_name} ${user.last_name}`.toLowerCase().replace(/\s+/g, '');
-    return fullName.includes(query) || user.first_name?.toLowerCase().includes(query) || user.last_name?.toLowerCase().includes(query);
-});
+      const query = this.searchQuery.toLowerCase().replace(/\s+/g, '');
+      this.filteredUsers = this.users.filter(user => {
+      const fullName = `${user.first_name} ${user.last_name}`.toLowerCase().replace(/\s+/g, '');
+      return fullName.includes(query) || user.first_name?.toLowerCase().includes(query) || user.last_name?.toLowerCase().includes(query);
+  });
   }
 }

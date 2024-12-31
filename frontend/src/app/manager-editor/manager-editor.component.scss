@@ -318,4 +318,37 @@ $text-color: #2c3e50;
     }
   }
   
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  
+  .form-field {
+    flex: 1;
+    min-width: 250px;
+    min-height: 80px;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+
+  .mat-form-field i {
+    margin-right: 8px; 
+    font-size: 20px;  
+    vertical-align: middle;  
+  }
+  
+  .mat-form-field .mat-form-field-infix {
+    padding-left: 36px;  
+  }
 }

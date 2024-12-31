@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { backApiUrl } from './modules-api-url';
-import { ReservationSchema, UpdateReservation, UpdateUser, User } from '../core/modules/manager';
+import { ManagerContactInfoGet200ResponseInner, ManagerContactInfoPutRequest, ReservationSchema, UpdateReservation, UpdateUser, User } from '../core/modules/manager';
 import { Reservation } from '../core/modules/reservation';
 
 
@@ -46,6 +46,14 @@ export class ManagerService {
 
   updateReservation(reservationData: UpdateReservation): Observable<any> {
     return this.http.put(backApiUrl(`/manager/reservations/${reservationData.id}`), reservationData);
+  }
+
+  getContactInfo(): Observable<ManagerContactInfoGet200ResponseInner> {
+    return this.http.get(backApiUrl(`/manager/contact-info`));
+  }
+
+  putContactInfo(contactInfo: ManagerContactInfoPutRequest): Observable<any> {
+    return this.http.put(backApiUrl(`/manager/contact-info`), contactInfo);
   }
 }
 function HandleError(reason: any) {

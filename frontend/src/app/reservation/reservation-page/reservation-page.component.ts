@@ -3,6 +3,8 @@ import { NgbTimeStruct } from '@ng-bootstrap/ng-bootstrap';
 import { Reservation, Table } from 'src/app/core/modules/reservation';
 import { ReservationService } from 'src/app/services/reservation.service';
 import { TablePlanComponent } from '../table-plan/table-plan.component';
+import { ManagerService } from 'src/app/services/manager.service';
+import { ReservationSchema } from 'src/app/core/modules/manager';
 
 @Component({
   selector: 'app-reservation-page',
@@ -32,14 +34,16 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
   tablePlanComponent!: TablePlanComponent;
 
   tables: Table[] = [];
+  settings: ReservationSchema[] = [];
   
-  constructor(private reservationService: ReservationService) {}
+  constructor(private reservationService: ReservationService, private managerService: ManagerService) {}
 
   ngOnInit(): void {
     this.setMinMaxDate();
     this.subscribeToUpdates();
     this.fetchTables();
     this.fetchOccupiedTables();
+    this.fetchWorkingHours();
   }
 
   ngOnDestroy(): void {
@@ -59,6 +63,17 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
         console.error('Error fetching tables:', err);
       }
     });
+  }
+
+  fetchWorkingHours() {
+     this.managerService.getSettings().subscribe({
+          next: (data: ReservationSchema[]) => {
+            this.settings = data;
+          },
+          error: (error: any) => {
+            console.error('Error fetching settings', error);
+          }
+        });
   }
 
   setMinMaxDate(): void {
@@ -149,9 +164,9 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
     endDateTime.setHours(endDateTime.getHours() + duration.hour);
     endDateTime.setMinutes(endDateTime.getMinutes() + duration.minute);
 
-    const dayOfWeek = startDateTime.getDay();
-    const openingTime = dayOfWeek >= 1 && dayOfWeek <= 5 ? '10:00' : '12:00';
-    const closingTime = dayOfWeek >= 1 && dayOfWeek <= 5 ? '22:00' : '24:00';
+    const dayOfWeek = (new Date(date).getDay() - 1) % 7;
+    const openingTime = this.settings.find(setting => setting.day_of_week === dayOfWeek)?.opening_time || '10:00';
+    const closingTime = this.settings.find(setting => setting.day_of_week === dayOfWeek)?.closing_time || '22:00';
 
     const [openingHours, openingMinutes] = openingTime.split(':').map(Number);
     const [closingHours, closingMinutes] = closingTime.split(':').map(Number);
@@ -212,14 +227,31 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
 
   getMinTime(date: string): string {
     if (!date) return '00:00';
-    const dayOfWeek = new Date(date).getDay();
-    return dayOfWeek === 0 || dayOfWeek === 6 ? '12:00' : '10:00';
+    const dayOfWeek = (new Date(date).getDay() - 1) % 7;
+    console.log('Dzień tygodnia:', dayOfWeek);
+    console.log( this.settings.find(setting => setting.day_of_week === dayOfWeek)?.opening_time || '10:00');
+    return this.settings.find(setting => setting.day_of_week === dayOfWeek)?.opening_time || '10:00';
   }
   
   getMaxTime(date: string): string {
     if (!date) return '23:59';
-    const dayOfWeek = new Date(date).getDay();
-    return dayOfWeek === 0 || dayOfWeek === 6 ? '23:30' : '21:30';
+    const dayOfWeek = (new Date(date).getDay() - 1) % 7;
+    const closingTime = this.settings.find(setting => setting.day_of_week === dayOfWeek)?.closing_time || '22:00';
+
+    // Rozdziel godzinę i minutę
+    const [hours, minutes] = closingTime.split(':').map(Number);
+
+    // Utwórz obiekt Date z godziny i minuty
+    const closingDateTime = new Date();
+    closingDateTime.setHours(hours, minutes, 0);
+
+    // Odejmij 30 minut
+    closingDateTime.setMinutes(closingDateTime.getMinutes() - 30);
+
+    // Zwróć czas w formacie HH:mm
+    const adjustedHours = closingDateTime.getHours().toString().padStart(2, '0');
+    const adjustedMinutes = closingDateTime.getMinutes().toString().padStart(2, '0');
+    return `${adjustedHours}:${adjustedMinutes}`;
   }
 
   compareTime(first: NgbTimeStruct, second: NgbTimeStruct, isOnlyBigger: boolean=false): boolean {

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
+import { FormsModule,  ReactiveFormsModule } from '@angular/forms';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -90,6 +90,7 @@ const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
     imports: [BrowserModule,
         AppRoutingModule,
         FormsModule,
+        ReactiveFormsModule,
         BrowserAnimationsModule,
         MatDialogModule,
         MatButtonModule,

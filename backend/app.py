@@ -26,7 +26,7 @@ db.init_app(app)
 mail = Mail(app)
 
 # Now import models after db is initialized
-from database_model import Settings, User, Reservation, Table
+from database_model import Settings, User, Reservation, Table, ContactInfo
 
 # Configuration for JWT
 app.config['SECRET_KEY'] = 'your-secret-key'  # Use a strong key for production
@@ -246,7 +246,10 @@ class CheckLoginStatus(Resource):
         Endpoint sprawdzający status logowania użytkownika.
         Weryfikuje token JWT, zwracając informację o statusie logowania.
         """
-        return {'status': 'logged_in'}, 200
+        return {
+        'status': 'logged_in',
+        'isAdmin': request.current_user.is_admin  # Zwróć wartość 'is_admin' użytkownika
+        }, 200
 
 @ns.route('/auth/request-password-reset')
 class RequestPasswordReset(Resource):
@@ -634,8 +637,7 @@ class CreateReservation(Resource):
 
 @ns.route('/manager/settings')
 class ManagerSettings(Resource):
-    @token_required
-    @admin_required
+   
     def get(self):
         """Get all settings (manager only)"""
         settings = Settings.query.all()
@@ -682,7 +684,81 @@ class ManagerSettings(Resource):
             return {'message': 'Settings updated successfully'}, 200
         except Exception as e:
             return {'message': 'Failed to update settings', 'error': str(e)}, 400
-        
+@ns.route('/manager/contact-info')
+class ContactInfoResource(Resource):
+    def get(self):
+        """
+        Get all contact information.
+        """
+        contacts = ContactInfo.query.all()
+        return jsonify([{
+            'id': c.id,
+            'street': c.street,
+            'city': c.city,
+            'zip_code': c.zip_code,
+            'phone': c.phone,
+            'email': c.email,
+            'facebook_url': c.facebook_url,
+            'twitter_url': c.twitter_url,
+            'google_url': c.google_url,
+            'instagram_url': c.instagram_url,
+        } for c in contacts])
+
+    @ns.expect(ns.model('ContactInfoUpdate', {
+        'street': {'type': 'string', 'required': False},
+        'city': {'type': 'string', 'required': False},
+        'zip_code': {'type': 'string', 'required': False},
+        'phone': {'type': 'string', 'required': False},
+        'email': {'type': 'string', 'required': False},
+        'facebook_url': {'type': 'string', 'required': False},
+        'twitter_url': {'type': 'string', 'required': False},
+        'google_url': {'type': 'string', 'required': False},
+        'instagram_url': {'type': 'string', 'required': False},
+    }))
+
+    @token_required
+    @admin_required
+    def put(self):
+        """
+        Update contact information.
+        You can pass only some fields (e.g., 'street') and the rest will remain unchanged.
+        Example JSON:
+        {
+            "street": "New Street 123",
+            "city": "New City",
+            "phone": "987654321"
+        }
+        """
+        data = request.json
+        try:
+            contact = ContactInfo.query.first()
+            if not contact:
+                contact = ContactInfo()
+                db.session.add(contact)
+
+            if 'street' in data:
+                contact.street = data['street']
+            if 'city' in data:
+                contact.city = data['city']
+            if 'zip_code' in data:
+                contact.zip_code = data['zip_code']
+            if 'phone' in data:
+                contact.phone = data['phone']
+            if 'email' in data:
+                contact.email = data['email']
+            if 'facebook_url' in data:
+                contact.facebook_url = data['facebook_url']
+            if 'twitter_url' in data:
+                contact.twitter_url = data['twitter_url']
+            if 'google_url' in data:
+                contact.google_url = data['google_url']
+            if 'instagram_url' in data:
+                contact.instagram_url = data['instagram_url']
+
+            db.session.commit()
+            return {'message': 'Contact information updated successfully'}, 200
+        except Exception as e:
+            return {'message': 'Failed to update contact information', 'error': str(e)}, 400
 @ns.route('/manager/users')
 class ManagerUsers(Resource):
     @token_required
@@ -829,7 +905,6 @@ Table&Taste
 @ns.route('/manager/reservations')
 class ManagerReservations(Resource):
     @token_required
-    @admin_required
     def get(self):
         """Get all reservations (manager only)"""
         reservations = Reservation.query.all()

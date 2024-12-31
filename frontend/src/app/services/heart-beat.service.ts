@@ -32,8 +32,9 @@ export class HeartbeatService {
       this.checkLoginStatus().subscribe(
         (response: any) => {
           console.log('Użytkownik jest nadal zalogowany.');
-          const isAdmin = response.isAdmin;
+          const isAdmin = response.isAdmin.toString() === 'true';
           localStorage.setItem('isAdmin', isAdmin.toString());
+          console.log('isAdmin:', isAdmin);
           this.isAdminSubject.next(isAdmin);
         },
         (error) => {
