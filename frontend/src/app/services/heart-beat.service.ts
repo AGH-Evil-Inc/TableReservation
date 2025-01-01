@@ -12,7 +12,7 @@ import { BehaviorSubject } from 'rxjs';
 export class HeartbeatService {
   private intervalId: any = null;
 
-  private isAdminSubject = new BehaviorSubject<boolean>(!!localStorage.getItem('isAdmin'));
+  private isAdminSubject = new BehaviorSubject<boolean>(localStorage.getItem('isAdmin') === 'true');
   isAdmin$ = this.isAdminSubject.asObservable();
 
   constructor(

@@ -23,7 +23,10 @@ export class LoginComponent {
     this.authService.login(this.user).subscribe(
       response => {
         if (response.token) {
-          this.authComponentService.login(response.name,response.token, response.isAdmin)
+          const isAdmin = response.isAdmin.toString() === 'true';
+          localStorage.setItem('isAdmin', isAdmin.toString());
+          console.log('isAdmin:', isAdmin);
+          this.authComponentService.login(response.name,response.token, isAdmin);
           this.closeDialog();
         } else {
           this.message = 'Login failed! Invalid credentials.';

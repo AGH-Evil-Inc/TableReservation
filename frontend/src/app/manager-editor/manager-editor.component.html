@@ -1,160 +1,43 @@
 <div class="manager-editor">
-  <mat-toolbar>
-    <button mat-icon-button (click)="toggleSidenav()" class="toggle-button">
-      <mat-icon>{{ sidenavOpened ? 'chevron_left' : 'menu' }}</mat-icon>
+  <h1>Panel Managera</h1>
+
+  <!-- Tab Navigation -->
+  <div class="tabs">
+    <button 
+      class="tab-button" 
+      (click)="activeTab = 'users'" 
+      [class.active]="activeTab === 'users'">
+      Użytkownicy
     </button>
-  </mat-toolbar>
-  
-  <mat-sidenav-container class="sidenav-container">   
-    <mat-sidenav #sidenav mode="side" [opened]="sidenavOpened" class="sidenav">
-      <mat-nav-list>
-        <mat-list-item (click)="setActiveTab('users')" [class.active]="activeTab === 'users'">
-          <mat-icon>person</mat-icon>
-          <span *ngIf="sidenavOpened">Użytkownicy</span>
-        </mat-list-item>
-        <mat-list-item (click)="setActiveTab('reservations')" [class.active]="activeTab === 'reservations'">
-          <mat-icon>event</mat-icon>
-          <span *ngIf="sidenavOpened">Rezerwacje</span>
-        </mat-list-item>
-        <mat-list-item (click)="setActiveTab('gantt')" [class.active]="activeTab === 'gantt'">
-          <mat-icon>bar_chart</mat-icon>
-          <span *ngIf="sidenavOpened">Wykres Gantta</span>
-        </mat-list-item>
-        <mat-list-item (click)="setActiveTab('tables')" [class.active]="activeTab === 'tables'">
-          <mat-icon>table_chart</mat-icon>
-          <span *ngIf="sidenavOpened">Stoliki</span>
-        </mat-list-item>
-        <mat-list-item (click)="setActiveTab('settings')" [class.active]="activeTab === 'settings'">
-          <mat-icon>settings</mat-icon>
-          <span *ngIf="sidenavOpened">Ustawienia</span>
-        </mat-list-item>
-        <mat-list-item (click)="setActiveTab('contact')" [class.active]="activeTab === 'contact'">
-          <mat-icon>contact_mail</mat-icon>
-          <span *ngIf="sidenavOpened">Dane kontaktowe</span>
-        </mat-list-item>        
-      </mat-nav-list>
-    </mat-sidenav>
-    
-    <mat-sidenav-content>
-<!-- Users Tab -->
-<div class="tab-content" *ngIf="activeTab === 'users'">
-  <h2 class="section-title">Zarządzanie użytkownikami</h2>
+    <button 
+      class="tab-button" 
+      (click)="activeTab = 'reservations'" 
+      [class.active]="activeTab === 'reservations'">
+      Rezerwacje
+    </button>
+    <button 
+      class="tab-button" 
+      (click)="activeTab = 'settings'" 
+      [class.active]="activeTab === 'settings'">
+      Ustawienia
+    </button>
+  </div>
 
-  <!-- Wyszukiwanie użytkowników -->
-  <mat-form-field appearance="fill" class="search-field">
-    <mat-label>Wyszukaj użytkownika</mat-label>
-    <div class="input-wrapper">
-      <input 
-        matInput 
-        [(ngModel)]="searchQuery" 
-        (input)="onSearch()" 
-        [matAutocomplete]="auto"
-        placeholder="Wpisz imię lub nazwisko"
-      />
-      <mat-icon class="search-icon">search</mat-icon>
-    </div>
-    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onSearch()">
-      <mat-option *ngFor="let user of filteredUsers" [value]="user.first_name + ' ' + user.last_name">
-        {{ user.first_name }} {{ user.last_name }}
-      </mat-option>
-    </mat-autocomplete>
-  </mat-form-field>
-
-  <ul class="list">
-    <li class="card" *ngFor="let user of filteredUsers">
-      <div class="card-header">
-        <span>{{ user.first_name }} {{ user.last_name }}</span>
-        <button (click)="deleteUser(user.id ?? 0)" class="btn btn-delete">Usuń</button>
-      </div>
-      <div class="card-body">
-        <form (ngSubmit)="updateUser(user)" class="form">
-          <mat-form-field appearance="fill">
-            <mat-label>Imię</mat-label>
-            <input matInput [(ngModel)]="user.first_name" name="first_name" required>
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Nazwisko</mat-label>
-            <input matInput [(ngModel)]="user.last_name" name="last_name" required>
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Email</mat-label>
-            <input matInput [(ngModel)]="user.email" name="email" required>
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Numer telefonu</mat-label>
-            <input matInput [(ngModel)]="user.phone_number" name="phone_number">
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Rola użytkownika</mat-label>
-            <mat-select [(ngModel)]="user.is_admin" name="is_admin">
-              <mat-option [value]="true">Pracownik</mat-option>
-              <mat-option [value]="false">Klient</mat-option>
-            </mat-select>
-          </mat-form-field>            
-          <button type="submit" class="btn btn-update">Aktualizuj</button>
-        </form>
-      </div>
-    </li>
-  </ul>
-</div>
-
-  <!-- Reservations Tab -->
-  <div class="tab-content" *ngIf="activeTab === 'reservations'">
-    <h2 class="section-title">Rezerwacje</h2>
-    <div class="filters">
-      <!-- Filtrowanie po stolikach -->
-      <mat-form-field appearance="outline" class="filter-field">
-        <mat-label>Filtruj po stoliku</mat-label>
-        <mat-select [(ngModel)]="selectedTable" placeholder="Wybierz stolik">
-          <mat-option *ngFor="let tableId of tableIds" [value]="tableId">
-            Stolik {{ tableId }}
-          </mat-option>
-          <mat-option [value]="null">Wszystkie stoliki</mat-option>
-        </mat-select>
-      </mat-form-field>
-    
-      <!-- Sortowanie po dacie -->
-      <mat-form-field appearance="outline" class="filter-field">
-        <mat-label>Sortuj po dacie</mat-label>
-        <mat-select [(ngModel)]="sortOrder" placeholder="Sortuj">
-          <mat-option value="asc">Rosnąco</mat-option>
-          <mat-option value="desc">Malejąco</mat-option>
-        </mat-select>
-      </mat-form-field>
-    
-      <!-- Zastosuj button -->
-      <button mat-raised-button color="primary" (click)="applyFilters()" class="btn-filter">
-        <mat-icon>filter_list</mat-icon>
-        Zastosuj
-      </button>
-    </div>
-    
-    
+  <!-- Users Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'users'">
+    <h2 class="section-title">Zarządzanie użytkownikami</h2>
     <ul class="list">
-      <li class="card" *ngFor="let reservation of filteredReservations">
+      <li class="card" *ngFor="let user of users">
         <div class="card-header">
-          <span>Rezerwacja #{{ reservation.id }}</span>
-          <button (click)="deleteReservation(reservation.id ?? 0)" class="btn btn-delete">Usuń</button>
+          <span>{{ user.first_name }} {{ user.last_name }}</span>
+          <button (click)="deleteUser(user.id ?? 0)" class="btn btn-delete">Usuń</button>
         </div>
         <div class="card-body">
-          <form (ngSubmit)="updateReservation(reservation)" class="form">
-            <mat-form-field appearance="fill">
-              <mat-label>ID stolika:</mat-label>
-              <input matInput [ngModel]="reservation.table_id" name="table_id" required>
-            </mat-form-field>
-            <label>Początek rezerwacji:
-              <input [(ngModel)]="reservation.reservation_start" name="reservation_start" type="datetime-local" required>
-            </label>
-            <label>Koniec rezerwacji:
-              <input [(ngModel)]="reservation.reservation_end" name="reservation_end" type="datetime-local" required>
-            </label>
-            <mat-slide-toggle 
-            [(ngModel)]="reservation.pending" 
-            name="pending"
-            [labelPosition]="'before'">
-            <span>Oczekujące na zatwierdzenie: {{ reservation.pending ? 'Tak' : 'Nie' }}</span>
-          </mat-slide-toggle>
-                          
+          <form (ngSubmit)="updateUser(user)" class="form">
+            <input [(ngModel)]="user.first_name" name="first_name" placeholder="Imię" required>
+            <input [(ngModel)]="user.last_name" name="last_name" placeholder="Nazwisko" required>
+            <input [(ngModel)]="user.email" name="email" placeholder="Email" required>
+            <input [(ngModel)]="user.phone_number" name="phone_number" placeholder="Numer telefonu">
             <button type="submit" class="btn btn-update">Aktualizuj</button>
           </form>
         </div>
@@ -162,211 +45,49 @@
     </ul>
   </div>
 
-  <div class="tab-content gantt-chart" *ngIf="activeTab === 'gantt'">
-    <h2 class="section-title ">Wykres Gantta</h2>
-    <app-gantt-chart></app-gantt-chart>
-  </div>
-
-  <!-- Tables Tab -->
-  <div class="tab-content" *ngIf="activeTab === 'tables'">
-    <h2 class="section-title">Zarządzanie stolikami</h2>
-    <app-table-plan
-      class="plan-full-width"
-      [tables]="tables"
-      [occupiedTables]="[]"
-      [selectedTables]="[]"
-      [isManager]="true"
-      (layoutSaved)="handleLayoutSave($event)"
-      (restore)="restoreLayout($event)"
-    ></app-table-plan>
-  </div>
-
-  <div class="tab-content" *ngIf="activeTab === 'settings'">
-    <h2 class="section-title">Ustawienia</h2>
-  
-    <!-- Dropdown do wyboru dnia tygodnia -->
-    <mat-form-field appearance="fill" class="day-select">
-      <mat-label>Wybierz dzień tygodnia</mat-label>
-      <mat-select [(value)]="selectedDay" (selectionChange)="onDaySelect($event.value)">
-        <mat-option *ngFor="let day of daysOfWeek" [value]="day.value">
-          {{ day.name }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  
-    <!-- Formularz ustawień -->
-    <div *ngIf="selectedSetting" class="settings-form">
-      <form (ngSubmit)="updateSetting(selectedSetting)" class="form">
-        <!-- Godzina otwarcia -->
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Godzina otwarcia</mat-label>
-          <div class="timepicker-wrapper">
-            <input
-              matInput
-              [ngxMatTimepicker]="openingPicker"
-              [(ngModel)]="selectedSetting.opening_time"
-              placeholder="Wybierz godzinę"
-              aria-label="Wybierz godzinę otwarcia"
-              [format]="24"
-              name="opening_time"
-              required
-              readonly
-            />
-            <ngx-mat-timepicker #openingPicker [minutesGap]="15" [format]="24"></ngx-mat-timepicker>
-          </div>
-        </mat-form-field>
-  
-        <!-- Godzina zamknięcia -->
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Godzina zamknięcia</mat-label>
-          <div class="timepicker-wrapper">
-            <input
-              matInput
-              [ngxMatTimepicker]="closingPicker"
-              [(ngModel)]="selectedSetting.closing_time"
-              placeholder="Wybierz godzinę"
-              aria-label="Wybierz godzinę zamknięcia"
-              [format]="24"
-              name="closing_time"
-              required
-              readonly
-            />
-            <ngx-mat-timepicker #closingPicker [minutesGap]="15" [format]="24"></ngx-mat-timepicker>
-          </div>
-        </mat-form-field>
-  
-        <!-- Minimalna długość rezerwacji -->
-        <mat-form-field appearance="fill" class="form-field">
-          <mat-label>Minimalna długość rezerwacji (minuty)</mat-label>
-          <input matInput [(ngModel)]="selectedSetting.min_reservation_length" name="min_reservation_length" type="number" required>
-        </mat-form-field>
-  
-        <!-- Maksymalna długość rezerwacji -->
-        <mat-form-field appearance="fill" class="form-field">
-          <mat-label>Maksymalna długość rezerwacji (minuty)</mat-label>
-          <input matInput [(ngModel)]="selectedSetting.max_reservation_length" name="max_reservation_length" type="number" required>
-        </mat-form-field>
-  
-        <!-- Przycisk Zapisz -->
-        <div class="form-actions">
-          <button mat-raised-button color="primary" type="submit" class="btn btn-update">
-            Zapisz ustawienia
-          </button>
+  <!-- Reservations Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'reservations'">
+    <h2 class="section-title">Rezerwacje</h2>
+    <ul class="list">
+      <li class="card" *ngFor="let reservation of reservations">
+        <div class="card-header">
+          <span>Rezerwacja #{{ reservation.id }}</span>
+          <button (click)="deleteReservation(reservation.id ?? 0)" class="btn btn-delete">Usuń</button>
         </div>
-      </form>
+        <div class="card-body">
+          <form (ngSubmit)="updateReservation(reservation)" class="form">
+            <input [(ngModel)]="reservation.table_id" name="table_id" placeholder="ID stolika" required>
+            <input [(ngModel)]="reservation.reservation_start" name="reservation_start" type="datetime-local" required>
+            <input [(ngModel)]="reservation.reservation_end" name="reservation_end" type="datetime-local" required>
+            <label>
+              <input [(ngModel)]="reservation.pending" name="pending" type="checkbox"> Oczekujące
+            </label>
+            <button type="submit" class="btn btn-update">Aktualizuj</button>
+          </form>
+        </div>
+      </li>
+    </ul>
+    <div class="gantt-chart">
+      <app-gantt-chart></app-gantt-chart>
     </div>
   </div>
 
-  <div class="tab-content" *ngIf="activeTab === 'contact'">
-    <h2 class="section-title">Zarządzanie danymi kontaktowymi</h2>
-    <form 
-      *ngIf="contactInfo" 
-      (ngSubmit)="saveContactInfo()" 
-      class="contact-form"
-      [formGroup]="contactForm"
-    >
-      <div class="form-row">
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Ulica</mat-label>
-          <mat-icon matPrefix>location_on</mat-icon>
-          <input 
-            matInput 
-            formControlName="street" 
-            placeholder="Podaj ulicę">
-          <mat-error *ngIf="contactForm.get('street')?.hasError('required')">
-            Ulica jest wymagana.
-          </mat-error>
-        </mat-form-field>
-        
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Miasto</mat-label>
-          <mat-icon matPrefix>location_city</mat-icon>
-          <input 
-            matInput 
-            formControlName="city" 
-            placeholder="Podaj miasto">
-          <mat-error *ngIf="contactForm.get('city')?.hasError('required')">
-            Miasto jest wymagane.
-          </mat-error>
-        </mat-form-field>
-      </div>
-  
-      <div class="form-row">
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Kod pocztowy</mat-label>
-          <mat-icon matPrefix>mail</mat-icon>
-          <input 
-            matInput 
-            formControlName="zip_code" 
-            placeholder="Podaj kod pocztowy">
-          <mat-error *ngIf="contactForm.get('zip_code')?.hasError('pattern')">
-            Podaj poprawny kod pocztowy.
-          </mat-error>
-        </mat-form-field>
-        
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Telefon</mat-label>
-          <mat-icon matPrefix>phone</mat-icon>
-          <input 
-            matInput 
-            formControlName="phone" 
-            placeholder="Podaj numer telefonu">
-          <mat-error *ngIf="contactForm.get('phone')?.hasError('pattern')">
-            Podaj poprawny numer telefonu.
-          </mat-error>
-        </mat-form-field>
-      </div>
-  
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Email</mat-label>
-        <mat-icon matPrefix>email</mat-icon>
-        <input 
-          matInput 
-          formControlName="email" 
-          placeholder="Podaj adres e-mail">
-        <mat-error *ngIf="contactForm.get('email')?.hasError('email')">
-          Podaj poprawny adres e-mail.
-        </mat-error>
-      </mat-form-field>
-  
-      <div class="form-row">
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Facebook</mat-label>
-          <mat-icon matPrefix>facebook</mat-icon>
-          <input matInput formControlName="facebook_url" placeholder="Link do profilu Facebook">
-        </mat-form-field>
-        
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Twitter</mat-label>
-          <mat-icon matPrefix><i class="fab fa-twitter"></i></mat-icon>
-          <input matInput formControlName="twitter_url" placeholder="Link do profilu Twitter">
-        </mat-form-field>
-        
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Instagram</mat-label>
-          <mat-icon matPrefix><i class="fab fa-instagram"></i></mat-icon>
-          <input matInput formControlName="instagram_url" placeholder="Link do profilu Instagram">
-        </mat-form-field>
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Google</mat-label>
-          <mat-icon matPrefix><i class="fab fa-google"></i></mat-icon>
-          <input matInput formControlName="google_url" placeholder="Link do profilu Google">
-        </mat-form-field>
-      </div>
-  
-      <div class="form-actions">
-        <button 
-          mat-raised-button 
-          color="primary" 
-          type="submit" 
-          [disabled]="contactForm.invalid"
-        >
-          <mat-icon>save</mat-icon> Zapisz
-        </button>
-      </div>
-    </form>
-  </div>  
-  
-</mat-sidenav-content>
-</mat-sidenav-container>
+  <!-- Settings Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'settings'">
+    <h2 class="section-title">Ustawienia</h2>
+    <ul class="list">
+      <li class="card" *ngFor="let setting of settings">
+        <div class="card-body">
+          <form (ngSubmit)="updateSetting(setting)" class="form">
+            <input [(ngModel)]="setting.day_of_week" name="day_of_week" readonly>
+            <input [(ngModel)]="setting.opening_time" name="opening_time" type="time" required>
+            <input [(ngModel)]="setting.closing_time" name="closing_time" type="time" required>
+            <input [(ngModel)]="setting.min_reservation_length" name="min_reservation_length" type="number" required>
+            <input [(ngModel)]="setting.max_reservation_length" name="max_reservation_length" type="number" required>
+            <button type="submit" class="btn btn-update">Zapisz ustawienia</button>
+          </form>
+        </div>
+      </li>
+    </ul>
+  </div>
 </div>

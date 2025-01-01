@@ -16,6 +16,9 @@ export class AuthComponentService {
   private userNameSubject = new BehaviorSubject<string | null>(localStorage.getItem('userName'));
   userName$ = this.userNameSubject.asObservable();
 
+  private isAdminSubject = new BehaviorSubject<boolean>(localStorage.getItem('isAdmin') === 'true');
+  isAdminIn$ = this.isAdminSubject.asObservable();
+
   login(userName: string, token: string, isAdmin: boolean) {
     localStorage.setItem('token', token);
     localStorage.setItem('userName', userName);

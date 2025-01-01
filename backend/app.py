@@ -225,7 +225,7 @@ class Login(Resource):
             'user_id': user.id,
             'exp': datetime.now(timezone.utc) + timedelta(hours=1)
         }, app.config['SECRET_KEY'], algorithm='HS256')
-
+        print(user.is_admin)
         return {'name': user.first_name, 'token': token, 'isAdmin': user.is_admin}, 200
 
 
@@ -246,6 +246,7 @@ class CheckLoginStatus(Resource):
         Endpoint sprawdzający status logowania użytkownika.
         Weryfikuje token JWT, zwracając informację o statusie logowania.
         """
+        print(request.current_user.is_admin)
         return {
         'status': 'logged_in',
         'isAdmin': request.current_user.is_admin  # Zwróć wartość 'is_admin' użytkownika
