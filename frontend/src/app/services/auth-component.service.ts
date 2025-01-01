@@ -24,6 +24,7 @@ export class AuthComponentService {
     localStorage.setItem('userName', userName);
     localStorage.setItem('isAdmin', isAdmin.toString());
     this.isLoggedInSubject.next(true);
+    this.isAdminSubject.next(true);
     this.userNameSubject.next(userName);
   }
 
@@ -33,6 +34,7 @@ export class AuthComponentService {
     localStorage.removeItem('isAdmin');
     this.isLoggedInSubject.next(false);
     this.userNameSubject.next(null);
+    this.isAdminSubject.next(false);
     this.router.navigate(['/home']);
   }
 }

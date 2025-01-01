@@ -55,6 +55,7 @@ export class HeartbeatService {
     if (this.intervalId) {
       clearInterval(this.intervalId);
       this.intervalId = null;
+      this.isAdminSubject.next(false);
       console.log('Heartbeat zatrzymany.');
     }
   }

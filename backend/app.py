@@ -225,7 +225,6 @@ class Login(Resource):
             'user_id': user.id,
             'exp': datetime.now(timezone.utc) + timedelta(hours=1)
         }, app.config['SECRET_KEY'], algorithm='HS256')
-        print(user.is_admin)
         return {'name': user.first_name, 'token': token, 'isAdmin': user.is_admin}, 200
 
 
