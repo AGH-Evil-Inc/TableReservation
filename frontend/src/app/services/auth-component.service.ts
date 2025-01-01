@@ -24,7 +24,7 @@ export class AuthComponentService {
     localStorage.setItem('userName', userName);
     localStorage.setItem('isAdmin', isAdmin.toString());
     this.isLoggedInSubject.next(true);
-    this.isAdminSubject.next(true);
+    this.isAdminSubject.next(isAdmin);
     this.userNameSubject.next(userName);
   }
 
