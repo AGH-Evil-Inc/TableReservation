@@ -39,18 +39,24 @@ export class LoginComponent {
   }
 
   goToRegister() {
+    document.body.classList.add('no-scroll');
     const dialogRef = this.dialog.open(RegisterComponent, {
       width: '500px'
     });
     dialogRef.afterClosed().subscribe(() => {
       this.isLoggedIn = !!localStorage.getItem('token');
+      document.body.classList.remove('no-scroll');
     });
     this.closeDialog();
   }
 
   forgotPassword() {
+    document.body.classList.add('no-scroll');
     const dialogRef = this.dialog.open(ForgotPasswordComponent, {
       width: '400px'
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      document.body.classList.remove('no-scroll');
     });
     this.closeDialog();
   }
