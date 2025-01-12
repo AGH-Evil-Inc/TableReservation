@@ -1,0 +1,235 @@
+openapi: 3.0.0
+info:
+  title: Manager API
+  description: Endpoints for administrative (manager) operations
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:5000/api
+paths:
+  /manager/settings:
+    get:
+      summary: Get all settings (manager only)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of settings
+          content:
+           application/json:
+            schema:
+              $ref: './defs/manager/ReservationSchema.yaml'
+    put:
+      summary: Update settings (partial updates allowed)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+           application/json:
+            schema:
+              $ref: './defs/manager/ReservationSchema.yaml'
+      responses:
+        '200':
+          description: Settings updated successfully
+        '400':
+          description: Failed to update settings
+
+  /manager/users:
+    get:
+      summary: Get all users (manager only)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of users
+          content:
+           application/json:
+            schema:
+              type: array
+              items:
+                $ref: './defs/auth/User.yaml'
+
+  /manager/users/{user_id}:
+    delete:
+      summary: Delete a user by ID (manager only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User deleted successfully
+        '404':
+          description: User not found
+    put:
+      summary: Update user data (manager only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './defs/manager/UpdateUser.yaml'
+      responses:
+        '200':
+          description: User updated successfully
+        '404':
+          description: User not found
+
+  /manager/reservations:
+    get:
+      summary: Get all reservations (manager only)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of reservations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: './defs/reservation/Reservation.yaml'
+
+  /manager/reservations/{reservation_id}:
+    delete:
+      summary: Delete a reservation by ID (manager only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: reservation_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Reservation deleted successfully
+        '404':
+          description: Reservation not found
+    put:
+      summary: Update reservation data (manager only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: reservation_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './defs/manager/UpdateReservation.yaml'
+      responses:
+        '200':
+          description: Reservation updated successfully
+        '404':
+          description: Reservation not found
+  /manager/contact-info:
+    get:
+      summary: Get all contact information
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of contact information
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: ID of the contact information
+                    street:
+                      type: string
+                      description: Street address
+                    city:
+                      type: string
+                      description: City name
+                    zip_code:
+                      type: string
+                      description: ZIP code
+                    phone:
+                      type: string
+                      description: Phone number
+                    email:
+                      type: string
+                      description: Email address
+                    facebook_url:
+                      type: string
+                      description: Facebook URL
+                    twitter_url:
+                      type: string
+                      description: Twitter URL
+                    google_url:
+                      type: string
+                      description: Google URL
+                    instagram_url:
+                      type: string
+                      description: Instagram URL
+    put:
+      summary: Update contact information
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                street:
+                  type: string
+                  description: Street address
+                city:
+                  type: string
+                  description: City name
+                zip_code:
+                  type: string
+                  description: ZIP code
+                phone:
+                  type: string
+                  description: Phone number
+                email:
+                  type: string
+                  description: Email address
+                facebook_url:
+                  type: string
+                  description: Facebook URL
+                twitter_url:
+                  type: string
+                  description: Twitter URL
+                google_url:
+                  type: string
+                  description: Google URL
+                instagram_url:
+                  type: string
+                  description: Instagram URL
+      responses:
+        '200':
+          description: Contact information updated successfully
+        '400':
+          description: Failed to update contact information
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT  # Określenie formatu tokenu jako JWT

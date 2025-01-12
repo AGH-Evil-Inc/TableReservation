@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
+import { FormsModule,  ReactiveFormsModule } from '@angular/forms';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -55,6 +55,15 @@ import { AddTableComponent } from './reservation/table-plan/add-table/add-table.
 import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'; 
+import { ManagerEditorComponent } from './manager-editor/manager-editor.component';
+import { ClarityModule } from '@clr/angular'; 
+import { GanttComponent } from './manager-editor/gantt-chart/gantt-chart.component';
+import { MatSidenavModule } from '@angular/material/sidenav'; 
+import { MatListModule } from '@angular/material/list'; 
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle'
+import { MatAutocompleteModule } from '@angular/material/autocomplete'; 
 
 const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
 
@@ -73,12 +82,15 @@ const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
         CarouselComponent,
         ComingSoonComponent,
         TablePlanComponent,
-        AddTableComponent
+        AddTableComponent,
+        ManagerEditorComponent,
+        GanttComponent
     ],
     bootstrap: [AppComponent],
     imports: [BrowserModule,
         AppRoutingModule,
         FormsModule,
+        ReactiveFormsModule,
         BrowserAnimationsModule,
         MatDialogModule,
         MatButtonModule,
@@ -86,7 +98,14 @@ const config: SocketIoConfig = { url: 'http://127.0.0.1:5000', options: {} };
         MatInputModule,
         MatOptionModule,
         MatSelectModule,
+        MatAutocompleteModule,
         MatFormFieldModule,
+        MatSidenavModule,
+        MatCheckboxModule,
+        MatSlideToggleModule,
+        MatListModule,
+        MatToolbarModule,
+        ClarityModule,
         MatSnackBarModule,
         MdbAccordionModule,
         MatCardModule,

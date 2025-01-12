@@ -11,6 +11,10 @@
 
 export interface Reservation { 
     /**
+     * ID of the Reservation
+     */
+    readonly id?: number;
+    /**
      * IDs of the table to reserve
      */
     table_ids: Array<number>;

@@ -23,7 +23,7 @@ export class TablePlanComponent implements AfterViewInit {
   private stage!: Konva.Stage;
   private layer!: Konva.Layer;
   private scale = 1; 
-  private baseWidth = 1000; 
+  private baseWidth = 1543; 
   private baseHeight = 630; 
 
   constructor(private elementRef: ElementRef, private dialog: MatDialog) {}
@@ -195,11 +195,13 @@ export class TablePlanComponent implements AfterViewInit {
 
         shape.on('mouseover', () => {
           tooltip.visible(true);
+          tooltip.opacity(0); // start z zerową widocznością
+          gsap.to(tooltip, { opacity: 1, duration: 0.3 });
           this.layer.batchDraw();
         });
 
         shape.on('mouseout', () => {
-          tooltip.visible(false);
+          gsap.to(tooltip, { opacity: 0, duration: 0.3 });
           this.layer.batchDraw();
         });
         

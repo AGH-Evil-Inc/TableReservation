@@ -39,13 +39,13 @@ class ReservationSchema(Schema):
 
         # Sprawdzenie minimalnego i maksymalnego czasu trwania rezerwacji
         duration = reservation_end - reservation_start
-        min_duration = timedelta(minutes=15)
-        max_duration = timedelta(hours=4, minutes=30)
+        min_duration = timedelta(minutes=1)
+        max_duration = timedelta(hours=23, minutes=30)
 
         if duration < min_duration:
-            raise ValidationError('The minimal time of the reservation is 15 minutes', field_name='reservation_end')
+            raise ValidationError('The minimal time of the reservation is 1 minute', field_name='reservation_end')
         if duration > max_duration:
-            raise ValidationError('The maximal time of the reservvation is 4.5 hours', field_name='reservation_end')
+            raise ValidationError('The maximal time of the reservvation is 23.5 hours', field_name='reservation_end')
 
         # Sprawdzenie, czy rezerwacja jest w przyszłości
         if reservation_start < current_time:

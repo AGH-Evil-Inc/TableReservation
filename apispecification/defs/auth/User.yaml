@@ -1,6 +1,10 @@
 title: User
 type: object
 properties:
+  id:
+    type: integer
+    description: ID of the user
+    readOnly: true
   email:
     type: string
     example: user@example.com

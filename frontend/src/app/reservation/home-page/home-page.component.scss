@@ -1,4 +1,5 @@
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
+$primary-color: #f39f03;
 
 .content {
   padding: 2rem;
@@ -7,13 +8,22 @@
 
 /* Hero Section */
 .hero-section {
-  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/assets/krakow.jpg') center/cover no-repeat;
+  background: linear-gradient(
+      to bottom right,
+      rgba(0, 0, 0, 0.7),
+      rgba(0, 0, 0, 0.5)
+    ),
+    url('/assets/krakow.jpg') center/cover no-repeat;
   color: #f39f03;
   text-align: center;
-  padding: 4rem 2rem;
+  padding: 5rem 2rem;
   border-radius: 10px;
   margin-bottom: 2rem;
   position: relative;
+
+  .highlight {
+    color: $primary-color;
+  }
 }
 
 
@@ -39,7 +49,8 @@
 }
 
 .cta-button:hover {
-  background-color: #e76f51;
+  transform: scale(1.05);
+  background: darken($primary-color, 10%);
 }
 
 .about-section {
