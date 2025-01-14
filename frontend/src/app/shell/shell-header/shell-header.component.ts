@@ -17,6 +17,7 @@ export class ShellHeaderComponent implements OnInit {
   userName: string | null = '';
   remainingTime: number = 0;
   isMenuOpen: boolean = false;
+  isUserManager = false;
 
   constructor(private dialog: MatDialog, private authComponentService: AuthComponentService,
      private authService: AuthService, private sessionTimerService: SessionTimerService,
@@ -26,6 +27,16 @@ export class ShellHeaderComponent implements OnInit {
     // Subskrypcja na status logowania
     this.authComponentService.isLoggedIn$.subscribe(status => {
       this.isLoggedIn = status;
+    });
+
+    this.authComponentService.isAdminIn$.subscribe(isAdmin => {
+      this.isUserManager = isAdmin;
+      console.log('isAdmin:', isAdmin);
+    });
+
+    this.heartbeatService.isAdmin$.subscribe(isAdmin => {
+      this.isUserManager = isAdmin;
+      console.log('isAdmin:', isAdmin);
     });
 
     // Subskrypcja na nazwisko użytkownika

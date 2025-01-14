@@ -16,18 +16,25 @@ export class AuthComponentService {
   private userNameSubject = new BehaviorSubject<string | null>(localStorage.getItem('userName'));
   userName$ = this.userNameSubject.asObservable();
 
-  login(userName: string, token: string) {
+  private isAdminSubject = new BehaviorSubject<boolean>(localStorage.getItem('isAdmin') === 'true');
+  isAdminIn$ = this.isAdminSubject.asObservable();
+
+  login(userName: string, token: string, isAdmin: boolean) {
     localStorage.setItem('token', token);
     localStorage.setItem('userName', userName);
+    localStorage.setItem('isAdmin', isAdmin.toString());
     this.isLoggedInSubject.next(true);
+    this.isAdminSubject.next(isAdmin);
     this.userNameSubject.next(userName);
   }
 
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('userName');
+    localStorage.removeItem('isAdmin');
     this.isLoggedInSubject.next(false);
     this.userNameSubject.next(null);
+    this.isAdminSubject.next(false);
     this.router.navigate(['/home']);
   }
 }

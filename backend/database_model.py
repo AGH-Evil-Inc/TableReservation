@@ -105,6 +105,22 @@ class Settings(db.Model):
     min_reservation_length = db.Column(db.Integer, default=30)
     max_reservation_length = db.Column(db.Integer, default=120)
 
+class ContactInfo(db.Model):
+    __tablename__ = 'contact_info'  # Możesz zmienić nazwę tabeli, jeśli jest inna
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    street = db.Column(db.Text, nullable=False)
+    city = db.Column(db.Text, nullable=False)
+    zip_code = db.Column(db.Text, nullable=False)
+    phone = db.Column(db.Text, nullable=False)
+    email = db.Column(db.Text, nullable=False)
+    facebook_url = db.Column(db.Text, nullable=True)
+    twitter_url = db.Column(db.Text, nullable=True)
+    google_url = db.Column(db.Text, nullable=True)
+    instagram_url = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f"<ContactInfo(id={self.id}, street='{self.street}', city='{self.city}', zip_code='{self.zip_code}', phone='{self.phone}', email='{self.email}')>"
+
 
 # engine.connect()
 # Base.metadata.create_all(engine)

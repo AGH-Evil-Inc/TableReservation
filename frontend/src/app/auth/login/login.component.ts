@@ -23,7 +23,10 @@ export class LoginComponent {
     this.authService.login(this.user).subscribe(
       response => {
         if (response.token) {
-          this.authComponentService.login(response.name,response.token)
+          const isAdmin = response.isAdmin.toString() === 'true';
+          localStorage.setItem('isAdmin', isAdmin.toString());
+          console.log('isAdmin:', isAdmin);
+          this.authComponentService.login(response.name,response.token, isAdmin);
           this.closeDialog();
         } else {
           this.message = 'Login failed! Invalid credentials.';
@@ -36,18 +39,24 @@ export class LoginComponent {
   }
 
   goToRegister() {
+    document.body.classList.add('no-scroll');
     const dialogRef = this.dialog.open(RegisterComponent, {
       width: '500px'
     });
     dialogRef.afterClosed().subscribe(() => {
       this.isLoggedIn = !!localStorage.getItem('token');
+      document.body.classList.remove('no-scroll');
     });
     this.closeDialog();
   }
 
   forgotPassword() {
+    document.body.classList.add('no-scroll');
     const dialogRef = this.dialog.open(ForgotPasswordComponent, {
       width: '400px'
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      document.body.classList.remove('no-scroll');
     });
     this.closeDialog();
   }

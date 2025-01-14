@@ -25,7 +25,7 @@ export class AuthService {
   login(credentials: any) {
     return this.http.post('/api/auth/login', credentials).pipe(
       tap((response: any) => {
-        this.authComponentService.login(response.userName,response.token);
+        this.authComponentService.login(response.userName,response.token, response.isAdmin);
         this.heartbeatService.start(); 
       })
     );

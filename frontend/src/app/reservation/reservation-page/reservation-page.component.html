@@ -70,13 +70,13 @@
         <label for="tableId">
           <mat-icon>table_restaurant</mat-icon> Wybrane stoliki
         </label>
-        <ul>
+        <ul class="selected-tables-list">
           <li *ngFor="let tableId of reservation.table_ids">
             Stolik {{ tableId }}
           </li>
         </ul>
       </div>
-      <button type="submit" class="submit-button">Wyślij rezerwację</button>
+      <button type="submit" class="submit-button" [disabled]="!isReservationValid()">Wyślij rezerwację</button>
     </form>
   </div>
 
@@ -86,10 +86,9 @@
     [tables]="tables"
     [occupiedTables]="occupiedTables"
     [selectedTables]="reservation.table_ids"
-    [isManager]="isUserManager"
+    [isManager]="false"
     (tableSelected)="selectTable($event)"
     (layoutSaved)="handleLayoutSave($event)"
     (restore)="restoreLayout($event)"
   ></app-table-plan>
-
 </div>

@@ -6,6 +6,9 @@ properties:
     description: JWT token for authenticated sessions
   name:
     type: string
+  isAdmin:
+    type: boolean
 required:
   - token
   - name
+  - isAdmin

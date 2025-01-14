@@ -1,0 +1,16 @@
+type: object
+properties:
+  id:
+      type: integer
+      description: ID of the user
+      readOnly: true
+  email:
+    type: string
+  first_name:
+    type: string
+  last_name:
+    type: string
+  phone_number:
+    type: string
+  is_admin:
+    type: boolean

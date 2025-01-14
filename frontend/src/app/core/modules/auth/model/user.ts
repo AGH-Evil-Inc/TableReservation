@@ -10,6 +10,10 @@
 
 
 export interface User { 
+    /**
+     * ID of the user
+     */
+    readonly id?: number;
     email: string;
     first_name: string;
     last_name: string;

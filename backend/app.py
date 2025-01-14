@@ -26,7 +26,7 @@ db.init_app(app)
 mail = Mail(app)
 
 # Now import models after db is initialized
-from database_model import Settings, User, Reservation, Table
+from database_model import Settings, User, Reservation, Table, ContactInfo
 
 # Configuration for JWT
 app.config['SECRET_KEY'] = 'your-secret-key'  # Use a strong key for production
@@ -50,6 +50,14 @@ with open('../apispecification/defs/reservation/Reservation.yaml', 'r') as file:
     reservation_schema = yaml.safe_load(file)
 with open('../apispecification/defs/reservation/Table.yaml', 'r') as file:
     table_schema = yaml.safe_load(file)
+with open('../apispecification/manager.yaml', 'r') as file:
+    manager_spec = yaml.safe_load(file)
+with open('../apispecification/defs/manager/UpdateReservation.yaml', 'r') as file:
+    update_reservation_schema = yaml.safe_load(file)
+with open('../apispecification/defs/manager/UpdateUser.yaml', 'r') as file:
+    update_user_schema = yaml.safe_load(file)
+with open('../apispecification/defs/manager/ReservationSchema.yaml', 'r') as file:
+    update_settings_schema = yaml.safe_load(file)
 
 # Dynamiczne tworzenie modelu
 user_model = api.schema_model('User', user_schema)
@@ -59,6 +67,9 @@ reset_pass_model = api.schema_model('ResetPassword', reset_pass_schema)
 login_response_model = api.schema_model('LoginResponse', login_response_schema)
 reservation_model = api.schema_model('Reservation', reservation_schema)
 table_model = api.schema_model('Table', table_schema)
+update_user_model = api.schema_model('UpdateUser', update_user_schema)
+update_reservation_model = api.schema_model('UpdateReservation', update_reservation_schema)
+update_settings_model = api.schema_model('UpdateSettings', update_settings_schema)
 
 # Helper function to validate JWT tokens
 def token_required(f):
@@ -66,13 +77,14 @@ def token_required(f):
     def decorator(*args, **kwargs):
         token = None
         if 'Authorization' in request.headers:
-            token = request.headers['Authorization'].split(" ")[1]  # Extract token from Authorization header
+            parts = request.headers['Authorization'].split(" ")
+            if len(parts) == 2 and parts[0].lower() == 'bearer':
+                token = parts[1]
 
         if not token:
             return {'message': 'Token is missing'}, 401
 
         try:
-            # Decode the JWT token to get user_id
             payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
             current_user = db.session.get(User, payload['user_id'])
             if not current_user:
@@ -82,8 +94,17 @@ def token_required(f):
         except jwt.InvalidTokenError:
             return {'message': 'Invalid token'}, 401
 
-        # Attach current_user to the request context
         request.current_user = current_user
+        return f(*args, **kwargs)
+    return decorator
+
+def admin_required(f):
+    @wraps(f)
+    def decorator(*args, **kwargs):
+        if not getattr(request, 'current_user', None):
+            return {'message': 'User not found'}, 401
+        if not request.current_user.is_admin:
+            return {'message': 'Admin privileges required'}, 403
         return f(*args, **kwargs)
     return decorator
 
@@ -140,38 +161,6 @@ class Init(Resource):
                 db.session.commit()
 
             return {'message': 'Initial configuration done!'}, 200
-@ns.route('/settings')
-class SettingsAPI(Resource):
-    @token_required
-    def get(self):
-        settings = Settings.query.all()
-        return jsonify([{
-            'day_of_week': s.day_of_week,
-            'opening_time': s.opening_time.strftime('%H:%M'),
-            'closing_time': s.closing_time.strftime('%H:%M'),
-            'min_reservation_length': s.min_reservation_length,
-            'max_reservation_length': s.max_reservation_length,
-        } for s in settings])
-
-    @token_required
-    def put(self):
-        data = request.json
-        try:
-            for day, values in data.items():
-                setting = Settings.query.filter_by(day_of_week=day).first()
-                if not setting:
-                    setting = Settings(day_of_week=day)
-                    db.session.add(setting)
-                setting.opening_time = datetime.strptime(values['opening_time'], '%H:%M').time()
-                setting.closing_time = datetime.strptime(values['closing_time'], '%H:%M').time()
-                setting.min_reservation_length = values['min_reservation_length']
-                setting.max_reservation_length = values['max_reservation_length']
-            db.session.commit()
-            return {'message': 'Settings updated successfully'}, 200
-        except Exception as e:
-            return {'message': 'Failed to update settings', 'error': str(e)}, 400
-
-
 # Rejestracja nowego użytkownika
 @ns.route('/auth/register')
 class Register(Resource):
@@ -236,8 +225,7 @@ class Login(Resource):
             'user_id': user.id,
             'exp': datetime.now(timezone.utc) + timedelta(hours=1)
         }, app.config['SECRET_KEY'], algorithm='HS256')
-
-        return {'name': user.first_name, 'token': token}, 200
+        return {'name': user.first_name, 'token': token, 'isAdmin': user.is_admin}, 200
 
 
 # Wylogowywanie:
@@ -257,7 +245,11 @@ class CheckLoginStatus(Resource):
         Endpoint sprawdzający status logowania użytkownika.
         Weryfikuje token JWT, zwracając informację o statusie logowania.
         """
-        return {'status': 'logged_in'}, 200
+        print(request.current_user.is_admin)
+        return {
+        'status': 'logged_in',
+        'isAdmin': request.current_user.is_admin  # Zwróć wartość 'is_admin' użytkownika
+        }, 200
 
 @ns.route('/auth/request-password-reset')
 class RequestPasswordReset(Resource):
@@ -401,13 +393,42 @@ class TableDetail(Resource):
     @ns.response(204, 'Table deleted successfully')
     @ns.response(404, 'Table not found')
     def delete(self, table_id):
-        """Delete a table by ID"""
+        """Delete a table by ID and related reservations, notify users via email"""
         table = Table.query.get(table_id)
         if not table:
             return {'message': 'Table not found'}, 404
         
+        # Pobierz wszystkie rezerwacje związane z tym stolikiem
+        reservations = Reservation.query.filter_by(table_id=table_id).all()
+
+        # Dla każdej rezerwacji wysyłamy e-mail do użytkownika, informując o anulowaniu
+        for reservation in reservations:
+            user = reservation.user
+            if user and user.email:
+                # Konstruujemy wiadomość e-mail
+                msg = Message("Reservation Cancelled",
+                              recipients=[user.email])
+                msg.body = f"""Hello {user.first_name},
+
+We regret to inform you that your reservation has been cancelled due to the table being removed from our system.
+
+We apologize for any inconvenience caused.
+
+Best regards,
+Table&Taste
+"""
+                try:
+                    mail.send(msg)
+                except Exception as e:
+                    app.logger.error(f'Failed to send cancellation email to {user.email}: {str(e)}')
+
+            # Usuwamy rezerwację z bazy danych
+            db.session.delete(reservation)
+
+        # Na koniec usuwamy sam stolik
         db.session.delete(table)
         db.session.commit()
+
         return '', 204
        
 
@@ -612,6 +633,527 @@ class CreateReservation(Resource):
         occupied_table_ids = [reservation.table_id for reservation in overlapping_reservations]
 
         return {'occupied_table_ids': occupied_table_ids}, 200
+    
+
+@ns.route('/manager/settings')
+class ManagerSettings(Resource):
+   
+    def get(self):
+        """Get all settings (manager only)"""
+        settings = Settings.query.all()
+        return jsonify([{
+            'day_of_week': s.day_of_week,
+            'opening_time': s.opening_time.strftime('%H:%M') if s.opening_time else None,
+            'closing_time': s.closing_time.strftime('%H:%M') if s.closing_time else None,
+            'min_reservation_length': s.min_reservation_length if s.min_reservation_length else None,
+            'max_reservation_length': s.max_reservation_length if s.max_reservation_length else None,
+        } for s in settings])
+
+    @ns.expect(update_settings_model)
+    @token_required
+    @admin_required
+    def put(self):
+        """
+        Update all or some fields of settings for each day (manager only).
+        You can pass only some fields (like only 'opening_time') and the rest will remain unchanged.
+        Example JSON:
+        {
+          "0": {"opening_time": "09:00"},
+          "1": {"closing_time": "23:00", "min_reservation_length": 20}
+        }
+        """
+        data = request.json
+        try:
+            for day_str, values in data.items():
+                day = int(day_str)
+                setting = Settings.query.filter_by(day_of_week=day).first()
+                if not setting:
+                    setting = Settings(day_of_week=day)
+                    db.session.add(setting)
+
+                if 'opening_time' in values:
+                    setting.opening_time = datetime.strptime(values['opening_time'], '%H:%M').time()
+                if 'closing_time' in values:
+                    setting.closing_time = datetime.strptime(values['closing_time'], '%H:%M').time()
+                if 'min_reservation_length' in values:
+                    setting.min_reservation_length = values['min_reservation_length']
+                if 'max_reservation_length' in values:
+                    setting.max_reservation_length = values['max_reservation_length']
+
+            db.session.commit()
+            return {'message': 'Settings updated successfully'}, 200
+        except Exception as e:
+            return {'message': 'Failed to update settings', 'error': str(e)}, 400
+@ns.route('/manager/contact-info')
+class ContactInfoResource(Resource):
+    def get(self):
+        """
+        Get all contact information.
+        """
+        contacts = ContactInfo.query.all()
+        return jsonify([{
+            'id': c.id,
+            'street': c.street,
+            'city': c.city,
+            'zip_code': c.zip_code,
+            'phone': c.phone,
+            'email': c.email,
+            'facebook_url': c.facebook_url,
+            'twitter_url': c.twitter_url,
+            'google_url': c.google_url,
+            'instagram_url': c.instagram_url,
+        } for c in contacts])
+
+    @ns.expect(ns.model('ContactInfoUpdate', {
+        'street': {'type': 'string', 'required': False},
+        'city': {'type': 'string', 'required': False},
+        'zip_code': {'type': 'string', 'required': False},
+        'phone': {'type': 'string', 'required': False},
+        'email': {'type': 'string', 'required': False},
+        'facebook_url': {'type': 'string', 'required': False},
+        'twitter_url': {'type': 'string', 'required': False},
+        'google_url': {'type': 'string', 'required': False},
+        'instagram_url': {'type': 'string', 'required': False},
+    }))
+
+    @token_required
+    @admin_required
+    def put(self):
+        """
+        Update contact information.
+        You can pass only some fields (e.g., 'street') and the rest will remain unchanged.
+        Example JSON:
+        {
+            "street": "New Street 123",
+            "city": "New City",
+            "phone": "987654321"
+        }
+        """
+        data = request.json
+        try:
+            contact = ContactInfo.query.first()
+            if not contact:
+                contact = ContactInfo()
+                db.session.add(contact)
+
+            if 'street' in data:
+                contact.street = data['street']
+            if 'city' in data:
+                contact.city = data['city']
+            if 'zip_code' in data:
+                contact.zip_code = data['zip_code']
+            if 'phone' in data:
+                contact.phone = data['phone']
+            if 'email' in data:
+                contact.email = data['email']
+            if 'facebook_url' in data:
+                contact.facebook_url = data['facebook_url']
+            if 'twitter_url' in data:
+                contact.twitter_url = data['twitter_url']
+            if 'google_url' in data:
+                contact.google_url = data['google_url']
+            if 'instagram_url' in data:
+                contact.instagram_url = data['instagram_url']
+
+            db.session.commit()
+            return {'message': 'Contact information updated successfully'}, 200
+        except Exception as e:
+            return {'message': 'Failed to update contact information', 'error': str(e)}, 400
+@ns.route('/manager/users')
+class ManagerUsers(Resource):
+    @token_required
+    @admin_required
+    def get(self):
+        """Get all users (manager only)"""
+        users = User.query.all()
+        return jsonify([{
+            'id': u.id,
+            'email': u.email,
+            'first_name': u.first_name,
+            'last_name': u.last_name,
+            'phone_number': u.phone_number,
+            'is_admin': u.is_admin
+        } for u in users])
+
+    @ns.expect(user_model)  # Używamy już istniejącego modelu User, który jest stosowany przy rejestracji
+    @token_required
+    @admin_required
+    def post(self):
+        """
+        Create a new user (manager only).
+        Manager can create a user (including setting is_admin if needed).
+        Example JSON:
+        {
+          "email": "newuser@example.com",
+          "first_name": "John",
+          "last_name": "Doe",
+          "phone_number": "123456789",
+          "password": "somepassword",
+          "is_admin": false
+        }
+        """
+        data = request.get_json()
+        
+        # Walidacja po stronie Marshmallow jeśli chcesz, lub samodzielna:
+        schema = UserSchema()
+        try:
+            validated_data = schema.load(data)
+        except ValidationError as err:
+            return {'message': 'Invalid input', 'errors': err.messages}, 400
+        
+        email = validated_data['email']
+        first_name = validated_data['first_name']
+        last_name = validated_data['last_name']
+        password = validated_data['password']
+        phone_number = validated_data.get('phone_number')
+        # Menadżer może nadawać prawa admina, jeśli chce:
+        is_admin = data.get('is_admin', False)
+
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            return {'message': 'User already exists'}, 400
+
+        hashed_password = User.get_hashed_password(password)
+        new_user = User(
+            email=email,
+            password=hashed_password,
+            first_name=first_name,
+            last_name=last_name,
+            phone_number=phone_number,
+            is_admin=is_admin
+        )
+        db.session.add(new_user)
+        db.session.commit()
+
+        return {'message': 'User created successfully by manager', 'user_id': new_user.id}, 201
+    
+@ns.route('/manager/users/<int:user_id>')
+class ManagerUserDetail(Resource):
+    @token_required
+    @admin_required
+    def delete(self, user_id):
+        """Delete a user by ID (manager only) and send them an email."""
+        user = User.query.get(user_id)
+        if not user:
+            return {'message': 'User not found'}, 404
+
+        # Zapamiętujemy email przed usunięciem
+        user_email = user.email
+        user_first_name = user.first_name
+
+        # Usuwamy rezerwacje użytkownika
+        reservations = Reservation.query.filter_by(user_id=user_id).all()
+        for res in reservations:
+            db.session.delete(res)
+
+        db.session.delete(user)
+        db.session.commit()
+
+        # Wysyłamy email do usuniętego użytkownika
+        if user_email:
+            msg = Message("Account Deleted",
+                          recipients=[user_email])
+            msg.body = f"""Hello {user_first_name},
+
+We regret to inform you that your account has been deleted by our manager.
+
+If you have any questions, please contact support.
+
+Best regards,
+Table&Taste
+"""
+            try:
+                mail.send(msg)
+            except Exception as e:
+                app.logger.error(f'Failed to send deletion email to {user_email}: {str(e)}')
+
+        return {'message': 'User deleted successfully'}, 200
+    
+    @ns.expect(update_user_model)
+    @token_required
+    @admin_required
+    def put(self, user_id):
+        """
+        Update user data (manager only).
+        You can update any of the user's fields such as email, first_name, last_name, phone_number, is_admin.
+        Example JSON:
+        {
+          "email": "newmail@example.com",
+          "is_admin": true
+        }
+        """
+        user = User.query.get(user_id)
+        if not user:
+            return {'message': 'User not found'}, 404
+
+        data = request.json
+        # Aktualizujemy tylko pola, które zostały podane
+        if 'email' in data:
+            user.email = data['email']
+        if 'first_name' in data:
+            user.first_name = data['first_name']
+        if 'last_name' in data:
+            user.last_name = data['last_name']
+        if 'phone_number' in data:
+            user.phone_number = data['phone_number']
+        if 'is_admin' in data:
+            user.is_admin = data['is_admin']
+
+        db.session.commit()
+        return {'message': 'User updated successfully'}, 200
+    
+@ns.route('/manager/reservations')
+class ManagerReservations(Resource):
+    @token_required
+    def get(self):
+        """Get all reservations (manager only)"""
+        reservations = Reservation.query.all()
+        return jsonify([{
+            'id': r.id,
+            'user_id': r.user_id,
+            'table_id': r.table_id,
+            'pending': r.pending,
+            'created_at': r.created_at.isoformat() if r.created_at else None,
+            'reservation_start': r.reservation_start.isoformat() if r.reservation_start else None,
+            'reservation_end': r.reservation_end.isoformat() if r.reservation_end else None
+        } for r in reservations])
+    
+    @ns.expect(reservation_model)  
+    @token_required
+    @admin_required
+    def post(self):
+        """
+        Create a new reservation (manager only).
+        Manager can create a reservation for any user by specifying user_id, table_ids, reservation_start, reservation_end.
+        Example JSON:
+        {
+          "user_id": 10,
+          "table_ids": [1, 2],
+          "reservation_start": "2024-05-10T18:00",
+          "reservation_end": "2024-05-10T20:00",
+          "pending": true
+        }
+        """
+        data = request.get_json()
+        
+        # Walidacja schematu
+        schema = ReservationSchema()
+        try:
+            validated_data = schema.load(data)
+        except ValidationError as err:
+            return {'message': 'Invalid input', 'errors': err.messages}, 400
+
+        # Menadżer może podać user_id, dla kogo tworzy rezerwację
+        user_id = data.get('user_id')
+        if not user_id:
+            return {'message': 'user_id is required'}, 400
+
+        user = User.query.get(user_id)
+        if not user:
+            return {'message': 'User not found'}, 404
+
+        table_ids = validated_data['table_ids']
+        reservation_start = validated_data['reservation_start'].replace(tzinfo=timezone.utc)
+        reservation_end = validated_data['reservation_end'].replace(tzinfo=timezone.utc)
+        pending = validated_data.get('pending', True)
+
+        # Walidacja czasu tak jak przy normalnej rezerwacji
+        day_of_week = reservation_start.weekday()
+        opening_hours = Settings.query.filter_by(day_of_week=day_of_week).first()
+        if not opening_hours:
+            return {
+                'message': 'The opening hours are not set up',
+                'errors': {'reservation_start': ['Opening hours are not set up']}
+            }, 400
+
+        opening_time = opening_hours.opening_time
+        closing_time = opening_hours.closing_time
+        opening_datetime = datetime.combine(reservation_start.date(), opening_time).replace(tzinfo=timezone.utc)
+        closing_datetime = datetime.combine(reservation_start.date(), closing_time).replace(tzinfo=timezone.utc)
+        if closing_time <= opening_time:
+            closing_datetime += timedelta(days=1)
+
+        if not (opening_datetime <= reservation_start < closing_datetime and
+                opening_datetime < reservation_end <= closing_datetime):
+            return {
+                'message': 'The reservation must be during opening hours',
+                'errors': {'reservation_start': ['The reservation must be during opening hours']}
+            }, 400
+
+        last_reservation_time = closing_datetime - timedelta(minutes=30)
+        if reservation_start > last_reservation_time:
+            return {
+                'message': 'The last reservation can be made no later than 30 minutes before closing',
+                'errors': {'reservation_start': ['The last reservation can be made no later than 30 minutes before closing']}
+            }, 400
+
+        # Sprawdzenie czasu trwania jak wcześniej
+        duration = reservation_end - reservation_start
+        min_duration = timedelta(minutes=15)
+        max_duration = timedelta(hours=4, minutes=30)
+
+        if duration < min_duration:
+            return {
+                'message': 'The minimal time of the reservation is 15 minutes',
+                'errors': {'reservation_end': ['The minimal time of the reservation is 15 minutes']}
+            }, 400
+        if duration > max_duration:
+            return {
+                'message': 'The maximal time of the reservation is 4.5 hours',
+                'errors': {'reservation_end': ['The maximal time of the reservation is 4.5 hours']}
+            }, 400
+        
+        current_time = datetime.now(timezone.utc)
+        max_advance = current_time + relativedelta(months=4)
+        if reservation_start > max_advance:
+            return {
+                'message': 'Rezerwację można dokonać maksymalnie na 4 miesiące do przodu.',
+                'errors': {'reservation_start': ['Rezerwację można dokonać maksymalnie na 4 miesiące do przodu.']}
+            }, 400
+
+        if reservation_start < current_time:
+            return {
+                'message': 'Rezerwacja nie może być w przeszłości.',
+                'errors': {'reservation_start': ['Rezerwacja nie może być w przeszłości.']}
+            }, 400
+
+        # Sprawdzenie dostępności stolików
+        unavailable_tables = []
+        for table_id in table_ids:
+            table = Table.query.get(table_id)
+            if not table:
+                return {'message': f'Table {table_id} does not exist'}, 400
+            if not table.available:
+                return {'message': f'Table {table_id} is currently unavailable'}, 400
+
+            overlapping_reservations = Reservation.query.filter(
+                Reservation.table_id == table_id,
+                Reservation.reservation_end > reservation_start,
+                Reservation.reservation_start < reservation_end,
+                Reservation.pending == True
+            ).first()
+
+            if overlapping_reservations:
+                unavailable_tables.append(table_id)
+
+        if unavailable_tables:
+            return {'message': f'Table {unavailable_tables} is already reserved during that time'}, 409
+
+        # Tworzenie rezerwacji
+        reserved_tables = []
+        for t_id in table_ids:
+            new_res = Reservation(
+                user_id=user_id,
+                table_id=t_id,
+                pending=pending,
+                created_at=datetime.now(timezone.utc),
+                reservation_start=reservation_start,
+                reservation_end=reservation_end
+            )
+            db.session.add(new_res)
+            reserved_tables.append(t_id)
+
+        db.session.commit()
+
+        socketio.emit('reservation_update', {
+            'table_ids': reserved_tables,
+            'reservation_start': reservation_start.isoformat(),
+            'reservation_end': reservation_end.isoformat() 
+        })
+
+        return {
+            'message': 'Reservation created successfully by manager',
+            'reserved_tables': reserved_tables,
+            'reservation_start': reservation_start.isoformat(),
+            'reservation_end': reservation_end.isoformat()
+        }, 201
+    
+@ns.route('/manager/reservations/<int:reservation_id>')
+class ManagerReservationDetail(Resource):
+    @token_required
+    @admin_required
+    def delete(self, reservation_id):
+        """Delete a reservation by ID (manager only) and send user an email."""
+        reservation = Reservation.query.get(reservation_id)
+        if not reservation:
+            return {'message': 'Reservation not found'}, 404
+
+        user = reservation.user
+        user_email = user.email if user else None
+        user_first_name = user.first_name if user else None
+
+        db.session.delete(reservation)
+        db.session.commit()
+
+        # Wysyłamy email do użytkownika
+        if user_email:
+            msg = Message("Reservation Cancelled",
+                          recipients=[user_email])
+            msg.body = f"""Hello {user_first_name},
+
+We regret to inform you that your reservation has been cancelled by our manager.
+
+We apologize for any inconvenience caused.
+
+Best regards,
+Table&Taste
+"""
+            try:
+                mail.send(msg)
+            except Exception as e:
+                app.logger.error(f'Failed to send cancellation email to {user_email}: {str(e)}')
+
+        return {'message': 'Reservation deleted successfully'}, 200
+
+    @ns.expect(update_reservation_model)    
+    @token_required
+    @admin_required
+    def put(self, reservation_id):
+        """
+        Update reservation data (manager only).
+        You can update fields such as table_id, pending, reservation_start, reservation_end.
+        Example JSON:
+        {
+          "table_id": 2,
+          "pending": false,
+          "reservation_start": "2024-05-10T18:00",
+          "reservation_end": "2024-05-10T20:00"
+        }
+        """
+        reservation = Reservation.query.get(reservation_id)
+        if not reservation:
+            return {'message': 'Reservation not found'}, 404
+
+        data = request.json
+
+        # Aktualizujemy tylko pola, które zostały podane
+        if 'table_id' in data:
+            table_id = data['table_id']
+            # Sprawdzamy czy taki stół istnieje
+            table = Table.query.get(table_id)
+            if not table:
+                return {'message': f'Table {table_id} does not exist'}, 400
+            reservation.table_id = table_id
+
+        if 'pending' in data:
+            reservation.pending = data['pending']
+
+        # Zmiana czasu rezerwacji jeśli podane
+        fmt = '%Y-%m-%dT%H:%M'
+        if 'reservation_start' in data:
+            try:
+                reservation.reservation_start = datetime.strptime(data['reservation_start'], fmt).replace(tzinfo=timezone.utc)
+            except ValueError:
+                return {'message': 'Invalid reservation_start format, use YYYY-MM-DDTHH:MM'}, 400
+
+        if 'reservation_end' in data:
+            try:
+                reservation.reservation_end = datetime.strptime(data['reservation_end'], fmt).replace(tzinfo=timezone.utc)
+            except ValueError:
+                return {'message': 'Invalid reservation_end format, use YYYY-MM-DDTHH:MM'}, 400
+
+        db.session.commit()
+        return {'message': 'Reservation updated successfully'}, 200
 
 @socketio.on('connect')
 def handle_connect():

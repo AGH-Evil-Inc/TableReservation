@@ -1,0 +1,20 @@
+type: object
+properties:
+  id:
+    type: integer
+    description: ID of the Reservation
+    readOnly: true
+  table_id:
+    type: integer
+  pending:
+    type: boolean
+  reservation_start:
+    type: string
+    format: date-time
+  reservation_end:
+    type: string
+    format: date-time
+required:
+  - table_id
+  - reservation_start
+  - reservation_end

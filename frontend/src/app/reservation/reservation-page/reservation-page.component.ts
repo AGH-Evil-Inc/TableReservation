@@ -3,6 +3,8 @@ import { NgbTimeStruct } from '@ng-bootstrap/ng-bootstrap';
 import { Reservation, Table } from 'src/app/core/modules/reservation';
 import { ReservationService } from 'src/app/services/reservation.service';
 import { TablePlanComponent } from '../table-plan/table-plan.component';
+import { ManagerService } from 'src/app/services/manager.service';
+import { ReservationSchema } from 'src/app/core/modules/manager';
 
 @Component({
   selector: 'app-reservation-page',
@@ -24,23 +26,33 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
 
   minDate: string ='';
   maxDate: string ='';
-  minDuration: NgbTimeStruct = { hour: 0, minute: 15, second: 0 }; 
-  maxDuration: NgbTimeStruct = { hour: 4, minute: 30, second: 0 };
+  minDuration: NgbTimeStruct = {
+    hour: 0,
+    minute: 0,
+    second: 0
+  }; 
+  maxDuration: NgbTimeStruct = {
+    hour: 0,
+    minute: 0,
+    second: 0
+  };
   occupiedTables: number[] = []; 
-  isUserManager = false;
 
   @ViewChild(TablePlanComponent) 
   tablePlanComponent!: TablePlanComponent;
 
   tables: Table[] = [];
+  settings: ReservationSchema[] = [];
   
-  constructor(private reservationService: ReservationService) {}
+  constructor(private reservationService: ReservationService, private managerService: ManagerService) {}
 
   ngOnInit(): void {
     this.setMinMaxDate();
     this.subscribeToUpdates();
     this.fetchTables();
     this.fetchOccupiedTables();
+    this.fetchWorkingHours();
+    this.setDefaultDateTime();
   }
 
   ngOnDestroy(): void {
@@ -61,6 +73,39 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+  fetchWorkingHours() {
+     this.managerService.getSettings().subscribe({
+          next: (data: ReservationSchema[]) => {
+            this.settings = data;
+          },
+          error: (error: any) => {
+            console.error('Error fetching settings', error);
+          }
+        });
+  }
+
+  private updateDynamicDurations(date: string): void {
+    let dayOfWeek = (new Date(date).getDay() - 1) % 7;
+    if (dayOfWeek === -1) dayOfWeek = 6; // niedziela
+  
+    const currentDaySettings = this.settings.find(setting => setting.day_of_week === dayOfWeek);
+    if (currentDaySettings) {
+      const { min_reservation_length, max_reservation_length } = currentDaySettings;
+      if (min_reservation_length !== undefined) {
+        this.minDuration = this.minutesToTimeStruct(min_reservation_length);
+      }
+      if (max_reservation_length !== undefined) {
+        this.maxDuration = this.minutesToTimeStruct(max_reservation_length);
+      }
+    }
+  }
+
+  private minutesToTimeStruct(minutes: number): NgbTimeStruct {
+  const hour = Math.floor(minutes / 60);
+  const minute = minutes % 60;
+  return { hour, minute, second: 0 };
+}
 
   setMinMaxDate(): void {
     const today = new Date();
@@ -111,6 +156,7 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
 
   private mapFormToReservation(): void {
     const { date, start_time, duration } = this.reservationFormData;
+    this.updateDynamicDurations(date);
 
     if (this.compareTime(duration, this.minDuration,true) ||
       this.compareTime(this.maxDuration, duration, true)) {
@@ -150,10 +196,16 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
     endDateTime.setHours(endDateTime.getHours() + duration.hour);
     endDateTime.setMinutes(endDateTime.getMinutes() + duration.minute);
 
-    const dayOfWeek = startDateTime.getDay();
-    const openingTime = dayOfWeek >= 1 && dayOfWeek <= 5 ? '10:00' : '12:00';
-    const closingTime = dayOfWeek >= 1 && dayOfWeek <= 5 ? '22:00' : '24:00';
+    let dayOfWeek = (new Date(date).getDay() - 1) % 7;
+    if (dayOfWeek === -1) {
+      dayOfWeek = 6; // niedziela
+    }
+    const openingTime = this.settings.find(setting => setting.day_of_week === dayOfWeek)?.opening_time || '10:00';
+    let closingTime = this.settings.find(setting => setting.day_of_week === dayOfWeek)?.closing_time || '22:00';
 
+    if( closingTime === '00:00') {
+      closingTime = '24:00';
+    }
     const [openingHours, openingMinutes] = openingTime.split(':').map(Number);
     const [closingHours, closingMinutes] = closingTime.split(':').map(Number);
 
@@ -165,6 +217,8 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
     
     const lastOpeningDateTime = new Date(startDateTime);
     lastOpeningDateTime.setHours(closingHours-1, closingMinutes+30); // Rezerwacja musi kończyć się na 30 minut przed zamknięciem
+
+    this.updateDynamicDurations(date);
 
     return (
       startDateTime >= openingDateTime &&
@@ -192,6 +246,53 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
     });
   }
 
+  private setDefaultDateTime(): void {
+    const now = new Date();
+  
+    // Get the current day of the week
+    let dayOfWeek = (now.getDay() - 1) % 7;
+    if (dayOfWeek === -1) dayOfWeek = 6; // Handle Sunday
+    
+    // Get today's opening and closing times
+    const todaySettings = this.settings.find(setting => setting.day_of_week === dayOfWeek);
+    let openingTime = todaySettings?.opening_time || '10:00';
+    let closingTime = todaySettings?.closing_time || '22:00';
+  
+    // Adjust closing time if it's 00:00
+    if (closingTime === '00:00') closingTime = '24:00';
+  
+    const [openingHour, openingMinute] = openingTime.split(':').map(Number);
+    const [closingHour, closingMinute] = closingTime.split(':').map(Number);
+  
+    const openingDateTime = new Date(now);
+    openingDateTime.setHours(openingHour, openingMinute, 0);
+  
+    const closingDateTime = new Date(now);
+    closingDateTime.setHours(closingHour, closingMinute, 0);
+  
+    if (now >= closingDateTime) {
+      // If it's after closing time, set to the next day's opening time
+      now.setDate(now.getDate() + 1);
+      dayOfWeek = (now.getDay() - 1) % 7;
+      if (dayOfWeek === -1) dayOfWeek = 6; // Handle Sunday
+      const nextDaySettings = this.settings.find(setting => setting.day_of_week === dayOfWeek);
+      openingTime = nextDaySettings?.opening_time || '10:00';
+      const [nextOpeningHour, nextOpeningMinute] = openingTime.split(':').map(Number);
+      now.setHours(nextOpeningHour, nextOpeningMinute, 0);
+    } else if (now < openingDateTime) {
+      // If it's before opening time, set to today's opening time
+      now.setHours(openingHour, openingMinute, 0);
+    } else {
+      // Otherwise, round up to the nearest full hour
+      now.setMinutes(0, 0, 0);
+      now.setHours(now.getHours() + 1);
+    }
+  
+    // Set default values in the form
+    this.reservationFormData.date = now.toISOString().slice(0, 10); // Format as YYYY-MM-DD
+    this.reservationFormData.start_time = now.toTimeString().slice(0, 5); // Format as HH:mm
+  }
+
   selectTable(tableId: number): void {
     if (!this.reservation.table_ids.includes(tableId)) {
       this.reservation.table_ids.push(tableId);
@@ -213,14 +314,35 @@ export class ReservationPageComponent implements OnInit, OnDestroy {
 
   getMinTime(date: string): string {
     if (!date) return '00:00';
-    const dayOfWeek = new Date(date).getDay();
-    return dayOfWeek === 0 || dayOfWeek === 6 ? '12:00' : '10:00';
+    let dayOfWeek = (new Date(date).getDay() - 1) % 7;
+    if (dayOfWeek === -1) {
+      dayOfWeek = 6; // niedziela
+    }
+    return this.settings.find(setting => setting.day_of_week === dayOfWeek)?.opening_time || '10:00';
   }
   
   getMaxTime(date: string): string {
     if (!date) return '23:59';
-    const dayOfWeek = new Date(date).getDay();
-    return dayOfWeek === 0 || dayOfWeek === 6 ? '23:30' : '21:30';
+    let dayOfWeek = (new Date(date).getDay() - 1) % 7;
+    if (dayOfWeek === -1) {
+      dayOfWeek = 6; // niedziela
+    }
+    const closingTime = this.settings.find(setting => setting.day_of_week === dayOfWeek)?.closing_time || '22:00';
+
+    // Rozdziel godzinę i minutę
+    const [hours, minutes] = closingTime.split(':').map(Number);
+
+    // Utwórz obiekt Date z godziny i minuty
+    const closingDateTime = new Date();
+    closingDateTime.setHours(hours, minutes, 0);
+
+    // Odejmij 30 minut
+    closingDateTime.setMinutes(closingDateTime.getMinutes() - 30);
+
+    // Zwróć czas w formacie HH:mm
+    const adjustedHours = closingDateTime.getHours().toString().padStart(2, '0');
+    const adjustedMinutes = closingDateTime.getMinutes().toString().padStart(2, '0');
+    return `${adjustedHours}:${adjustedMinutes}`;
   }
 
   compareTime(first: NgbTimeStruct, second: NgbTimeStruct, isOnlyBigger: boolean=false): boolean {

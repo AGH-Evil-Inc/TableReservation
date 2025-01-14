@@ -1,0 +1,22 @@
+type: object
+properties:
+  day_of_week:
+    type: integer
+  opening_time:
+    type: string
+    description: Opening time in HH:MM format
+    pattern: '^[0-2]\d:[0-5]\d$'
+    example: '09:00'
+  closing_time:
+    type: string
+    description: Closing time in HH:MM format
+    pattern: '^[0-2]\d:[0-5]\d$'
+    example: '23:00'
+  min_reservation_length:
+    type: integer
+    description: Minimum reservation length in minutes
+    example: 20
+  max_reservation_length:
+    type: integer
+    description: Maximum reservation length in minutes
+    example: 180
